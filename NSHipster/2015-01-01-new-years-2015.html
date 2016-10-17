@@ -1,0 +1,396 @@
+<div class="announce instapaper_body md" data-path="2015-01-01-new-years-2015.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>Reader Submissions -<br> New Year's 2015</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div>Reader Submissions</div></td>
+
+  <td><div>2014 was an incredible year professionally for Apple developers. With a deluge of new developments—both from Cupertino and the community at large—there were no shortage of interesting tidbits for readers to share.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>1.0</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>As we take a moment to reflect on our experiences over the past year, one thing is clear: 2014 was an incredible year professionally for Apple developers. So much has happened in such a short timespan, and yet it's hard to remember our relationship to Objective-C before Swift, or what APIs could have captivated our imagination as much as iOS 8 or WatchKit.</p>
+
+<p>It's an NSHipster tradition to ask you, dear readers, to <a href="https://gist.github.com/mattt/f00da093956f20945727">send in your favorite tips and tricks from the past year</a> for publication over the New Year's holiday. This year, with a deluge of new developments—both from Cupertino and the community at large—there were no shortage of interesting tidbits to share.</p>
+
+<p>Thanks to <a href="https://github.com/cmyr">Colin Rofls</a>, <a href="https://github.com/0xced">Cédric Luthi</a>, <a href="https://github.com/fpillet">Florent Pillet</a>, <a href="https://github.com/hborders">Heath Borders</a>, <a href="https://github.com/zobkiw">Joe Zobkiw</a>, <a href="https://github.com/jonfriskics">Jon Friskics</a>, <a href="https://github.com/incanus">Justin Miller</a>, <a href="https://github.com/marcinmatczuk">Marcin Matczuk</a>, <a href="https://github.com/Konrad77">Mikael Konradsson</a>, <a href="https://github.com/NSProgrammer">Nolan O'Brien</a>, <a href="https://github.com/CodaFi">Robert Widmann</a>, <a href="https://github.com/palewar">Sachin Palewar</a>, <a href="https://github.com/defagos">Samuel Defago</a>, <a href="https://github.com/bitops">Sebastian Wittenkamp</a>, <a href="https://github.com/shpakovski">Vadim Shpakovski</a>, and <a href="https://github.com/kazmasaurus">Zak Remer</a> for their contributions.</p>
+
+<hr>
+
+<h2><a id="user-content-the-secret-lives-of-member-functions" class="anchor" href="#the-secret-lives-of-member-functions" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>The Secret Lives of Member Functions</h2>
+
+<p>From <a href="https://github.com/CodaFi">Robert Widmann</a>:</p>
+
+<blockquote>
+<p>Member functions on Swift classes and structures always have the following type when used statically:</p>
+</blockquote>
+
+<pre><code>Object -&gt; (Args) -&gt; Thing
+</code></pre>
+
+<p>For example, you can call <code>reverse()</code> on an array in two ways:</p>
+
+<div class="highlight highlight-source-swift"><pre>[<span class="pl-c1">1</span>, <span class="pl-c1">2</span>, <span class="pl-c1">3</span>, <span class="pl-c1">4</span>]<span class="pl-k">.</span><span class="pl-c1">reverse</span>()
+<span class="pl-c1">Array</span><span class="pl-k">.</span><span class="pl-c1">reverse</span>([<span class="pl-c1">1</span>, <span class="pl-c1">2</span>, <span class="pl-c1">3</span>, <span class="pl-c1">4</span>])()</pre></div>
+
+<h2><a id="user-content---for-boxing-c-strings" class="anchor" href="#--for-boxing-c-strings" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>@( )</code> for Boxing C-Strings</h2>
+
+<p>From <a href="https://github.com/defagos">Samuel Defago</a>:</p>
+
+<blockquote>
+<p>Given the fact that literals are most of the time associated with numbers and collections, I often forget that they work for UTF8-encoded <code>NULL</code>-terminated C-strings as well, especially when I write code using the runtime:</p>
+</blockquote>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSString</span> *propertyAttributesString =
+    @(<span class="pl-c1">property_getAttributes</span>(<span class="pl-c1">class_getProperty</span>([NSObject <span class="pl-c1">class</span>], <span class="pl-s"><span class="pl-pds">"</span>description<span class="pl-pds">"</span></span>)));
+<span class="pl-c">// T@"NSString",R,C</span></pre></div>
+
+<h2><a id="user-content-amibeingdebugged" class="anchor" href="#amibeingdebugged" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>AmIBeingDebugged</h2>
+
+<p><a href="https://github.com/NSProgrammer">Nolan O'Brien</a> brings the <code>AmIBeingDebugged</code> function to our attention from from <a href="https://developer.apple.com/library/mac/qa/qa1361/_index.html">this Technical Q&amp;A document</a>:</p>
+
+<div class="highlight highlight-source-objc"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>assert.h<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>stdbool.h<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>sys/types.h<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>unistd.h<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>sys/sysctl.h<span class="pl-pds">&gt;</span></span>
+
+<span class="pl-k">static</span> Bool <span class="pl-en">AmIBeingDebugged</span>(<span class="pl-k">void</span>) {
+    <span class="pl-k">int</span> mib[<span class="pl-c1">4</span>];
+    <span class="pl-k">struct</span> kinfo_proc info;
+    <span class="pl-c1">size_t</span> size = <span class="pl-k">sizeof</span>(info);
+
+    info.<span class="pl-smi">kp_proc</span>.<span class="pl-smi">p_flag</span> = <span class="pl-c1">0</span>;
+
+    mib[<span class="pl-c1">0</span>] = CTL_KERN;
+    mib[<span class="pl-c1">1</span>] = KERN_PROC;
+    mib[<span class="pl-c1">2</span>] = KERN_PROC_PID;
+    mib[<span class="pl-c1">3</span>] = <span class="pl-c1">getpid</span>();
+
+    <span class="pl-c1">sysctl</span>(mib, <span class="pl-k">sizeof</span>(mib) / <span class="pl-k">sizeof</span>(*mib), &amp;info, &amp;size, <span class="pl-c1">NULL</span>, <span class="pl-c1">0</span>);
+
+    <span class="pl-k">return</span> (info.<span class="pl-smi">kp_proc</span>.<span class="pl-smi">p_flag</span> &amp; P_TRACED) != <span class="pl-c1">0</span>;
+}</pre></div>
+
+<h2><a id="user-content-use-lazy-variables" class="anchor" href="#use-lazy-variables" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Use Lazy Variables</h2>
+
+<p>From <a href="https://github.com/cmyr">Colin Rofls</a>:</p>
+
+<blockquote>
+<p>Optionals should be avoided. Implicitly unwrapped optionals should be strongly avoided. Want to declare a var but don't necessarily have an initial value at init time? Use the lazy keyword, and just don't call the getter before you have your real value.</p>
+</blockquote>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">lazy</span> <span class="pl-k">var</span> someModelStructure <span class="pl-k">=</span> ExpensiveClass()</pre></div>
+
+<blockquote>
+<p>If you call <code>set</code> on this var without having ever called the getter, the lazy expression is never evaluated. Great for references to views that you don't necessarily want to init until viewDidLoad, for instance.</p>
+</blockquote>
+
+<h2><a id="user-content-accessing-child-controllers-inserted-into-storyboard-container-views" class="anchor" href="#accessing-child-controllers-inserted-into-storyboard-container-views" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Accessing Child Controllers Inserted Into Storyboard Container Views</h2>
+
+<p>From <a href="https://github.com/shpakovski">Vadim Shpakovski</a>:</p>
+
+<blockquote>
+<p>Here is a convenient way to access child controllers inserted into Storyboard container views:</p>
+</blockquote>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c">// 1. A property has the same name as a segue identifier in XIB</span>
+@property (nonatomic) ChildViewController1 *childController1;
+@property (nonatomic) ChildViewController2 *childController2;
+
+<span class="pl-c">// #pragma mark - UIViewController</span>
+
+- (<span class="pl-k">void</span>)prepareForSegue:(UIStoryboardSegue *)segue
+                 sender:(<span class="pl-c1">id</span>)sender
+{
+    [<span class="pl-v">super</span> <span class="pl-c1">prepareForSegue:</span>segue <span class="pl-c1">sender:</span>sender];
+
+    <span class="pl-c">// 2. All known destination controllers assigned to properties</span>
+    <span class="pl-k">if</span> ([<span class="pl-v">self</span> <span class="pl-c1">respondsToSelector:</span><span class="pl-c1">NSSelectorFromString</span>(segue.identifier)]) {
+        [<span class="pl-v">self</span> <span class="pl-c1">setValue:</span>segue.destinationViewController <span class="pl-c1">forKey:</span>segue.identifier];
+    }
+}
+
+- (<span class="pl-k">void</span>)viewDidLoad {
+    [<span class="pl-v">super</span> <span class="pl-c1">viewDidLoad</span>];
+
+    <span class="pl-c">// 3. Controllers already available bc viewDidLoad is called after prepareForSegue</span>
+    self.<span class="pl-smi">childController1</span>.<span class="pl-smi">view</span>.<span class="pl-smi">backgroundColor</span> = [UIColor <span class="pl-c1">redColor</span>];
+    self.<span class="pl-smi">childController2</span>.<span class="pl-smi">view</span>.<span class="pl-smi">backgroundColor</span> = [UIColor <span class="pl-c1">blueColor</span>];
+}</pre></div>
+
+<h2><a id="user-content-re-run-without-re-building" class="anchor" href="#re-run-without-re-building" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Re-Run without Re-Building</h2>
+
+<p>From <a href="https://github.com/hborders">Heath Borders</a>:</p>
+
+<blockquote>
+<p>If you're repeatedly debugging the same problem over and over, you can run your app without rebuilding with "Product &gt; Perform Action &gt; Run without Building" (<code>⌘⌃R</code>).</p>
+</blockquote>
+
+<h2><a id="user-content-quick-access-to-playground-resources" class="anchor" href="#quick-access-to-playground-resources" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Quick Access to Playground Resources</h2>
+
+<p>From <a href="https://github.com/jonfriskics">Jon Friskics</a>:</p>
+
+<blockquote>
+<p>Swift Playgrounds all share the same Shared Playground Data folder that's symlinked to <code>/Users/HOME/Documents/Shared Playground Data</code>.</p>
+
+<p>If you like using lots of Playgrounds, you'll want to organize the data that each Playground is using into subfolders of that shared folder, but then you've got to let the Playground know where to look. Here's a helper function that I use that makes that easy:</p>
+</blockquote>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">func</span> <span class="pl-en">pathToFileInSharedSubfolder</span>(file: <span class="pl-c1">String</span>) <span class="pl-k">-&gt;</span> <span class="pl-c1">String</span> {
+    <span class="pl-k">return</span> XCPSharedDataDirectoryPath <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">"</span>/<span class="pl-pds">"</span></span> <span class="pl-k">+</span> NSProcessInfo<span class="pl-k">.</span>processInfo()<span class="pl-k">.</span>processName <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">"</span>/<span class="pl-pds">"</span></span> <span class="pl-k">+</span> file
+}</pre></div>
+
+<blockquote>
+<p>That processName property in NSProcessInfo contains the name of the Playground file, so as long as you have already created a sub-folder in the Shared Playground Data folder with the same name you can access those files pretty easily, like reading local JSON:</p>
+</blockquote>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">var</span> jsonReadError:NSError?
+<span class="pl-k">let</span> jsonData <span class="pl-k">=</span> NSFileManager<span class="pl-k">.</span>defaultManager()<span class="pl-k">.</span>contentsAtPath(pathToFileInSharedSubfolder(<span class="pl-s"><span class="pl-pds">"</span>data.json<span class="pl-pds">"</span></span>))<span class="pl-k">!</span>
+<span class="pl-k">let</span> jsonArray <span class="pl-k">=</span> NSJSONSerialization<span class="pl-k">.</span>JSONObjectWithData(jsonData, options: <span class="pl-c1">nil</span>, error: <span class="pl-k">&amp;</span>jsonReadError) <span class="pl-k">as</span> [<span class="pl-c1">AnyObject</span>]</pre></div>
+
+<blockquote>
+<p>...or pulling out a local image:</p>
+</blockquote>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> imageView <span class="pl-k">=</span> UIImageView()
+imageView<span class="pl-k">.</span>image <span class="pl-k">=</span> UIImage(contentsOfFile: pathToFileInSharedSubfolder(<span class="pl-s"><span class="pl-pds">"</span>image.png<span class="pl-pds">"</span></span>))</pre></div>
+
+<hr>
+
+<p>The rest of this year's reader submissions come from <a href="https://github.com/0xced">Cédric Luthi</a>, who (as in <a href="http://nshipster.com/new-years-2014/">years</a> <a href="http://nshipster.com/reader-submissions-new-years-2013/">past</a>) contributed a payload of tips and tricks worthy of an entire article unto themselves. Thanks so much for these, Cédric!</p>
+
+<h2><a id="user-content-cocoapods-exposed" class="anchor" href="#cocoapods-exposed" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>CocoaPods, Exposed!</h2>
+
+<blockquote>
+<p>Here's a quick way to check all the pods used by a (closed source) app:</p>
+</blockquote>
+
+<p><code>$ class-dump -C Pods_ /Applications/Squire.app | grep -o "Pods_\w+"</code></p>
+
+<h2><a id="user-content-create_infoplist_section_in_binary" class="anchor" href="#create_infoplist_section_in_binary" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>CREATE_INFOPLIST_SECTION_IN_BINARY</code></h2>
+
+<blockquote>
+<p>Check out the <code>CREATE_INFOPLIST_SECTION_IN_BINARY</code> Xcode setting for command-line apps. It's much easier to use than the <code>-sectcreate __TEXT __info_plist</code> linker flag and it embeds the processed Info.plist file into the binary.</p>
+
+<p>It's also a lesson on filing radars. This feature request was filed as <code>rdar://4722772</code> in 2006 and was addressed about 7 years later.</p>
+</blockquote>
+
+<h2><a id="user-content-stop-dylib-hooking" class="anchor" href="#stop-dylib-hooking" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Stop dylib Hooking</h2>
+
+<blockquote>
+<p>Make hackers' lives tougher with <a href="https://twitter.com/dirk_gently/status/481075149437804544">this trick from Sam Marshall</a>:</p>
+
+<blockquote>
+<p>Add this one line to your "Other Linker Flags":</p>
+</blockquote>
+</blockquote>
+
+<p><code>-Wl,-sectcreate,__RESTRICT,__restrict,/dev/null</code></p>
+
+<h2><a id="user-content-nsbundle--preferredlocalizations" class="anchor" href="#nsbundle--preferredlocalizations" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>NSBundle -preferredLocalizations</h2>
+
+<blockquote>
+<p>Sometimes, you need to know which language your app is running in. Often, people will use <code>NSLocale +preferredLanguages</code>. Unfortunately this tells nothing about the language the app is actually displaying. It will just give you the ordered list as found in "Settings → General → Language &amp; Region → Preferred Language" Order on iOS, or "System Preferences → Language &amp; Region → Preferred Languages" on OS X.</p>
+
+<p>Imagine that the preferred language order is <code>{English, French}</code> but your app is German only. Calling <code>[[NSLocale preferredLanguages] firstObject]</code> will give you English when you want German.</p>
+
+<p>The proper way to get the actual language used by the app is to use <code>[[NSBundle mainBundle] preferredLocalizations]</code>.</p>
+</blockquote>
+
+<p>From the documentation:</p>
+
+<blockquote>
+<blockquote>
+<p>An array of <code>NSString</code> objects containing language IDs for localizations in the bundle. The strings are ordered according to the user's language preferences and available localizations.</p>
+</blockquote>
+</blockquote>
+
+<p>From a comment in <code>NSBundle.h</code>:</p>
+
+<blockquote>
+<blockquote>
+<p>A subset of this bundle's localizations, re-ordered into the preferred order for this process's current execution environment; the main bundle's preferred localizations indicate the language (of text) the user is most likely seeing in the UI</p>
+</blockquote>
+
+<p>You may also need to use <code>NSLocale +canonicalLanguageIdentifierFromString:</code> in order to ensure a canonical language identifier.</p>
+</blockquote>
+
+<h2><a id="user-content-preserve-sdk-headers" class="anchor" href="#preserve-sdk-headers" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Preserve SDK Headers</h2>
+
+<blockquote>
+<p>If you are installing Xcode from the dmg, check out <a href="https://twitter.com/joar_at_work/statuses/472986684196278272">this technique by Joar Wingfors</a> in order to avoid to accidentally modifying SDK headers by preserving ownership, permissions and hard links:</p>
+</blockquote>
+
+<p><code>$ sudo ditto /Volumes/Xcode/Xcode.app /Applications/Xcode.app</code></p>
+
+<h2><a id="user-content-inspecting-void--instance-variables" class="anchor" href="#inspecting-void--instance-variables" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Inspecting <code>void *</code> Instance Variables</h2>
+
+<blockquote>
+<p>For reverse engineering purpose, it's often useful to look at instance variables of objects. It's usually pretty easy to do so with <code>valueForKey:</code>, since very few classes override <code>+accessInstanceVariablesDirectly</code> to disable ivar access through Key-Value Coding.</p>
+
+<p>There's one case where it doesn't work though: when the ivar has a <code>void *</code> type.</p>
+
+<p>Here is an excerpt of the MediaPlayer framework class-dump on iOS 6.1:</p>
+</blockquote>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-k">@interface</span> <span class="pl-en">MPMoviePlayerController</span> : <span class="pl-e">NSObject</span> &lt;MPMediaPlayback&gt;
+{
+    <span class="pl-k">void</span> *_internal;    <span class="pl-c">// 4 = 0x4</span>
+    <span class="pl-c1">BOOL</span> _readyForDisplay;  <span class="pl-c">// 8 = 0x8</span>
+}</pre></div>
+
+<blockquote>
+<p>Since <code>id internal = [moviePlayerController valueForKey:@"internal"]</code> doesn't work, here is the hardcore way to access the internal ivar:</p>
+</blockquote>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">id</span> internal = *((<span class="pl-k">const</span> <span class="pl-c1">id</span>*)(<span class="pl-k">void</span>*)((<span class="pl-c1">uintptr_t</span>)moviePlayerController + <span class="pl-k">sizeof</span>(<span class="pl-c1">Class</span>)));</pre></div>
+
+<blockquote>
+<p>Don't ship this code, its's very fragile because the ivar layout may change. Use this for reverse engineering only!</p>
+</blockquote>
+
+<h2><a id="user-content-nsdateformatter-dateformatfromtemplateoptionslocale" class="anchor" href="#nsdateformatter-dateformatfromtemplateoptionslocale" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>NSDateFormatter +dateFormatFromTemplate:options:locale:</code></h2>
+
+<blockquote>
+<p>A friendly reminder that if you are using <code>NSDateFormatter -setDateFormat:</code> without <code>NSDateFormatter +dateFormatFromTemplate:options:locale:</code>, you're probably doing it wrong.</p>
+
+<p>From the <a href="https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSDateFormatter_Class/#//apple_ref/occ/clm/NSDateFormatter/dateFormatFromTemplate:options:locale">documentation</a>:</p>
+</blockquote>
+
+<div class="highlight highlight-source-objc"><pre>+ (<span class="pl-c1">NSString</span> *)dateFormatFromTemplate:(<span class="pl-c1">NSString</span> *)template
+                             options:(<span class="pl-c1">NSUInteger</span>)opts
+                              locale:(<span class="pl-c1">NSLocale</span> *)locale</pre></div>
+
+<blockquote>
+<blockquote>
+<p>Different locales have different conventions for the ordering of date components. You use this method to get an appropriate format string for a given set of components for a specified locale (typically you use the current locale—see currentLocale).</p>
+
+<p>The following example shows the difference between the date formats for British and American English:</p>
+</blockquote>
+</blockquote>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSLocale</span> *usLocale = [[<span class="pl-c1">NSLocale</span> <span class="pl-c1">alloc</span>] <span class="pl-c1">initWithLocaleIdentifier:</span><span class="pl-s"><span class="pl-pds">@"</span>en_US<span class="pl-pds">"</span></span>];
+<span class="pl-c1">NSLocale</span> *gbLocale = [[<span class="pl-c1">NSLocale</span> <span class="pl-c1">alloc</span>] <span class="pl-c1">initWithLocaleIdentifier:</span><span class="pl-s"><span class="pl-pds">@"</span>en_GB<span class="pl-pds">"</span></span>];
+
+<span class="pl-c1">NSString</span> *dateFormat;
+<span class="pl-c1">NSString</span> *dateComponents = <span class="pl-s"><span class="pl-pds">@"</span>yMMMMd<span class="pl-pds">"</span></span>;
+
+dateFormat = [<span class="pl-c1">NSDateFormatter</span> <span class="pl-c1">dateFormatFromTemplate:</span>dateComponents <span class="pl-c1">options:</span><span class="pl-c1">0</span> <span class="pl-c1">locale:</span>usLocale];
+<span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span>Date format for <span class="pl-c1">%@</span>: <span class="pl-c1">%@</span><span class="pl-pds">"</span></span>,
+    [usLocale <span class="pl-c1">displayNameForKey:</span><span class="pl-c1">NSLocaleIdentifier</span> <span class="pl-c1">value:</span>[usLocale <span class="pl-c1">localeIdentifier</span>]], dateFormat);
+
+dateFormat = [<span class="pl-c1">NSDateFormatter</span> <span class="pl-c1">dateFormatFromTemplate:</span>dateComponents <span class="pl-c1">options:</span><span class="pl-c1">0</span> <span class="pl-c1">locale:</span>gbLocale];
+<span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span>Date format for <span class="pl-c1">%@</span>: <span class="pl-c1">%@</span><span class="pl-pds">"</span></span>,
+    [gbLocale <span class="pl-c1">displayNameForKey:</span><span class="pl-c1">NSLocaleIdentifier</span> <span class="pl-c1">value:</span>[gbLocale <span class="pl-c1">localeIdentifier</span>]], dateFormat);
+
+<span class="pl-c">// Output:</span>
+<span class="pl-c">// Date format for English (United States): MMMM d, y</span>
+<span class="pl-c">// Date format for English (United Kingdom): d MMMM y</span></pre></div>
+
+<h2><a id="user-content-deriving-internal-constants-with-the-debugger" class="anchor" href="#deriving-internal-constants-with-the-debugger" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Deriving Internal Constants with the Debugger</h2>
+
+<blockquote>
+<p>Recently, <a href="https://twitter.com/myell0w/">Matthias Tretter</a> asked on Twitter:</p>
+</blockquote>
+
+<blockquote lang="en"><p>Does anyone know the default animation duration and springs for modal viewController presentation on iOS 8?</p>— Matthias Tretter (@myell0w) <a href="https://twitter.com/myell0w/status/535775373729234944">November 21, 2014</a></blockquote>
+
+
+
+<blockquote>
+<p>Search for duration in a class-dump of UIKit, find the <code>UITransitionView +defaultDurationForTransition:</code> method, and set a breakpoint for that method:</p>
+</blockquote>
+
+<pre><code>(lldb) br set -n "+[UITransitionView defaultDurationForTransition:]"
+</code></pre>
+
+<blockquote>
+<p>Present a modal view controller, you will hit the breakpoint, type <code>finish</code> to execute the method:</p>
+</blockquote>
+
+<pre><code>(lldb) finish
+</code></pre>
+
+<blockquote>
+<p>At that point <code>defaultDurationForTransition:</code> has executed, and you can read the result (it's in the <code>xmm0</code> register):</p>
+</blockquote>
+
+<pre><code>(lldb) register read xmm0 --format float64
+    xmm0 = {0.4 0}
+</code></pre>
+
+<blockquote>
+<p>Answer: the default duration is 0.4s.</p>
+</blockquote>
+
+<h2><a id="user-content-diy-weak-associated-objects" class="anchor" href="#diy-weak-associated-objects" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>DIY Weak Associated Objects</h2>
+
+<blockquote>
+<p>Unfortunately, the associated objects <code>OBJC_ASSOCIATION_ASSIGN</code> policy does not support zeroing weak references. Fortunately, it's quite easy to implement yourself. You just need a simple class to wrap an object with a weak reference:</p>
+</blockquote>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-k">@interface</span> <span class="pl-en">WeakObjectContainter</span> : <span class="pl-e">NSObject</span>
+<span class="pl-k">@property</span> (<span class="pl-k">nonatomic</span>, <span class="pl-k">readonly</span>, <span class="pl-k">weak</span>) <span class="pl-c1">id</span> object;
+<span class="pl-k">@end</span>
+
+<span class="pl-k">@implementation</span> <span class="pl-en">WeakObjectContainter</span>
+- (<span class="pl-k">instancetype</span>)<span class="pl-en">initWithObject</span><span class="pl-en">:</span>(<span class="pl-c1">id</span>)<span class="pl-smi">object</span> {
+    self = [<span class="pl-v">super</span> <span class="pl-c1">init</span>];
+    <span class="pl-k">if</span> (!self) {
+        <span class="pl-k">return</span> <span class="pl-c1">nil</span>;
+    }
+
+    self.<span class="pl-smi">object</span> = object;
+
+    <span class="pl-k">return</span> self;
+}
+<span class="pl-k">@end</span></pre></div>
+
+<blockquote>
+<p>Then, associate the <code>WeakObjectContainter</code> with <code>OBJC_ASSOCIATION_RETAIN(_NONATOMIC):</code></p>
+</blockquote>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">objc_setAssociatedObject</span>(self, &amp;MyKey, [[WeakObjectContainter <span class="pl-c1">alloc</span>] <span class="pl-c1">initWithObject:</span>object], <span class="pl-c1">OBJC_ASSOCIATION_RETAIN_NONATOMIC</span>);</pre></div>
+
+<blockquote>
+<p>Use the <code>object</code> property to access it in order to get a zeroing weak reference to the desired object:</p>
+</blockquote>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">id</span> object = [<span class="pl-c1">objc_getAssociatedObject</span>(<span class="pl-v">self</span>, &amp;MyKey) <span class="pl-c1">object</span>];</pre></div>
+
+<hr>
+
+<p>And with that, we bring in a brand new year of possibilities and opportunities. Happy 2015, everyone!</p>
+
+<p>May your code continue to compile and inspire.</p>
+</article></div>

@@ -1,0 +1,177 @@
+<div class="announce instapaper_body md" data-path="2014-09-02-swift-default-protocol-implementations.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>tags</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>Swift Default Protocol Implementations</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div>Swift</div></td>
+
+  <td><div>swift</div></td>
+
+  <td><div>Protocols are the foundation of generics in Swift, but suffer from the lack of a built-in way to provide default implementations for methods. However, there is an interesting workaround in Swift that you probably haven't noticed.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>1.2</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>Swift was announced 3 months ago to the day. For many of us, it was among the most shocking and exciting events in our professional lives. In these intervening months, it's safe to say our collective understanding and appreciation of the language has evolved and changed significantly.</p>
+
+<p>First came the infatuation period. We fixated on appearances, on surface-level features like Unicode support (<code>let 🐶🐮</code>!) and its new, streamlined syntax. Hell, even its <em>name</em> was objectively better than its predecessor's.</p>
+
+<p>Within a few weeks, though, after having a chance to go through the Swift manual a few times, we started to understand the full implications of this new multi-paradigm language. All of those folks who had affected the zealotry of functional programmers in order to sound smarter (generics!) learned enough to start backing it up. We finally got the distinction between <code>class</code> and <code>struct</code> down, and picked up a few tricks like <a href="http://nshipster.com/swift-operators/">custom operators</a> and <a href="http://nshipster.com/swift-literal-convertible/">literal convertibles</a> along the way. All of that initial excitement could now be channeled productively into apps and libraries and tutorials.</p>
+
+<p>Next week's announcement effectively marks the end of the summer for iOS &amp; OS X developers. It's time to reign in our experimentation and start shipping again.</p>
+
+<p>But hey, we have another few days before things get real again. Let's learn a few more things:</p>
+
+<hr>
+
+<p>Generics are the defining feature of Swift. Working in coordination with the language's powerful type system, a developer can write safer and more performant code than was ever possible with Objective-C.</p>
+
+<p>The underlying mechanism for generics are protocols. A Swift protocol, like an Objective-C <a href="https://developer.apple.com/library/ios/documentation/Cocoa/Conceptual/ProgrammingWithObjectiveC/WorkingwithProtocols/WorkingwithProtocols.html"><code>@protocol</code></a> declares methods and properties to be implemented in order to conform to it.</p>
+
+<blockquote>
+<p>Within the Object-Oriented paradigm, types are often conflated with class identity. <strong>When programming in Swift, though, think about polymorphism through <em>protocols</em> first, before resorting to inheritance.</strong></p>
+</blockquote>
+
+<p>The one major shortcoming of protocols, both in Swift and Objective-C, is the lack of a built-in way to provide default implementations for methods, as one might accomplish in other languages with <a href="http://en.wikipedia.org/wiki/Mixin">mixins</a> or <a href="http://en.wikipedia.org/wiki/Trait_%28computer_programming%29">traits</a>.</p>
+
+<p>...but that's not the end of the story. Swift is a fair bit more <a href="http://en.wikipedia.org/wiki/Aspect-oriented_programming">Aspect-Oriented</a> than it initially lets on.</p>
+
+<p>Consider the <code>Equatable</code> protocol, used throughout the standard library:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">protocol</span> <span class="pl-c1">Equatable</span> {
+    <span class="pl-k">func</span> <span class="pl-en">==</span>(lhs: <span class="pl-k">Self</span>, rhs: <span class="pl-k">Self</span>) <span class="pl-k">-&gt;</span> <span class="pl-c1">Bool</span>
+}</pre></div>
+
+<p>Given an <code>Article</code> <code>struct</code> with a <code>title</code> and <code>body</code> field, implementing <code>Equatable</code> is straightforward:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">struct</span> Article {
+    <span class="pl-k">let</span> title: <span class="pl-c1">String</span>
+    <span class="pl-k">let</span> body: <span class="pl-c1">String</span>
+}
+
+<span class="pl-k">extension</span> Article: <span class="pl-c1">Equatable</span> {}
+
+<span class="pl-k">func</span> <span class="pl-en">==</span>(lhs: Article, rhs: Article) <span class="pl-k">-&gt;</span> <span class="pl-c1">Bool</span> {
+    <span class="pl-k">return</span> lhs<span class="pl-k">.</span>title <span class="pl-k">==</span> rhs<span class="pl-k">.</span>title <span class="pl-k">&amp;&amp;</span> lhs<span class="pl-k">.</span>body <span class="pl-k">==</span> rhs<span class="pl-k">.</span>body
+}</pre></div>
+
+<p>With everything in place, let's show <code>Equatable</code> in action:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> title <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>Swift Custom Operators: Syntactic Sugar or Menace to Society?<span class="pl-pds">"</span></span>
+<span class="pl-k">let</span> body <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>...<span class="pl-pds">"</span></span>
+
+<span class="pl-k">let</span> a <span class="pl-k">=</span> Article(title: title, body: body)
+<span class="pl-k">let</span> b <span class="pl-k">=</span> Article(title: title, body: body)
+
+a <span class="pl-k">==</span> b <span class="pl-c">// true</span>
+a <span class="pl-k">!=</span> b <span class="pl-c">// false</span></pre></div>
+
+<p>Wait... where did <code>!=</code> come from?</p>
+
+<p><code>!=</code> isn't defined by the <code>Equatable</code> protocol, and it's certainly not implemented for <code>Article</code>. So what's going on?</p>
+
+<p><code>!=</code> is actually drawing its implementation from this function in the standard library:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">func</span> <span class="pl-en">!=</span>&lt;T <span class="pl-k">:</span> <span class="pl-c1">Equatable</span>&gt;(lhs: T, rhs: T) <span class="pl-k">-&gt;</span> <span class="pl-c1">Bool</span></pre></div>
+
+<p>Because <code>!=</code> is implemented as a generic function for <code>Equatable</code>, any type that conforms to <code>Equatable</code>, including <code>Article</code>, automatically gets the <code>!=</code> operator as well.</p>
+
+<p>If we really wanted to, we could override the implementation of <code>!=</code>:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">func</span> <span class="pl-en">!=</span>(lhs: Article, rhs: Article) <span class="pl-k">-&gt;</span> <span class="pl-c1">Bool</span> {
+    <span class="pl-k">return</span> <span class="pl-k">!</span>(lhs <span class="pl-k">==</span> rhs)
+}</pre></div>
+
+<p>For equality, it's unlikely that we could offer something more efficient than the negation of the provided <code>==</code> check, but this might make sense in other cases. Swift's type inference system allows more specific declarations to trump any generic or implicit candidates.</p>
+
+<p>The standard library uses generic operators all over the place, like for bitwise operations:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">protocol</span> <span class="pl-c1">BitwiseOperationsType</span> {
+    <span class="pl-k">func</span> <span class="pl-en">&amp;</span>(_: <span class="pl-k">Self</span>, _: <span class="pl-k">Self</span>) <span class="pl-k">-&gt;</span> Self
+    <span class="pl-k">func</span> <span class="pl-en">|</span>(_: <span class="pl-k">Self</span>, _: <span class="pl-k">Self</span>) <span class="pl-k">-&gt;</span> Self
+    <span class="pl-k">func</span> <span class="pl-en">^</span>(_: <span class="pl-k">Self</span>, _: <span class="pl-k">Self</span>) <span class="pl-k">-&gt;</span> Self
+    <span class="pl-k">prefix</span> <span class="pl-k">func</span> <span class="pl-en">~</span>(_: <span class="pl-k">Self</span>) <span class="pl-k">-&gt;</span> Self
+
+    <span class="pl-k">class</span> <span class="pl-k">var</span> allZeros: <span class="pl-k">Self</span> { <span class="pl-k">get</span> }
+}</pre></div>
+
+<p>Implementing functionality in this way significantly reduces the amount of boilerplate code needed to build on top of existing infrastructure.</p>
+
+<h2><a id="user-content-default-implementation-of-methods" class="anchor" href="#default-implementation-of-methods" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Default Implementation of Methods</h2>
+
+<p>However, the aforementioned technique only really works for operators. Providing a default implementation of a protocol method is less convenient.</p>
+
+<p>Consider a protocol <code>P</code> with a method <code>m()</code> that takes a single <code>Int</code> argument:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">protocol</span> P {
+    <span class="pl-k">func</span> <span class="pl-en">m</span>(arg: <span class="pl-c1">Int</span>)
+}</pre></div>
+
+<p>The closest one can get to a default implementation is to provide a top-level generic function that takes explicit <code>self</code> as the first argument:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">protocol</span> P {
+    <span class="pl-k">func</span> <span class="pl-en">m</span>() /* {
+        f(<span class="pl-k">self</span>)
+    }*/
+}
+
+<span class="pl-k">func</span> <span class="pl-en">f</span>&lt;T: P&gt;(<span class="pl-en">_</span> <span class="pl-smi">arg</span>: T) {
+    <span class="pl-c">// ...</span>
+}</pre></div>
+
+<blockquote>
+<p>The commented-out code in the protocol helps communicate the provided functional implementation to the consumer.</p>
+</blockquote>
+
+<hr>
+
+<p>All of this highlights a significant tension between methods and functions in Swift.</p>
+
+<p>The Object-Oriented paradigm is based around the concept of objects that encapsulate both state and behavior. However, in Swift, it's simply impossible to implement certain generic functions as methods on the <code>struct</code> or <code>class</code> itself.</p>
+
+<p>Take, for instance, the <code>contains</code> method:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">func</span> <span class="pl-en">contains</span>&lt;S <span class="pl-k">:</span> <span class="pl-c1">SequenceType</span> <span class="pl-k">where</span> S<span class="pl-k">.</span>Generator<span class="pl-k">.</span>Element <span class="pl-k">:</span> <span class="pl-c1">Equatable</span>&gt;(seq: S, x: S<span class="pl-k">.</span>Generator<span class="pl-k">.</span>Element) <span class="pl-k">-&gt;</span> <span class="pl-c1">Bool</span></pre></div>
+
+<p>Because of the constraint on the element of the sequence generator being <code>Equatable</code>, this cannot be declared on a generic container, without thereby requiring elements in that collection to conform to <code>Equatable</code>.</p>
+
+<p>Relegating behavior like <code>contains</code>, <code>advance</code>, or <code>partition</code> to top-level functions does a  disservice to the standard library. Not only does it hide functionality from method autocompletion, but it fragments the API across a Object-Oriented and Functional paradigms.</p>
+
+<p>Although it's unlikely that this will be resolved in time for 1.0 (and there are certainly more pressing matters), there are a number of ways this could be resolved:</p>
+
+<ul>
+<li>Provide mixin or trait functionality that extend protocols to allow them to provide default implementations.</li>
+<li>Allow extensions with generic arguments, such that something like <code>extension Array&lt;T: Equatable&gt;</code> could define additional methods, like <code>func contains(x: T)</code>, that are only available to associated types that match a particular criteria.</li>
+<li>Automatically bridge function calls with <code>Self</code> as the first argument to be available as methods using implicit <code>self</code>.</li>
+</ul>
+</article></div>

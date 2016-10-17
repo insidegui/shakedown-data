@@ -1,0 +1,86 @@
+<div class="announce instapaper_body md" data-path="2013-04-15-nssecurecoding.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>NSSecureCoding</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div>Cocoa</div></td>
+
+  <td><div>A short post for this week: everything you need to know about NSSecureCoding.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>1.1</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>A short post for this week: everything you need to know about <code>NSSecureCoding</code>.</p>
+
+<hr>
+
+<p><code>NSSecureCoding</code> is a protocol introduced in the iOS 6 / OS X Mountain Lion SDKs. Aside from a few mentions at WWDC, <code>NSSecureCoding</code> remains relatively obscure—most developers have perhaps heard of it, but perhaps never went so far as to look up what it does.</p>
+
+<p><code>NSSecureCoding</code> extends the <code>NSCoding</code> protocol by adding the class method <code>supportsSecureCoding</code>:</p>
+
+<p>By conforming to <code>NSSecureCoding</code> and returning <code>YES</code> for <code>+supportsSecureCoding</code>, a class declares that it handles encoding and decoding of instances of itself in a way that guards against substitution attacks.</p>
+
+<p>Specifically, classes that override <code>-initWithCoder</code> and conform to <code>NSSecureCoding</code> should use <code>-decodeObjectOfClass:forKey:</code> rather than <code>-decodeObjectForKey:</code>.</p>
+
+<p>Why is this important? Recall that <code>NSCoding</code> is Foundation's way of marshaling objects to be either archived on a file system, or copied to another address space. When <code>-decodeObjectForKey:</code> is used to decode representations of objects into actual objects, there is no guarantee that the result of creating the object will be what was expected. If that representation is corrupted—specifically, in changing the target class (and thus designated initializer)—the application runs the risk of constructing unknown objects. Whether by malicious intent or an incidental coding error, this can cause serious problems.</p>
+
+<p>It's not an apples-to-apples comparison, but it's somewhat similar to <a href="http://tenderlovemaking.com/2013/02/06/yaml-f7u12.html">recent YAML exploit found in Rails</a>.</p>
+
+<p>For an <a href="http://developer.apple.com/library/mac/#documentation/MacOSX/Conceptual/BPSystemStartup/Chapters/CreatingXPCServices.html">XPC service</a>, which is designed with security in mind, data integrity of this nature is especially important. It's a safe bet that XPC will only wax influence in subsequent iOS and OS X releases, so it's good to keep this all in mind.</p>
+
+<p>Anyway, <code>NSSecureCoding</code> patches this vulnerability by establishing a contract for best practices. Now, decoding an object requires the class to be known ahead of time.</p>
+
+<p>Whereas a standard, secure implementation of <code>-initWithCoder:</code> might have a check like:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">if</span> <span class="pl-k">let</span> object <span class="pl-k">=</span> decoder<span class="pl-k">.</span>decodeObjectForKey(<span class="pl-s"><span class="pl-pds">"</span>key<span class="pl-pds">"</span></span>) <span class="pl-k">as?</span> SomeClass {
+    <span class="pl-c">// ...</span>
+}</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">id</span> obj = [decoder <span class="pl-c1">decodeObjectForKey:</span><span class="pl-s"><span class="pl-pds">@"</span>myKey<span class="pl-pds">"</span></span>];
+<span class="pl-k">if</span> (![obj <span class="pl-c1">isKindOfClass:</span>[MyClass <span class="pl-c1">class</span>]]) {
+  <span class="pl-c">// fail</span>
+}</pre></div>
+
+<p>...an <code>NSSecureCoding</code>-conforming class would use:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> object <span class="pl-k">=</span> decoder<span class="pl-k">.</span>decodeObjectOfClass(SomeClass<span class="pl-k">.</span><span class="pl-k">self</span>, forKey: <span class="pl-s"><span class="pl-pds">"</span>key<span class="pl-pds">"</span></span>) <span class="pl-k">as</span> SomeClass</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">id</span> obj = [decoder <span class="pl-c1">decodeObjectOfClass:</span>[MyClass <span class="pl-c1">class</span>]
+                               <span class="pl-c1">forKey:</span><span class="pl-s"><span class="pl-pds">@"</span>myKey<span class="pl-pds">"</span></span>];</pre></div>
+
+<p>Sometimes, a little API change makes all of the difference.</p>
+
+<hr>
+
+<p>So now you know what's up with <code>NSSecureCoding</code>. Perhaps not today, perhaps not tomorrow, but someday—you will probably need to implement <code>NSSecureCoding</code>. And when that day comes... you'll be ready.</p>
+
+<p>Stay safe, everyone.</p>
+</article></div>

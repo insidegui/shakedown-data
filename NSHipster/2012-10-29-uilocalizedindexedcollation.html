@@ -1,0 +1,211 @@
+<div class="announce instapaper_body md" data-path="2012-10-29-uilocalizedindexedcollation.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>tags</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>UILocalizedIndexedCollation</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div>Cocoa</div></td>
+
+  <td><div>nshipster</div></td>
+
+  <td><div>UITableView starts to become unwieldy once it gets to a few hundred rows. If users are reduced to frantically scratching at the screen like a cat playing Fruit Ninja in order to get at what they want... you may want to rethink your UI approach.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+
+  <th>reviewed</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>2.0</div></td>
+
+  <td><div>September 8, 2015</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>UITableView starts to become unwieldy once it gets to a few hundred rows. If users are reduced to frantically scratching at the screen like a <a href="http://www.youtube.com/watch?v=CdEBgZ5Y46U">cat playing Fruit Ninja</a> in order to get at what they want... you may want to rethink your UI approach.</p>
+
+<p>So, what are your options?</p>
+
+<p>Well, you could organize your data into a hierarchy, which could dramatically reduce the number of rows displayed on each screen in fashion, based on its <a href="http://en.wikipedia.org/wiki/Branching_factor">branching factor</a>.</p>
+
+<p>You could also add a <code>UISearchBar</code> to the top of your table view, allowing the user to filter on keywords to get exactly what they're looking for (or--perhaps more importantly--determine that what they seek doesn't exist in the first place).</p>
+
+<p>There is also a third approach, which is generally under-utilized in iOS applications: <strong>section index titles</strong>. These are the vertically flowing letters found along the right side of table views in your Address Book contacts list or Music library:</p>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/uilocalizedindexedcollation-example.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/uilocalizedindexedcollation-example.png" alt="Section Index Titles Example" style="max-width:100%;"></a></p>
+
+<p>As the user scrolls their finger down the list, the table view jumps to the corresponding section. Even the most tiresome table view is rendered significantly more usable as a result.</p>
+
+<p>Section index titles can be enabled by implementing the following <code>UITableViewDataSource</code> delegate methods:</p>
+
+<ul>
+<li><p><code>-sectionIndexTitlesForTableView:</code> - Returns an array of the section index titles to be displayed along the right hand side of the table view, such as the alphabetical list "A...Z" + "#". Section index titles are short--generally limited to 2 Unicode characters.</p></li>
+<li><p><code>-tableView:sectionForSectionIndexTitle:atIndex:</code> - Returns the section index that the table view should jump to when the user touches a particular section index title.</p></li>
+</ul>
+
+<p>As longtime readers of NSHipster doubtless have already guessed, the process of generating that alphabetical list is not something you would want to have to generate yourself. What it means to something to be alphabetically sorted, or even what is meant by an "alphabet" varies wildly across different locales.</p>
+
+<p>Coming to our rescue is <code>UILocalizedIndexedCollation</code>.</p>
+
+<hr>
+
+<p><code>UILocalizedIndexedCollation</code> is a class that helps to organize data in table views with section index titles in a locale-aware manner. Rather than creating the object directly, a shared instance corresponding to the current locale supported by your application is accessed, with <code>UILocalizedIndexedCollation +currentCollation</code></p>
+
+<p>The first task for <code>UILocalizedIndexedCollation</code> is to determine what section index titles to display for the current locale, which can be read from the <code>sectionIndexTitles</code> property.</p>
+
+<p>To give you a better idea of how section index titles vary between locales:</p>
+
+<blockquote>
+<p>In order to see these for yourself, you'll need to explicitly add the desired locales to your Project Localizations list.</p>
+</blockquote>
+
+<table><thead>
+<tr>
+<th>Locale</th>
+<th>Section Index Titles</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>en_US</td>
+<td><code>A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, #</code></td>
+</tr>
+<tr>
+<td>ja_JP</td>
+<td><code>A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, あ, か, さ, た, な, は, ま, や, ら, わ, #</code></td>
+</tr>
+<tr>
+<td>sv_SE</td>
+<td><code>A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, Å, Ä, Ö, #</code></td>
+</tr>
+<tr>
+<td>ko_KO</td>
+<td><code>A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, ㄱ, ㄴ, ㄷ, ㄹ, ㅁ, ㅂ, ㅅ, ㅇ, ㅈ, ㅊ, ㅋ, ㅌ, ㅍ, ㅎ, #</code></td>
+</tr>
+<tr>
+<td>AR_sa</td>
+<td>A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, آ, ب, ت, ث, ج, ح, خ, د, ذ, ر, ز, س, ش, ص, ض, ط, ظ, ع, غ, ف, ق, ك, ل, م, ن, ه, و, ي, #</td>
+</tr>
+</tbody></table>
+
+<p>Aren't you glad you don't have to do this yourself?</p>
+
+<p>So with the list of section titles laid out before you, the next step is to determine what section each object should be assigned to. This is accomplished with <code>-sectionForObject:collationStringSelector:</code>. This method returns the <code>NSInteger</code> index corresponding to the string value of the object when performing the specified selector. This selector might be something like <code>localizedName</code>, <code>title</code>, or even just <code>description</code>.</p>
+
+<p>So, as it stands, your table view data source has a NSArray property corresponding to the number of sections in the table view, with each element of the array containing an array representing each row in the section. Since collation was handled by <code>UILocalizedIndexedCollation</code>, it makes sense for it to sort the rows in each section as well. <code>– sortedArrayFromArray:collationStringSelector:</code> does this in similar fashion to <code>-sectionForObject:collationStringSelector:</code>, by sorting the objects in the section by their respective localized title.</p>
+
+<p>Finally, the table view should implement <code>-tableView:sectionForSectionIndexTitle:atIndex:</code>, so that touching a section index title jumps to the corresponding section in the table view. <code>UILocalizedIndexedCollation -sectionForSectionIndexTitleAtIndex:</code> does the trick.</p>
+
+<p>All told, here's what a typical table view data source implementation looks like:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">class</span> ObjectTableViewController: UITableViewController {
+    <span class="pl-k">let</span> collation <span class="pl-k">=</span> UILocalizedIndexedCollation<span class="pl-k">.</span>currentCollation()
+    <span class="pl-k">var</span> sections: [[<span class="pl-c1">AnyObject</span>]] <span class="pl-k">=</span> []
+    <span class="pl-k">var</span> objects: [<span class="pl-c1">AnyObject</span>] <span class="pl-k">=</span> [] {
+        <span class="pl-k">didSet</span> {
+            <span class="pl-k">let</span> selector: Selector <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>localizedTitle<span class="pl-pds">"</span></span>
+            sections <span class="pl-k">=</span> <span class="pl-c1">Array</span>(count: collation<span class="pl-k">.</span>sectionTitles<span class="pl-k">.</span><span class="pl-c1">count</span>, repeatedValue: [])
+
+            <span class="pl-k">let</span> sortedObjects <span class="pl-k">=</span> collation<span class="pl-k">.</span>sortedArrayFromArray(objects, collationStringSelector: selector)
+            <span class="pl-k">for</span> object <span class="pl-k">in</span> sortedObjects {
+                <span class="pl-k">let</span> sectionNumber <span class="pl-k">=</span> collation<span class="pl-k">.</span>sectionForObject(object, collationStringSelector: selector)
+                sections[sectionNumber]<span class="pl-k">.</span>append(object)
+            }
+
+            <span class="pl-k">self</span><span class="pl-k">.</span>tableView<span class="pl-k">.</span>reloadData()
+        }
+    }
+
+    <span class="pl-c">// MARK: UITableViewDelegate</span>
+
+    <span class="pl-k">override</span> <span class="pl-k">func</span> <span class="pl-en">tableView</span>(tableView: UITableView, <span class="pl-en">titleForHeaderInSection</span> <span class="pl-smi">section</span>: <span class="pl-c1">Int</span>) <span class="pl-k">-&gt;</span> <span class="pl-c1">String</span> {
+        <span class="pl-k">return</span> collation<span class="pl-k">.</span>sectionTitles[section]
+    }
+
+    <span class="pl-k">override</span> <span class="pl-k">func</span> <span class="pl-en">sectionIndexTitlesForTableView</span>(tableView: UITableView) <span class="pl-k">-&gt;</span> [<span class="pl-c1">String</span>] {
+        <span class="pl-k">return</span> collation<span class="pl-k">.</span>sectionIndexTitles
+    }
+
+    <span class="pl-k">override</span> <span class="pl-k">func</span> <span class="pl-en">tableView</span>(tableView: UITableView, <span class="pl-en">sectionForSectionIndexTitle</span> <span class="pl-smi">title</span>: <span class="pl-c1">String</span>, <span class="pl-en">atIndex</span> <span class="pl-smi">index</span>: <span class="pl-c1">Int</span>) <span class="pl-k">-&gt;</span> <span class="pl-c1">Int</span> {
+        <span class="pl-k">return</span> collation<span class="pl-k">.</span>sectionForSectionIndexTitleAtIndex(index)
+    }
+}</pre></div>
+
+<div class="highlight highlight-source-objc"><pre>- (<span class="pl-k">void</span>)setObjects:(<span class="pl-c1">NSArray</span> *)objects {
+    <span class="pl-c1">SEL</span> selector = <span class="pl-k">@selector</span>(<span class="pl-c1">localizedTitle</span>);
+    <span class="pl-c1">NSInteger</span> <span class="pl-c1">index</span>, sectionTitlesCount = [[[UILocalizedIndexedCollation <span class="pl-c1">currentCollation</span>] <span class="pl-c1">sectionTitles</span>] <span class="pl-c1">count</span>];
+
+    <span class="pl-c1">NSMutableArray</span> *mutableSections = [[<span class="pl-c1">NSMutableArray</span> <span class="pl-c1">alloc</span>] <span class="pl-c1">initWithCapacity:</span>sectionTitlesCount];
+    <span class="pl-k">for</span> (<span class="pl-c1">NSUInteger</span> idx = <span class="pl-c1">0</span>; idx &lt; sectionTitlesCount; idx++) {
+      [mutableSections <span class="pl-c1">addObject:</span>[<span class="pl-c1">NSMutableArray</span> <span class="pl-c1">array</span>]];
+    }
+
+    <span class="pl-k">for</span> (<span class="pl-c1">id</span> object in objects) {
+      <span class="pl-c1">NSInteger</span> sectionNumber = [[UILocalizedIndexedCollation <span class="pl-c1">currentCollation</span>] <span class="pl-c1">sectionForObject:</span>object <span class="pl-c1">collationStringSelector:</span>selector];
+      [[mutableSections <span class="pl-c1">objectAtIndex:</span>sectionNumber] <span class="pl-c1">addObject:</span>object];
+    }
+
+    <span class="pl-k">for</span> (<span class="pl-c1">NSUInteger</span> idx = <span class="pl-c1">0</span>; idx &lt; sectionTitlesCount; idx++) {
+      <span class="pl-c1">NSArray</span> *objectsForSection = [mutableSections <span class="pl-c1">objectAtIndex:</span>idx];
+      [mutableSections <span class="pl-c1">replaceObjectAtIndex:</span>idx <span class="pl-c1">withObject:</span>[[UILocalizedIndexedCollation <span class="pl-c1">currentCollation</span>] <span class="pl-c1">sortedArrayFromArray:</span>objectsForSection <span class="pl-c1">collationStringSelector:</span>selector]];
+    }
+
+    self.<span class="pl-smi">sections</span> = mutableSections;
+
+    [<span class="pl-v">self</span>.tableView <span class="pl-c1">reloadData</span>];
+}
+
+- (<span class="pl-c1">NSString</span> *)tableView:(UITableView *)tableView
+titleForHeaderInSection:(<span class="pl-c1">NSInteger</span>)section
+{
+    <span class="pl-k">return</span> [[[UILocalizedIndexedCollation <span class="pl-c1">currentCollation</span>] <span class="pl-c1">sectionTitles</span>] <span class="pl-c1">objectAtIndex:</span>section];
+}
+
+- (<span class="pl-c1">NSArray</span> *)sectionIndexTitlesForTableView:(UITableView *)tableView {
+    <span class="pl-k">return</span> [[UILocalizedIndexedCollation <span class="pl-c1">currentCollation</span>] <span class="pl-c1">sectionIndexTitles</span>];
+}
+
+- (<span class="pl-c1">NSInteger</span>)tableView:(UITableView *)tableView
+sectionForSectionIndexTitle:(<span class="pl-c1">NSString</span> *)title
+               atIndex:(<span class="pl-c1">NSInteger</span>)index
+{
+    <span class="pl-k">return</span> [[UILocalizedIndexedCollation <span class="pl-c1">currentCollation</span>] <span class="pl-c1">sectionForSectionIndexTitleAtIndex:</span><span class="pl-c1">index</span>];
+}</pre></div>
+
+<h2><a id="user-content-uitableviewindexsearch" class="anchor" href="#uitableviewindexsearch" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>UITableViewIndexSearch</h2>
+
+<p>There is one special section index title worth mentioning, and that's <code>UITableViewIndexSearch</code>. It's a common pattern to have both a search bar and section indexes. In equal parts convenience and visual consistency, a search icon is often included as the first section index title, which can be touched to bring up the <code>UISearchBar</code> in the header of the table view.</p>
+
+<p>To include the search icon in your table view, you would simply prepend the <code>NSString</code> constant <code>UITableViewIndexSearch</code> to the return value of <code>-sectionIndexTitlesForTableView:</code>, and adjust <code>-tableView:sectionForSectionIndexTitle:atIndex:</code> to account for the single element shift.</p>
+
+<hr>
+
+<p>So remember, NSHipsters one and all: if you see an excessively long table view, kill it with fire!</p>
+
+<p>...which is to say, refactor your content with some combination of hierarchies, a search bar, and section indexes. And when implementing section index titles, take advantage of <code>UILocalizedIndexedCollation</code>.</p>
+
+<p>Together, we can put an end to scroll view-induced repetitive stress injuries, and spend more time enjoying the finer things in life, like watching videos of pets playing with iPads.</p>
+</article></div>

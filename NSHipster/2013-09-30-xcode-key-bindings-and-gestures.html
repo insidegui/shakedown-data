@@ -1,0 +1,202 @@
+<div class="announce instapaper_body md" data-path="2013-09-30-xcode-key-bindings-and-gestures.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>tag</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>Xcode Key Bindings &amp; Gestures</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div>Xcode</div></td>
+
+  <td><div>popular</div></td>
+
+  <td><div>Xcode key bindings and gestures not only shave off seconds of precious work, but make you look more confident, competent, and cromulent in the process.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>n/a</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>The extent to which programming-as-craft is compared to manual disciplines like woodworking is tiresome. It's absolutely the case that one should know and maintain their tools as well as a carpenter or metalsmith, but... I mean, c'mon. One would think that an industry demanding the skills of ninjas and rockstars would mix it up a little: "keep your shurikens polished, sharp, and hidden" or "tune your guitar and condition your hair twice daily".</p>
+
+<p>Here at NSHipster, the advice is simple and only slightly allegorical: "Xcode is your mustache, so keep it trimmed, waxed to a sharp point, and free of bugs."</p>
+
+<p>Anyway, a few weeks ago, we looked at how <a href="http://nshipster.com/xcode-snippets/">Xcode Snippets</a> can make you more productive by reducing the amount of boilerplate code you have to type out. This week, we're going to pick up on that thread and cover the essential key bindings and gestures.</p>
+
+<p>Xcode key bindings and gestures not only shave off seconds of precious work, but make you look more confident, competent, and cromulent in the process. Learn the following tricks of the trade and join the elite set of Xcode power users.</p>
+
+<hr>
+
+<blockquote>
+<p>For your reference, here is a legend of the common modifier key symbols (as well as a symbol for click <a href="http://en.wikipedia.org/wiki/Click_consonant">shamelessly borrowed from the International Phonetic Alphabet</a>):</p>
+</blockquote>
+
+<table id="user-content-xcode-key-bindings-modifiers">
+  <thead>
+    <tr>
+      <th>Command</th>
+      <th>Control</th>
+      <th>Option</th>
+      <th>Shift</th>
+      <th>Click</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><tt>⌘</tt></td>
+      <td><tt>⌃</tt></td>
+      <td><tt>⌥</tt></td>
+      <td><tt>⇧</tt></td>
+      <td><tt>ʘ</tt></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2><a id="user-content-open-quickly-o" class="anchor" href="#open-quickly-o" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Open Quickly (<code>⇧⌘O</code>)</h2>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/xcode-shortcuts-quick-open.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/xcode-shortcuts-quick-open.png" alt="Open Quickly" style="max-width:100%;"></a></p>
+
+<p>Learn to rely less on the Project Navigator by learning to love Open Quickly. There's a lot to love, too—with support for partial case- and position-insensitive matches, Xcode does a great job of finding what you want with just a minimal amount of input on your part.</p>
+
+<hr>
+
+<h2><a id="user-content-quick-documentation-ʘ-on-symbol--three-finger-tap--open-documentation-ʘʘ-on-symbol" class="anchor" href="#quick-documentation-ʘ-on-symbol--three-finger-tap--open-documentation-ʘʘ-on-symbol" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Quick Documentation (<code>⌥ʘ</code> on Symbol / Three-Finger Tap) <br> Open Documentation (<code>⌥ʘʘ</code> on Symbol)</h2>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/xcode-shortcuts-quick-documentation.gif" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/xcode-shortcuts-quick-documentation.gif" alt="Quick Documentation" style="max-width:100%;"></a></p>
+
+<p>Quick Documentation is probably the first Xcode shortcut developers should learn. Just alt-click (or three-finger tap) any class, variable, or constant value, and Xcode will give you a quick rundown of what you're looking at. Alt-double-click to bring up the documentation window, opened to the relevant entry.</p>
+
+<h2><a id="user-content-jump-to-definition-ʘ-on-symbol" class="anchor" href="#jump-to-definition-ʘ-on-symbol" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Jump to Definition (<code>⌘ʘ</code> on Symbol)</h2>
+
+<p>Also well-know to an expert Xcoder's workflow is Jump to Definition, which opens the editor window to the relevant <code>@interface</code> definition or constant declaration in a <code>.h</code> file. This is especially useful for getting a raw look at system frameworks like Foundation, to get an idea of what's <em>really</em> going on behind-the-scenes.</p>
+
+<h2><a id="user-content-jump-to-next-counterpart-----three-finger-vertical-swipe" class="anchor" href="#jump-to-next-counterpart-----three-finger-vertical-swipe" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Jump to Next Counterpart (<code>^⌘↑</code> / <code>^⌘↓</code> / Three-Finger Vertical Swipe)</h2>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/xcode-shortcuts-counterpart.gif" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/xcode-shortcuts-counterpart.gif" alt="Jump to Next Counterpart" style="max-width:100%;"></a></p>
+
+<p>Last, but certainly not least, there's Jump to Next Counterpart, which is very likely the shortcut used the most on any given day. Quickly switch between a <code>.h</code> header and it's corresponding <code>.m</code> implementation with a simple three-finger swipe up or down (or <code>^⌘↑</code> / <code>^⌘↓</code> if you feel so inclined).</p>
+
+<hr>
+
+<h2><a id="user-content-comment-selection--current-line-" class="anchor" href="#comment-selection--current-line-" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Comment Selection / Current Line (<code>⌘/</code>)</h2>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/xcode-shortcuts-comment.gif" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/xcode-shortcuts-comment.gif" alt="Comment Selection" style="max-width:100%;"></a></p>
+
+<p>Sure, you <em>could</em> be debugging the "right way" by setting breakpoints and being clever with your code paths, but there's quite so refreshingly simple and powerful as phasing code in and out of computational existence with a comment. Add or remove <code>//</code> comments to the current line or selection.</p>
+
+<h2><a id="user-content-show-standard-editor---show-assistant-editor---show-version-editor-" class="anchor" href="#show-standard-editor---show-assistant-editor---show-version-editor-" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Show Standard Editor (<code>⌘↵</code>) <br> Show Assistant Editor (<code>⌥⌘↵</code>) <br> Show Version Editor (<code>⌥⇧⌘↵</code>)</h2>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/xcode-shortcuts-editors.gif" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/xcode-shortcuts-editors.gif" alt="Editors" style="max-width:100%;"></a></p>
+
+<p>For how useful the Assistant Editor can be, surprisingly few developers can actually remember the key combo to turn it on and off. But now with <code>⌘↵</code> and <code>⌥⌘↵</code> fresh in your mind, you'll be helping Xcode help yourself more often.</p>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/xcode-shortcuts-assistant-editor-position.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/xcode-shortcuts-assistant-editor-position.png" alt="Assistant Editor Position" style="max-width:100%;"></a></p>
+
+<p>As an aside, if you're not big on how editors are stacking, a different horizontal or vertical arrangement can be chosen in View &gt; Assistant Editor.</p>
+
+<hr>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/xcode-shortcuts-panels.gif" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/xcode-shortcuts-panels.gif" alt="Panels" style="max-width:100%;"></a></p>
+
+<p>Sandwiching the editors on the left and right flanks, the Navigator and Utilities panels encircle your code in their loving embrace. Learning how to get them to show what's useful and GTFO when needed are critical for inner peace and maximum productivity.</p>
+
+<h2><a id="user-content-showhide-navigator-panel-0" class="anchor" href="#showhide-navigator-panel-0" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Show/Hide Navigator Panel (<code>⌘0</code>)</h2>
+
+<h2><a id="user-content-select-navigator-1--8" class="anchor" href="#select-navigator-1--8" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Select Navigator (<code>⌘1, ..., ⌘8</code>)</h2>
+
+<ol>
+<li>Project Navigator</li>
+<li>Symbol Navigator</li>
+<li>Find Navigator</li>
+<li>Issue Navigator</li>
+<li>Test Navigator</li>
+<li>Debug Navigator</li>
+<li>Breakpoint Navigator</li>
+<li>Log Navigator</li>
+</ol>
+
+<h2><a id="user-content-showhide-utilities-panel-0" class="anchor" href="#showhide-utilities-panel-0" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Show/Hide Utilities Panel (<code>⌥⌘0</code>)</h2>
+
+<h2><a id="user-content-select-utilities-panel-1-2-" class="anchor" href="#select-utilities-panel-1-2-" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Select Utilities Panel (<code>⌥⌘1, ⌥⌘2, ...</code>)</h2>
+
+<h3><a id="user-content-source-file" class="anchor" href="#source-file" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Source File</h3>
+
+<ol>
+<li>File Inspector</li>
+<li>Quick Help</li>
+</ol>
+
+<h3><a id="user-content-interface-builder" class="anchor" href="#interface-builder" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Interface Builder</h3>
+
+<ol>
+<li>File Inspector</li>
+<li>Quick Help</li>
+<li>Identity Inspector</li>
+<li>Attributes Inspector</li>
+<li>Size Inspector</li>
+<li>Connections Inspector</li>
+</ol>
+
+<h2><a id="user-content-show--hide-debug-area-y--activate-console-c" class="anchor" href="#show--hide-debug-area-y--activate-console-c" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Show / Hide Debug Area (<code>⇧⌘Y</code>) <br> Activate Console (<code>⇧⌘C</code>)</h2>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/xcode-shortcuts-debug-area.gif" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/xcode-shortcuts-debug-area.gif" alt="Show / Hide Debug Area" style="max-width:100%;"></a></p>
+
+<p>Anyone miss the option in Xcode 3 to have a detached debugger window? Yeah, me too.</p>
+
+<p>Knowing how to toggle the debug area and activate the console in a single keystroke may be a shallow consolation, but it does help take the edge off of the pain or loss.</p>
+
+<hr>
+
+<h2><a id="user-content-find-f-find--replace-f-find-in-project-f-find--replace-in-project-f" class="anchor" href="#find-f-find--replace-f-find-in-project-f-find--replace-in-project-f" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Find (<code>⌘F</code>) /<br>Find &amp; Replace (<code>⌥⌘F</code>) /<br>Find in Project (<code>⇧⌘F</code>) /<br>Find &amp; Replace in Project (<code>⌥⇧⌘F</code>)</h2>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/xcode-shortcuts-find.gif" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/xcode-shortcuts-find.gif" alt="Find" style="max-width:100%;"></a></p>
+
+<p>For when Xcode's refactoring capabilities come up short... which is to say: often. On the plus side, Xcode allows reference, definition, and regular expression search in addition to literal text.</p>
+
+<h2><a id="user-content-spelling--grammar-" class="anchor" href="#spelling--grammar-" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Spelling &amp; Grammar (<code>⌘:</code>)</h2>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/xcode-shortcuts-spelling-and-grammar.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/xcode-shortcuts-spelling-and-grammar.png" alt="Spelling &amp; Grammar" style="max-width:100%;"></a></p>
+
+<p>All-powerful as Clang is, it still can't help your nightmarish grammar and punctuation in your comments. Especially for anyone releasing code into the open-source wilds, do yourself a favor and give it a once-over with a built-in OS X spelling and grammar check.</p>
+
+<hr>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/xcode-shortcuts-preferences.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/xcode-shortcuts-preferences.png" alt="Xcode Shortcut Preferences" style="max-width:100%;"></a></p>
+
+<p>But, of course, the fun doesn't stop there! Like any respectable editor, Xcode allows you to customize the key bindings for every menu item and action across the app.</p>
+
+<p>Here are a few non-standard key bindings that you might find useful:</p>
+
+<ul>
+<li><code>^w</code>: Close Document (replaces Delete to Mark)</li>
+<li><code>^⌘/</code>: Show / Hide Toolbar</li>
+<li><code>^⌘F</code>: <em>None</em> (removes Full Screen (at least until Mavericks))</li>
+</ul>
+
+<p>Got any useful or clever bindings to share? Tweet them to <a href="https://twitter.com/NSHipster">@NSHipster</a>!</p>
+</article></div>

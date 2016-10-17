@@ -1,0 +1,82 @@
+<div class="announce instapaper_body md" data-path="2012-07-07-nsindexset.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>tags</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>NSIndexSet</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div>Cocoa</div></td>
+
+  <td><div>nshipster</div></td>
+
+  <td><div>NSIndexSet (like its mutable counterpart, NSMutableIndexSet) is a sorted collection of unique unsigned integers. Think of it like an NSRange that supports non-contiguous series. It has wicked fast operations for finding indexes in ranges or set intersections, and comes with all of the convenience methods you'd expect in a Foundation collection class.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+
+  <th>reviewed</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>2.0</div></td>
+
+  <td><div>September 8, 2015</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p><code>NSIndexSet</code> (like its mutable counterpart, <code>NSMutableIndexSet</code>) is a sorted collection of unique unsigned integers. Think of it like an <code>NSRange</code> that supports non-contiguous series. It has wicked fast operations for finding indexes in ranges or set intersections, and comes with all of the convenience methods you'd expect in a Foundation collection class.</p>
+
+<p>You'll find <code>NSIndexSet</code> used throughout the Foundation framework. Anytime a method gets multiple elements from a sorted collection, such as an array or a table view's data source, you can be sure that an <code>NSIndexSet</code> parameter will be somewhere in the mix.</p>
+
+<p>If you look hard enough, you may start to find aspects of your data model that could be represented with <code>NSIndexSet</code>. For example, AFNetworking uses an index set to represent HTTP response status codes: the user defines a set of "acceptable" codes (in the <code>2XX</code> range, by default), and the response is checked by using <code>containsIndex:</code>.</p>
+
+<hr>
+
+<p>The Swift standard library includes <code>PermutationGenerator</code>, an often-overlooked type that dovetails nicely with <code>NSIndexSet</code>. <code>PermutationGenerator</code> wraps a collection and a sequence of indexes (sound familiar?) to allow easy iteration:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> streetscape <span class="pl-k">=</span> [<span class="pl-s"><span class="pl-pds">"</span>Ashmead<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Belmont<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Clifton<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Douglas<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Euclid<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Fairmont<span class="pl-pds">"</span></span>, 
+                        <span class="pl-s"><span class="pl-pds">"</span>Girard<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Harvard<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Irving<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Kenyon<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Lamont<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Monroe<span class="pl-pds">"</span></span>, 
+                        <span class="pl-s"><span class="pl-pds">"</span>Newton<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Otis<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Perry<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Quincy<span class="pl-pds">"</span></span>]
+
+<span class="pl-k">let</span> selectedIndices <span class="pl-k">=</span> NSMutableIndexSet(indexesInRange: NSRange(<span class="pl-c1">0</span><span class="pl-k">...</span><span class="pl-c1">2</span>))
+selectedIndices<span class="pl-k">.</span>addIndex(<span class="pl-c1">5</span>)
+selectedIndices<span class="pl-k">.</span>addIndexesInRange(NSRange(<span class="pl-c1">11</span><span class="pl-k">...</span><span class="pl-c1">13</span>))
+
+<span class="pl-k">for</span> street <span class="pl-k">in</span> <span class="pl-c1">PermutationGenerator</span>(elements: streetscape, indices: selectedIndices) {
+    <span class="pl-c1">print</span>(street)
+}
+<span class="pl-c">// Ashmead, Belmont, Clifton, Fairmont, Monroe, Newton, Otis</span></pre></div>
+
+<p>Here are a few more ideas to get you thinking in terms of index sets:</p>
+
+<ul>
+<li>Have a list of user preferences, and want to store which ones are switched on or off? Use a single <code>NSIndexSet</code> in combination with an <code>enum</code> <code>typedef</code>.</li>
+<li>Filtering a list of items by a set of composable conditions? Ditch the <code>NSPredicate</code>; instead, cache the indexes of objects that fulfill each condition, and then get the union or intersection of those indexes as conditions are added and removed.</li>
+</ul>
+
+<hr>
+
+<p>Overall, <code>NSIndexSet</code> is a solid class. A fair bit nerdier than its collection class siblings, but it has its place. At the very least, it's a prime example of the great functionality that you find by paying attention to what Foundation uses in its own APIs.</p>
+</article></div>

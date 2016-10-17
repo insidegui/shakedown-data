@@ -1,0 +1,228 @@
+<div class="announce instapaper_body md" data-path="2013-12-02-nsnotification-and-nsnotificationcenter.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>tags</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>NSNotification &amp;<br>NSNotificationCenter</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div>Cocoa</div></td>
+
+  <td><div>popular</div></td>
+
+  <td><div>Any idea is inextricably linked to how its communicated. A medium defines the form and scale of significance in such a way to shape the very meaning of an idea. Very truly, the medium is the message.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+
+  <th>reviewed</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>2.0</div></td>
+
+  <td><div>September 8, 2015</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>Any idea is inextricably linked to how it's communicated. A medium defines the form and scale of significance in such a way to shape the very meaning of an idea. Very truly, the medium is the message.</p>
+
+<p>One of the first lessons of socialization is to know one's audience. Sometimes communication is one-to-one, like an in-person conversation, while at other times, such as a television broadcast, it's one-to-many. Not being able to distinguish between these two circumstances leads to awkward situations.</p>
+
+<p>This is as true of humans as it is within a computer process. In Cocoa, there are a number of approaches to communicating between objects, with different characteristics of intimacy and coupling:</p>
+
+<table id="user-content-notification-center-coupling">
+    <thead>
+        <tr>
+            <td colspan="2" rowspan="2"></td>
+            <th colspan="2">Audience</th>
+        </tr>
+        <tr>
+            <th>Intimate (One-to-One)</th>
+            <th>Broadcast (One-to-Many)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th rowspan="2">Coupling</th>
+            <th>Loose</th>
+            <td>
+                <ul>
+                    <li>Target-Action</li>
+                    <li>Delegate</li>
+                    <li>Callbacks</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li><tt>Notifications</tt></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <th>Strong</th>
+            <td>
+                <ul>
+                    <li>Direct Method Invocation</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li>Key-Value Observing</li>
+                </ul>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<p>We've discussed the importance of how events are communicated in APIs previously in our <a href="http://nshipster.com/key-value-observing/">article on Key-Value Observing</a>. This week, we'll expand our look at the available options, with <code>NSNotificationCenter</code> &amp; <code>NSNotification</code>.</p>
+
+<hr>
+
+<p><code>NSNotificationCenter</code> provides a centralized hub through which any part of an application may notify and be notified of changes from any other part of the application. Observers register with a notification center to respond to particular events with a specified action. Each time an event occurs, the notification goes through its dispatch table, and messages any registered observers for that event.</p>
+
+<blockquote>
+<p>Each running Cocoa program manages its own default notification center, so it's unusual for a new notification center to be instantiated separately.</p>
+</blockquote>
+
+<p>Each <code>NSNotification</code> object has a <code>name</code>, with additional context optionally provided by an associated <code>object</code> and <code>userInfo</code> dictionary.</p>
+
+<p>For example, <code>UITextField</code> posts an <code>NSNotification</code> with the name <code>UITextFieldTextDidChangeNotification</code> each time its text changes. The object associated with that notification is the text field itself. In the case of <code>UIKeyboardWillShowNotification</code>, frame positioning and animation timing are passed in <code>userInfo</code>, while the notification's associated <code>object</code> is <code>nil</code>.</p>
+
+<h3><a id="user-content-adding-observers" class="anchor" href="#adding-observers" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Adding Observers</h3>
+
+<p>All sorts of notifications are constantly passing through <code>NSNotificationCenter</code>.<sup>*</sup>  But like a tree falling in the woods, a notification is moot unless there's something listening for it.</p>
+
+<p>The traditional way to add an observer is <code>–addObserver:selector:name:object:</code>, in which an object (usually <code>self</code>) adds itself to have the specified selector performed when a matching notification is posted.</p>
+
+<p>The modern, block-based API for adding notification observers is <code>–addObserverForName:object:queue:usingBlock:</code>. Instead of registering an existing object as an observer for a notification, this method creates its own anonymous object to be the observer, which performs a block on the specified queue (or the calling thread, if <code>nil</code>) when a matching notification is posted. Unlike its similarly named <code>@selector</code>-based counterpart, this method actually returns the constructed observer object, which is necessary for unregistering the observer, as discussed in the next section.</p>
+
+<blockquote>
+<p>Contrary to a recent article claiming otherwise, <code>–addObserverForName:object:queue:usingBlock:</code> should <em>not</em> be considered harmful. It's perfectly safe and suitable for use in applications. Just make sure to understand memory management rules when referencing <code>self</code> in blocks. Any concerns in this respect are the same as for any other block-based API.</p>
+</blockquote>
+
+<p>The <code>name</code> and <code>object</code> parameters of both methods are used to decide whether the criteria of a posted notification match the observer. If <code>name</code> is set, only notifications with that name will trigger, but if <code>nil</code> is set, then <em>all</em> names will match. The same is true of <code>object</code>. So, if both <code>name</code> and <code>object</code> are set, only notifications with that name <em>and</em> the specified object will trigger. However, if both <code>name</code> and <code>object</code> are <code>nil</code>, then <em>all</em> notifications posted will trigger.</p>
+
+<blockquote>
+<p><sup>*</sup>See for yourself! An ordinary iOS app fires dozens of notifications just in the first second of being launched—many that you've probably never heard of before, nor will ever have to think about again.</p>
+</blockquote>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> center <span class="pl-k">=</span> NSNotificationCenter<span class="pl-k">.</span>defaultCenter()
+center<span class="pl-k">.</span>addObserverForName(<span class="pl-c1">nil</span>, object: <span class="pl-c1">nil</span>, queue: <span class="pl-c1">nil</span>) { notification <span class="pl-k">in</span>
+    <span class="pl-c1">print</span>(<span class="pl-s"><span class="pl-pds">"</span><span class="pl-pse">\(</span><span class="pl-s1">notification<span class="pl-k">.</span>name</span><span class="pl-pse">)</span>: <span class="pl-pse">\(</span><span class="pl-s1">notification<span class="pl-k">.</span>userInfo <span class="pl-k">??</span> [<span class="pl-k">:</span>]</span><span class="pl-pse">)</span><span class="pl-pds">"</span></span>)
+}</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSNotificationCenter</span> *center = [<span class="pl-c1">NSNotificationCenter</span> <span class="pl-c1">defaultCenter</span>];
+[center <span class="pl-c1">addObserverForName:</span><span class="pl-c1">nil</span>
+                    <span class="pl-c1">object:</span><span class="pl-c1">nil</span>
+                     <span class="pl-c1">queue:</span><span class="pl-c1">nil</span>
+                <span class="pl-c1">usingBlock:</span>^(<span class="pl-c1">NSNotification</span> *notification)
+{
+     <span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span><span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, notification.<span class="pl-smi">name</span>);
+}];</pre></div>
+
+<h3><a id="user-content-removing-observers" class="anchor" href="#removing-observers" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Removing Observers</h3>
+
+<p>It's important for objects to remove observers before they're deallocated, in order to prevent further messages from being sent.</p>
+
+<p>There are two methods for removing observers: <code>-removeObserver:</code> and <code>-removeObserver:name:object:</code>. Again, just as with adding observers, <code>name</code> and <code>object</code> are used to define scope. <code>-removeObserver:</code>, or <code>-removeObserver:name:object</code> with <code>nil</code> for both parameters, will remove the observer from the notification center dispatch table entirely, while specifying parameters for <code>-removeObserver:name:object:</code> will only remove the observer for registrations with that name and/or object.</p>
+
+<h3><a id="user-content-posting-notifications" class="anchor" href="#posting-notifications" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Posting Notifications</h3>
+
+<p>Of course, consuming is but one side of the story. In addition to subscribing to system-provided notifications, applications may want to publish and subscribe to their own.</p>
+
+<p>Notifications are created with <code>+notificationWithName:object:userInfo:</code>.</p>
+
+<p>Notification names are generally defined as string constants. Like any string constant, it should be declared <code>extern</code> in a public interface, and defined privately in the corresponding implementation. It doesn't matter too much what a notification name's value is defined to be; the name of the variable itself is commonplace, but a reverse-DNS identifier is also a classy choice. So long as notification names are unique (or explicitly aliased), everything will work as expected.</p>
+
+<p>Keys for <code>userInfo</code> should likewise be defined as string constants. It's important to clearly document the expected kinds of values for each key, since the compiler can't enforce constraints on dictionaries the same way it can for an object. </p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">class</span> FooController <span class="pl-k">:</span> UIViewController {
+    <span class="pl-k">enum</span> Notifications {
+        <span class="pl-k">static</span> <span class="pl-k">let</span> FooDidBar    <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>XXFooDidBarNotification<span class="pl-pds">"</span></span>
+        <span class="pl-k">static</span> <span class="pl-k">let</span> FooDidBazoom <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>XXFooDidBazoomNotification<span class="pl-pds">"</span></span>
+    }
+
+    <span class="pl-c">// ...</span>
+}</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c">// Foo.h</span>
+<span class="pl-k">extern</span> <span class="pl-c1">NSString</span> * <span class="pl-k">const</span> XXFooDidBarNotification;
+
+<span class="pl-c">// Foo.m</span>
+<span class="pl-c1">NSString</span> * <span class="pl-k">const</span> XXFooDidBarNotification = <span class="pl-s"><span class="pl-pds">@"</span>XXFooDidBarNotification<span class="pl-pds">"</span></span>;</pre></div>
+
+<p>Notifications are posted with <code>–postNotificationName:object:userInfo:</code> or its convenience method <code>–postNotificationName:object:</code>, which passes <code>nil</code> for <code>userInfo</code>. <code>–postNotification:</code> is also available, but it's generally preferable to have the notification object creation handled by the method itself.</p>
+
+<p>Recall from the previous section how <code>name</code> and <code>object</code> act to scope notification dispatch. Developers are advised to be consistent in how objects are posted with notifications, and to have this behavior documented clearly in the public interface.</p>
+
+<p>Since notification dispatch happens on the posting thread, it may be necessary to <code>dispatch_async</code> to <code>dispatch_get_main_queue()</code> so that a notification is handled on the main thread. This is not usually necessary, but it's important to keep in mind.</p>
+
+<h2><a id="user-content-kvo--nsnotificationcenter" class="anchor" href="#kvo--nsnotificationcenter" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>KVO != NSNotificationCenter</h2>
+
+<p>Something that often slips up developers is how similar the method signatures for <a href="http://nshipster.com/key-value-observing/">Key-Value Observing</a> are to those of <code>NSNotificationCenter</code>:</p>
+
+<h4><a id="user-content-key-value-observing" class="anchor" href="#key-value-observing" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Key-Value Observing</h4>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">func</span> <span class="pl-en">addObserver</span>(observer: NSObject, <span class="pl-en">forKeyPath</span> <span class="pl-smi">keyPath</span>: <span class="pl-c1">String</span>, 
+    options: NSKeyValueObservingOptions, 
+    context: <span class="pl-c1">UnsafeMutablePointer</span><span class="pl-k">&lt;</span><span class="pl-c1">Void</span><span class="pl-k">&gt;</span>)</pre></div>
+
+<div class="highlight highlight-source-objc"><pre>- (<span class="pl-k">void</span>)addObserver:(NSObject *)observer
+         forKeyPath:(<span class="pl-c1">NSString</span> *)keyPath
+            options:(<span class="pl-c1">NSKeyValueObservingOptions</span>)options
+            context:(<span class="pl-k">void</span> *)context</pre></div>
+
+<h4><a id="user-content-nsnotificationcenter" class="anchor" href="#nsnotificationcenter" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>NSNotificationCenter</h4>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">func</span> <span class="pl-en">addObserver</span>(observer: <span class="pl-c1">AnyObject</span>, 
+    <span class="pl-en">selector</span> <span class="pl-smi">aSelector</span>: Selector,
+    <span class="pl-en">name</span> <span class="pl-smi">aName</span>: <span class="pl-c1">String</span>?, 
+    <span class="pl-en">object</span> <span class="pl-smi">anObject</span>: <span class="pl-c1">AnyObject</span>?)
+
+<span class="pl-k">func</span> <span class="pl-en">addObserverForName</span>(name: <span class="pl-c1">String</span>?, 
+    <span class="pl-en">object</span> <span class="pl-smi">obj</span>: <span class="pl-c1">AnyObject</span>?,
+    queue: NSOperationQueue?, 
+    <span class="pl-en">usingBlock</span> <span class="pl-smi">block</span>: (NSNotification) <span class="pl-k">-&gt;</span> <span class="pl-c1">Void</span>) -&gt; NSObjectProtocol</pre></div>
+
+<div class="highlight highlight-source-objc"><pre>- (<span class="pl-k">void</span>)addObserver:(<span class="pl-c1">id</span>)notificationObserver
+           selector:(<span class="pl-c1">SEL</span>)notificationSelector
+               name:(<span class="pl-c1">NSString</span> *)notificationName
+             object:(<span class="pl-c1">id</span>)notificationSender
+
+- (<span class="pl-c1">id</span>)addObserverForName:(<span class="pl-c1">NSString</span> *)name
+                  object:(<span class="pl-c1">id</span>)obj
+                   queue:(<span class="pl-c1">NSOperationQueue</span> *)queue
+              usingBlock:(<span class="pl-k">void</span> (^)(<span class="pl-c1">NSNotification</span> *))block</pre></div>
+
+<p><strong>Key-Value Observing adds observers for keypaths, while NSNotificationCenter adds observers for notifications.</strong> Keep this distinction clear in your mind, and proceed to use both APIs confidently.</p>
+
+<hr>
+
+<p>Notifications are an essential tool for communicating across an application. Because of its distributed, low-coupling characteristics, notifications are well-suited to a wide range of architectures. APIs would do well to add them for any significant events that might benefit from greater circulation—the performance overhead for this sort of chattiness is negligible.</p>
+
+<p>As it were, thinking about notifications in your own life can do wonders for improving your relationships with others. Communicating intent and giving sufficient notice are the trappings of a mature, grounded individual.</p>
+
+<p>...but don't take that advice too far and use it to justify life-streaming, or anything. Seriously, stop taking pictures, and just eat your damn food, <em>amiright</em>?</p>
+</article></div>

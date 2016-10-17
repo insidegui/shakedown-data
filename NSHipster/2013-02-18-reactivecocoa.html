@@ -1,0 +1,197 @@
+<div class="announce instapaper_body md" data-path="2013-02-18-reactivecocoa.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>ReactiveCocoa</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div>Open Source</div></td>
+
+  <td><div>Breaking from a tradition of covering Apple APIs exclusively, this edition of NSHipster will look at an open source project that exemplifies a brave new era of open source contribution to Objective-C: ReactiveCocoa.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>n/a</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>Languages are living works. They are nudged and challenged and bastardized and mashed-up in a perpetual cycle of undirected and rapid evolution. Technologies evolve, requirements change, corporate stewards and open source community come and go; obscure dialects are vaulted to prominence on the shoulders of exciting new frameworks, and thrust into a surprising new context after a long period of dormancy.</p>
+
+<p>Objective-C has a remarkable history spanning four acts in as many decades:</p>
+
+<p><strong>In its 1<sup>st</sup> act</strong>, Objective-C was adopted as the language of NeXT, powering <a href="http://en.wikipedia.org/wiki/NeXTSTEP">NeXTSTEP</a> and <a href="http://en.wikipedia.org/wiki/Web_server#History">the world's first web server</a>.</p>
+
+<p><strong>In its 2<sup>nd</sup> act</strong>, Objective-C positioned itself in the heart Apple's technology stack (after a prolonged turf war with Java) with Apple's acquisition of NeXT.</p>
+
+<p><strong>In its 3<sup>rd</sup> act</strong>, Objective-C rose to unprecedented significance with the release of iOS, making it the most important language of mobile computing.</p>
+
+<p><strong>Objective-C's 4<sup>th</sup> act takes us to the present day</strong>, with an influx of new iOS developers from the Ruby, Python, and Javascript communities sparking a revolution in open source participation. For the first time, Objective-C is being directly shaped and guided by the contributions of individuals outside of Apple.</p>
+
+<p>Breaking from a tradition of covering Apple APIs exclusively, this edition of NSHipster will look at an open source project that exemplifies this brave new era for Objective-C: <a href="https://github.com/ReactiveCocoa/ReactiveCocoa">ReactiveCocoa</a>.</p>
+
+<hr>
+
+<blockquote>
+<p>For a complete look at ReactiveCocoa, refer to the project's <a href="https://github.com/ReactiveCocoa/ReactiveCocoa/blob/master/README.md">README</a>, <a href="https://github.com/ReactiveCocoa/ReactiveCocoa/blob/master/Documentation/FrameworkOverview.md">Framework Overview</a> and <a href="https://github.com/ReactiveCocoa/ReactiveCocoa/blob/master/Documentation/DesignGuidelines.md">Design Guidelines</a>.</p>
+</blockquote>
+
+<p><a href="https://github.com/ReactiveCocoa/ReactiveCocoa">ReactiveCocoa</a> is an open source library that brings Functional Reactive Programming paradigm to Objective-C. It was created by <a href="https://github.com/joshaber">Josh Abernathy</a> &amp; <a href="https://github.com/jspahrsummers">Justin Spahr-Summers</a> in the development of <a href="http://mac.github.com">GitHub for Mac</a>. Last week, ReactiveCocoa reached a major milestone with its <a href="https://github.com/ReactiveCocoa/ReactiveCocoa/tree/v1.0.0">1.0 release</a>.</p>
+
+<p><a href="http://en.wikipedia.org/wiki/Functional_reactive_programming">Functional Reactive Programming</a> (FRP) is a way of thinking about software in terms of transforming inputs to produce output continuously over time. <a href="http://blog.maybeapps.com/post/42894317939/input-and-output">Josh Abernathy frames the paradigm thusly</a>:</p>
+
+<blockquote>
+<p>Programs take input and produce output. The output is the result of doing something with the input. Input, transform, output, done.</p>
+
+<p>The input is all the sources of action for your app. It's taps. It's keyboard events. It's timer triggers, GPS events, and web service responses. These things are all inputs. They all feed into the app, and the app combines them all in some way to produce a result: the output.</p>
+
+<p>The output is often a change in the app's UI. A switch is toggled or a list gets a new item. Or it could be more than that. It could be a new file on the device's disk, or it could be an API request. These things are the outputs of the app.</p>
+
+<p>But unlike the classic input/output design, this input and output happens more than once. It's not just a single input → work → output—the cycle continues while the app is open. The app is always consuming inputs and producing outputs based on them.</p>
+</blockquote>
+
+<p>To illustrate the difference between the conventional, imperative paradigm of Objective-C programming versus a functional reactive approach, consider the common example of validating a signup form:</p>
+
+<h3><a id="user-content-conventional" class="anchor" href="#conventional" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Conventional</h3>
+
+<div class="highlight highlight-source-objc"><pre>- (<span class="pl-c1">BOOL</span>)isFormValid {
+    <span class="pl-k">return</span> [<span class="pl-v">self</span>.usernameField.text <span class="pl-c1">length</span>] &gt; <span class="pl-c1">0</span> &amp;&amp;
+            [<span class="pl-v">self</span>.emailField.text <span class="pl-c1">length</span>] &gt; <span class="pl-c1">0</span> &amp;&amp;
+            [<span class="pl-v">self</span>.passwordField.text <span class="pl-c1">length</span>] &gt; <span class="pl-c1">0</span> &amp;&amp;
+            [<span class="pl-v">self</span>.passwordField.text <span class="pl-c1">isEqual:</span><span class="pl-v">self</span>.passwordVerificationField.text];
+}
+
+#<span class="pl-k">pragma mark</span> - UITextFieldDelegate
+
+- (<span class="pl-c1">BOOL</span>)textField:(UITextField *)textField
+shouldChangeCharactersInRange:(<span class="pl-c1">NSRange</span>)range
+replacementString:(<span class="pl-c1">NSString</span> *)string
+{
+    self.<span class="pl-smi">createButton</span>.<span class="pl-smi">enabled</span> = [<span class="pl-v">self</span> <span class="pl-c1">isFormValid</span>];
+
+    <span class="pl-k">return</span> <span class="pl-c1">YES</span>;
+}</pre></div>
+
+<p>In the conventional example, logic is fragmented across different methods in the view controller, with calls to <code>self.createButton.enabled = [self isFormValid];</code> interspersed throughout delegate methods and view lifecycle callbacks.</p>
+
+<p>Compare this with equivalent code using ReactiveCocoa:</p>
+
+<h3><a id="user-content-reactivecocoa" class="anchor" href="#reactivecocoa" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>ReactiveCocoa</h3>
+
+<div class="highlight highlight-source-objc"><pre>RACSignal *formValid = [RACSignal
+  <span class="pl-c1">combineLatest:</span>@[
+    <span class="pl-v">self</span>.username.rac_textSignal,
+    <span class="pl-v">self</span>.emailField.rac_textSignal,
+    <span class="pl-v">self</span>.passwordField.rac_textSignal,
+    <span class="pl-v">self</span>.passwordVerificationField.rac_textSignal
+  ]
+  <span class="pl-c1">reduce:</span>^(<span class="pl-c1">NSString</span> *username, <span class="pl-c1">NSString</span> *email, <span class="pl-c1">NSString</span> *password, <span class="pl-c1">NSString</span> *passwordVerification) {
+    <span class="pl-k">return</span> @([username <span class="pl-c1">length</span>] &gt; <span class="pl-c1">0</span> &amp;&amp; [email <span class="pl-c1">length</span>] &gt; <span class="pl-c1">0</span> &amp;&amp; [password <span class="pl-c1">length</span>] &gt; <span class="pl-c1">8</span> &amp;&amp; [password <span class="pl-c1">isEqual:</span>passwordVerification]);
+  }];
+
+<span class="pl-en">RAC</span>(self.createButton.enabled) = formValid;</pre></div>
+
+<p>Here, all of the logic for validating form input is contained in a single chain of logic and responsibility. Each time any of the text fields is updated, their inputs are reduced into a single boolean value, which automatically enables / disables the create button.</p>
+
+<h2><a id="user-content-overview" class="anchor" href="#overview" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Overview</h2>
+
+<p>ReactiveCocoa is comprised of two major components: <a href="https://github.com/ReactiveCocoa/ReactiveCocoa/blob/master/Documentation/FrameworkOverview.md#signals">signals</a> (<code>RACSignal</code>) and <a href="https://github.com/ReactiveCocoa/ReactiveCocoa/blob/master/Documentation/FrameworkOverview.md#sequences">sequences</a> (<code>RACSequence</code>).</p>
+
+<p>Both signals and sequences are kinds of <a href="https://github.com/ReactiveCocoa/ReactiveCocoa/blob/master/Documentation/FrameworkOverview.md#streams">streams</a>, sharing many of the same operators. ReactiveCocoa has done well to abstract a wide scope of functionality into a semantically dense, consistent design: signals are a <em>push</em>-driven stream, and sequences are a <em>pull</em>-driven stream.</p>
+
+<h3><a id="user-content-racsignal" class="anchor" href="#racsignal" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>RACSignal</code></h3>
+
+<blockquote>
+<ul>
+<li><strong>Handling Asynchronous Or Event-driven Data Sources</strong>: Much of Cocoa programming is focused on reacting to user events or changes in application state.</li>
+<li><strong>Chaining Dependent Operations</strong>: Dependencies are most often found in network requests, where a previous request to the server needs to complete before the next one can be constructed.</li>
+<li><strong>Parallelizing Independent Work</strong>: Working with independent data sets in parallel and then combining them into a final result is non-trivial in Cocoa, and often involves a lot of synchronization.</li>
+</ul>
+
+<p>Signals send three different types of events to their subscribers:</p>
+
+<ul>
+<li>The <strong>next</strong> event provides a new value from the stream. Unlike Cocoa collections, it is
+completely valid for a signal to include <code>nil</code>.</li>
+<li>The <strong>error</strong> event indicates that an error occurred before the signal could
+finish. The event may include an <code>NSError</code> object that indicates what went
+wrong. Errors must be handled specially – they are not included in the
+stream's values.</li>
+<li>The <strong>completed</strong> event indicates that the signal finished successfully, and
+that no more values will be added to the stream. Completion must be handled
+specially – it is not included in the stream of values.</li>
+</ul>
+
+<p>The lifetime of a signal consists of any number of <code>next</code> events, followed by
+one <code>error</code> or <code>completed</code> event (but not both).</p>
+</blockquote>
+
+<h3><a id="user-content-racsequence" class="anchor" href="#racsequence" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>RACSequence</code></h3>
+
+<blockquote>
+<ul>
+<li><strong>Simplifying Collection Transformations</strong>: Higher-order functions like <code>map</code>, <code>filter</code>, <code>fold/reduce</code> are sorely missing from <code>Foundation</code>.</li>
+</ul>
+
+<p>Sequences are a kind of collection, similar in purpose to <code>NSArray</code>. Unlike
+an array, the values in a sequence are evaluated <em>lazily</em> (i.e., only when they
+are needed) by default, potentially improving performance if only part of
+a sequence is used. Just like Cocoa collections, sequences cannot contain <code>nil</code>.</p>
+
+<p><code>RACSequence</code> allows any Cocoa collection to be manipulated in a uniform and declarative way.</p>
+</blockquote>
+
+<div class="highlight highlight-source-objc"><pre>RACSequence *normalizedLongWords = [[words.rac_sequence
+    <span class="pl-c1">filter:</span>^ <span class="pl-c1">BOOL</span> (<span class="pl-c1">NSString</span> *word) {
+        <span class="pl-k">return</span> [word <span class="pl-c1">length</span>] &gt;= <span class="pl-c1">10</span>;
+    }]
+    <span class="pl-c1">map:</span>^(<span class="pl-c1">NSString</span> *word) {
+        <span class="pl-k">return</span> [word <span class="pl-c1">lowercaseString</span>];
+    }];</pre></div>
+
+<h2><a id="user-content-precedents-in-cocoa" class="anchor" href="#precedents-in-cocoa" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Precedents in Cocoa</h2>
+
+<p>Capturing and responding to changes has a long tradition in Cocoa, and ReactiveCocoa is a conceptual and functional extension of that. It is instructive to contrast RAC with those Cocoa technologies:</p>
+
+<h3><a id="user-content-rac-vs-kvo" class="anchor" href="#rac-vs-kvo" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>RAC vs. KVO</h3>
+
+<p><a href="http://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/KeyValueObserving/KeyValueObserving.html">Key-Value Observing</a> is at the heart of all magic in Cocoa—indeed, it is used extensively by ReactiveCocoa to react to property changes. However, KVO is neither pleasant nor easy to use: its API is overwrought with unused parameters and sorely lacking a blocks-based interface.</p>
+
+<h3><a id="user-content-rac-vs-bindings" class="anchor" href="#rac-vs-bindings" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>RAC vs. Bindings</h3>
+
+<p><a href="https://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/CocoaBindings/CocoaBindings.html">Bindings</a> are magic—voodoo, really.</p>
+
+<p>Although essential to managing the complexity of a OS X application, Bindings' cultural relevance has waned for years, as the focus has shifted to iOS and UIKit, which notably lacks support. Bindings replace a lot of boilerplate glue code and allow programming to be done in Interface Builder, but they're severely limited and <em>impossible</em> to debug. RAC offers a clear, understandable, and extensible code-based API that works in iOS and is apt to replace all but the most trivial uses of bindings in your OS X application.</p>
+
+<hr>
+
+<p>Objective-C was built from Smalltalk's ideas on top of C's metal, but its cultural imports go far beyond its original pedigree.</p>
+
+<p><code>@protocol</code> was a rejection of C++'s multiple inheritance, favoring an abstract data type pattern comparable to a Java <code>Interface</code>. Objective-C 2.0 introduced <code>@property / @synthesize</code>, a contemporary of C#'s <code>get; set;</code> shorthand for getter and setter methods (as well as dot syntax, which is still a point of contention for NeXTSTEP hard-liners). Blocks injected some functional programming flavor to the language, which paired nicely with Grand Central Dispatch--a queue-based concurrency API almost certainly influenced by Fortran / C / C++ standard <a href="http://en.wikipedia.org/wiki/OpenMP">OpenMP</a>. Subscripting and object literals, a standard feature in scripting languages like Ruby and Javascript, now finally brought to Objective-C thanks to a Clang language extension.</p>
+
+<p>ReactiveCocoa brings a healthy dose of functional and reactive programming influence to Objective-C, and was itself influenced by C#'s <a href="http://msdn.microsoft.com/en-us/data/gg577609.aspx">Rx library</a>, <a href="http://en.wikipedia.org/wiki/Clojure">Clojure</a>, and <a href="http://en.wikipedia.org/wiki/Elm_(programming_language)">Elm</a>.</p>
+
+<p>Good ideas are contagious. ReactiveCocoa is a reminder that good ideas can come from unlikely places, and that a fresh perspective can make all of the difference with familiar problems.</p>
+</article></div>

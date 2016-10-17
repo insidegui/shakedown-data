@@ -1,0 +1,291 @@
+<div class="announce instapaper_body md" data-path="2013-03-25-search-kit.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+
+  <th>revisions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>Search Kit</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div>Cocoa</div></td>
+
+  <td><div>Search Kit is a C framework for searching and indexing content in human languages. It supports matching on phrase or partial word, including logical &amp; wildcard operators, and can rank results by relevance. Search Kit also provides document summarization, which is useful for generating representative excerpts. And best of all: it's thread-safe.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+
+  <th>reviewed</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>2.0</div></td>
+
+  <td><div>November 24, 2015</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>2013-03-25</th>
+
+  <th>2015-11-24</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>Original publication.</div></td>
+
+  <td><div>Revised for Swift 2.0.</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>NSHipsters love irony, right? How about this for irony:</p>
+
+<p>There's this framework called <a href="https://developer.apple.com/library/mac/#documentation/UserExperience/Reference/SearchKit/Reference/reference.html">Search Kit</a>, which despite being insanely powerful and useful for finding information, is something that almost no one has ever heard of.</p>
+
+<p>It's true! I'd reckon there's a better chance that more of you have implemented your own search functionality from scratch than have ever even heard of Search Kit. (Heck, most people haven't even heard of <a href="https://developer.apple.com/library/prerelease/mac/documentation/Carbon/Reference/CoreServicesReferenceCollection/index.html">Core Services</a>, its parent framework)</p>
+
+<p>If only everyone knew that they could harness the same killer search functionality that Apple uses for their own applications...</p>
+
+<hr>
+
+<p>Search Kit is a C framework for searching and indexing content in human languages. It supports matching on phrase or partial word, including logical (<code>AND</code>, <code>OR</code>) and wildcard (<code>*</code>) operators, and can rank results by relevance. Search Kit also provides document summarization, which is useful for generating representative excerpts. And best of all: it's thread-safe.</p>
+
+<p>All of the whiz-bang search-as-you-type features in OS X—from Mail.app and Xcode to System Preferences and Spotlight—use Search Kit under the hood.</p>
+
+<p>But to understand how Search Kit does its magic, it's important to explain some of the basics of Information Retrieval and Natural Language Processing.</p>
+
+<blockquote>
+<p>Be sure to check out <a href="https://developer.apple.com/library/mac/#documentation/UserExperience/Conceptual/SearchKitConcepts/searchKit_intro/searchKit_intro.html">Apple's Search Kit Programming Guide</a> for an authoritative explanation of the what's, why's, and how's of this great framework.</p>
+</blockquote>
+
+<h2><a id="user-content-search-101" class="anchor" href="#search-101" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Search 101</h2>
+
+<p>Quoth Apple:</p>
+
+<blockquote>
+<p>You have an information need. But before you can ask a question, you need someone or something to ask. That is, you need to establish who or what you will accept as an authority for an answer. So before you ask a question you need to define the target of your question.</p>
+</blockquote>
+
+<p>Finding the answer in a reasonable amount of time requires effort from the start. This is what that process looks like in general terms:</p>
+
+<h3><a id="user-content-extract" class="anchor" href="#extract" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Extract</h3>
+
+<p>First, content must be extracted from a <a href="http://en.wikipedia.org/wiki/Text_corpus">corpus</a>. For a text document, this could involve removing any styling, formatting, or other meta-information. For a data record, such as an <code>NSManagedObject</code>, this means taking all of the salient fields and combining it into a representation.</p>
+
+<p>Once extracted, the content is <a href="http://en.wikipedia.org/wiki/Tokenization">tokenized</a> for further processing.</p>
+
+<h3><a id="user-content-filter" class="anchor" href="#filter" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Filter</h3>
+
+<p>In order to get the most relevant matches, it's important to filter out common, or "stop" words like articles, pronouns, and helping verbs, that don't really contribute to overall meaning.</p>
+
+<h3><a id="user-content-reduce" class="anchor" href="#reduce" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Reduce</h3>
+
+<p>Along the same lines, words that mean basically the same thing should be reduced down into a common form. Morpheme clusters, such as grammatical conjugations like "computer", "computers", "computed", and "computing", for example, can all be simplified to be just "compute", using a <a href="http://en.wikipedia.org/wiki/Stemming">stemmer</a>. Synonyms, likewise, can be lumped into a common entry using a thesaurus lookup.</p>
+
+<h3><a id="user-content-index" class="anchor" href="#index" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Index</h3>
+
+<p>The end result of extracting, filtering, and reducing content into an array of normalized tokens is to form an <a href="http://en.wikipedia.org/wiki/Inverted_index">inverted index</a>, such that each token points to its origin in the index.</p>
+
+<p>After repeating this process for each document or record in the corpus until, each token can point to many different articles. In the process of searching, a query is mapped onto one or many of these tokens, retrieving the union of the articles associated with each token.</p>
+
+<h2><a id="user-content-using-search-kit" class="anchor" href="#using-search-kit" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Using Search Kit</h2>
+
+<h3><a id="user-content-creating-an-index" class="anchor" href="#creating-an-index" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Creating an Index</h3>
+
+<p><code>SKIndexRef</code> is the central data type in Search Kit, containing all of the information needed to process and fulfill searches, and add information from new documents. Indexes can be persistent / file-based or ephemeral / in-memory. Indexes can either be created from scratch, or loaded from an existing file or data object—and once 
+an index is finished being used, like many other C APIs, the index is closed.</p>
+
+<p>When starting a new in-memory index, use an empty <code>NSMutableData</code> instance as the data store:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> mutableData <span class="pl-k">=</span> NSMutableData()
+<span class="pl-k">let</span> index <span class="pl-k">=</span> SKIndexCreateWithMutableData(mutableData, <span class="pl-c1">nil</span>, SKIndexType(kSKIndexInverted<span class="pl-k">.</span><span class="pl-c1">rawValue</span>), <span class="pl-c1">nil</span>)<span class="pl-k">.</span><span class="pl-c1">takeRetainedValue</span>()</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSMutableData</span> *mutableData = [<span class="pl-c1">NSMutableData</span> <span class="pl-c1">data</span>];
+SKIndexRef index = SKIndexCreateWithMutableData((__bridge <span class="pl-c1">CFMutableDataRef</span>)mutableData, <span class="pl-c1">NULL</span>, <span class="pl-c1">kSKIndexInverted</span>, <span class="pl-c1">NULL</span>);</pre></div>
+
+<h3><a id="user-content-adding-documents-to-an-index" class="anchor" href="#adding-documents-to-an-index" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Adding Documents to an Index</h3>
+
+<p><code>SKDocumentRef</code> is the data type associated with entries in the index. When a search is performed, documents (along with their context and relevance) are the results.</p>
+
+<p>Each <code>SKDocumentRef</code> is associated with a URI.</p>
+
+<p>For documents on the file system, the URI is simply the location of the file on disk:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> fileURL <span class="pl-k">=</span> NSURL(fileURLWithPath: <span class="pl-s"><span class="pl-pds">"</span>/path/to/document<span class="pl-pds">"</span></span>)
+<span class="pl-k">let</span> document <span class="pl-k">=</span> SKDocumentCreateWithURL(fileURL)<span class="pl-k">.</span><span class="pl-c1">takeRetainedValue</span>()</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSURL</span> *fileURL = [<span class="pl-c1">NSURL</span> <span class="pl-c1">fileURLWithPath:</span><span class="pl-s"><span class="pl-pds">@"</span>/path/to/document<span class="pl-pds">"</span></span>];
+SKDocumentRef document = SKDocumentCreateWithURL((__bridge <span class="pl-c1">CFURLRef</span>)fileURL);</pre></div>
+
+<p>For Core Data managed objects, the <code>NSManagedObjectID -URIRepresentation</code> can be used:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> objectURL <span class="pl-k">=</span> objectID<span class="pl-k">.</span>URIRepresentation()
+<span class="pl-k">let</span> document <span class="pl-k">=</span> SKDocumentCreateWithURL(objectURL)<span class="pl-k">.</span><span class="pl-c1">takeRetainedValue</span>()</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSURL</span> *objectURL = [objectID <span class="pl-c1">URIRepresentation</span>];
+SKDocumentRef document = SKDocumentCreateWithURL((__bridge <span class="pl-c1">CFURLRef</span>)objectURL);</pre></div>
+
+<blockquote>
+<p>For any other kinds of data, it would be up to the developer to define a URI representation.</p>
+</blockquote>
+
+<p>When adding the contents of a <code>SKDocumentRef</code> to an <code>SKIndexRef</code>, the text can either be specified manually:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> string <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>Lorem ipsum dolar sit amet<span class="pl-pds">"</span></span>
+SKIndexAddDocumentWithText(index, document, string, <span class="pl-c1">true</span>)</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSString</span> *string = <span class="pl-s"><span class="pl-pds">@"</span>Lorem ipsum dolar sit amet<span class="pl-pds">"</span></span>;
+<span class="pl-en">SKIndexAddDocumentWithText</span>(index, document, (__bridge <span class="pl-c1">CFStringRef</span>)string, true);</pre></div>
+
+<p>...or collected automatically from a file:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> mimeTypeHint <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>text/rtf<span class="pl-pds">"</span></span>
+SKIndexAddDocument(index, document, mimeTypeHint, <span class="pl-c1">true</span>)</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSString</span> *mimeTypeHint = <span class="pl-s"><span class="pl-pds">@"</span>text/rtf<span class="pl-pds">"</span></span>;
+<span class="pl-en">SKIndexAddDocument</span>(index, document, (__bridge <span class="pl-c1">CFStringRef</span>)mimeTypeHint, true);</pre></div>
+
+<p>To change the way a file-based document's contents are processed, properties can be defined when creating the index:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> stopwords: <span class="pl-c1">Set</span> <span class="pl-k">=</span> [<span class="pl-s"><span class="pl-pds">"</span>all<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>and<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>its<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>it's<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>the<span class="pl-pds">"</span></span>]
+
+<span class="pl-k">let</span> properties: [NSObject: <span class="pl-c1">AnyObject</span>] <span class="pl-k">=</span> [
+    <span class="pl-s"><span class="pl-pds">"</span>kSKStartTermChars<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>, <span class="pl-c">// additional starting-characters for terms</span>
+    <span class="pl-s"><span class="pl-pds">"</span>kSKTermChars<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>-_@.'<span class="pl-pds">"</span></span>, <span class="pl-c">// additional characters within terms</span>
+    <span class="pl-s"><span class="pl-pds">"</span>kSKEndTermChars<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>,   <span class="pl-c">// additional ending-characters for terms</span>
+    <span class="pl-s"><span class="pl-pds">"</span>kSKMinTermLength<span class="pl-pds">"</span></span>: <span class="pl-c1">3</span>,
+    <span class="pl-s"><span class="pl-pds">"</span>kSKStopWords<span class="pl-pds">"</span></span>: stopwords
+]
+
+<span class="pl-k">let</span> index <span class="pl-k">=</span> SKIndexCreateWithURL(url, <span class="pl-c1">nil</span>, SKIndexType(kSKIndexInverted<span class="pl-k">.</span><span class="pl-c1">rawValue</span>), properties)<span class="pl-k">.</span><span class="pl-c1">takeRetainedValue</span>()</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSSet</span> *stopwords = [<span class="pl-c1">NSSet</span> <span class="pl-c1">setWithObjects:</span><span class="pl-s"><span class="pl-pds">@"</span>all<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">@"</span>and<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">@"</span>its<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">@"</span>it's<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">@"</span>the<span class="pl-pds">"</span></span>, <span class="pl-c1">nil</span>];
+
+<span class="pl-c1">NSDictionary</span> *properties = @{
+  <span class="pl-s"><span class="pl-pds">@"</span>kSKStartTermChars<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">@"</span><span class="pl-pds">"</span></span>, <span class="pl-c">// additional starting-characters for terms</span>
+  <span class="pl-s"><span class="pl-pds">@"</span>kSKTermChars<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">@"</span>-_@.'<span class="pl-pds">"</span></span>, <span class="pl-c">// additional characters within terms</span>
+  <span class="pl-s"><span class="pl-pds">@"</span>kSKEndTermChars<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">@"</span><span class="pl-pds">"</span></span>,   <span class="pl-c">// additional ending-characters for terms</span>
+  <span class="pl-s"><span class="pl-pds">@"</span>kSKMinTermLength<span class="pl-pds">"</span></span>: @(<span class="pl-c1">3</span>),
+  <span class="pl-s"><span class="pl-pds">@"</span>kSKStopWords<span class="pl-pds">"</span></span>:stopwords
+};
+
+SKIndexRef index = SKIndexCreateWithURL((<span class="pl-c1">CFURLRef</span>)url, <span class="pl-c1">NULL</span>, <span class="pl-c1">kSKIndexInverted</span>, (<span class="pl-c1">CFDictionaryRef</span>)properties);</pre></div>
+
+<p>After adding to or modifying an index's documents, you'll need to commit the changes to the backing store via <code>SKIndexFlush()</code> to make your changes available to a search.</p>
+
+<h3><a id="user-content-searching" class="anchor" href="#searching" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Searching</h3>
+
+<p><code>SKSearchRef</code> is the data type constructed to perform a search on an <code>SKIndexRef</code>. It contains a reference to the index, a query string, and a set of options:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> query <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>kind of blue<span class="pl-pds">"</span></span>
+<span class="pl-k">let</span> options <span class="pl-k">=</span> SKSearchOptions(kSKSearchOptionDefault)
+<span class="pl-k">let</span> search <span class="pl-k">=</span> SKSearchCreate(index, query, options)<span class="pl-k">.</span><span class="pl-c1">takeRetainedValue</span>()</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSString</span> *query = <span class="pl-s"><span class="pl-pds">@"</span>kind of blue<span class="pl-pds">"</span></span>;
+SKSearchOptions options = <span class="pl-c1">kSKSearchOptionDefault</span>;
+SKSearchRef search = SKSearchCreate(index, (<span class="pl-c1">CFStringRef</span>)query, options);</pre></div>
+
+<p><code>SKSearchOptions</code> is a bitmask with the following possible values:</p>
+
+<blockquote>
+<ul>
+<li><code>kSKSearchOptionDefault</code>: Default search options include:
+
+<ul>
+<li>Relevance scores will be computed</li>
+<li>Spaces in a query are interpreted as Boolean AND operators.</li>
+<li>Do not use similarity searching.</li>
+</ul></li>
+</ul>
+</blockquote>
+
+<p>These options can be specified individually as well:</p>
+
+<blockquote>
+<ul>
+<li><code>kSKSearchOptionNoRelevanceScores</code>: This option saves time during a search by suppressing the computation of relevance scores.</li>
+<li><code>kSKSearchOptionSpaceMeansOR</code>: This option alters query behavior so that spaces are interpreted as Boolean OR operators.</li>
+<li><code>kSKSearchOptionFindSimilar</code>: This option alters query behavior so that Search Kit returns references to documents that are similar to an example text string. When this option is specified, Search Kit ignores all query operators.</li>
+</ul>
+</blockquote>
+
+<p>Just creating an <code>SKSearchRef</code> kicks off the asynchronous search; results can be accessed with one or more calls to <code>SKSearchFindMatches</code>, which returns a batch of results at a time until you've seen all the matching documents. Iterating through the range of found matches provides access to the document URL and relevance score (if calculated):</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> limit <span class="pl-k">=</span> <span class="pl-k">...</span>                <span class="pl-c">// Maximum number of results</span>
+<span class="pl-k">let</span> time: NSTimeInterval <span class="pl-k">=</span> <span class="pl-k">...</span> <span class="pl-c">// Maximum time to get results, in seconds</span>
+
+<span class="pl-k">var</span> documentIDs: [SKDocumentID] <span class="pl-k">=</span> <span class="pl-c1">Array</span>(count: limit, repeatedValue: <span class="pl-c1">0</span>)
+<span class="pl-k">var</span> urls: [<span class="pl-c1">Unmanaged</span><span class="pl-k">&lt;</span>CFURL<span class="pl-k">&gt;</span>?] <span class="pl-k">=</span> <span class="pl-c1">Array</span>(count: limit, repeatedValue: <span class="pl-c1">nil</span>)
+<span class="pl-k">var</span> scores: [<span class="pl-c1">Float</span>] <span class="pl-k">=</span> <span class="pl-c1">Array</span>(count: limit, repeatedValue: <span class="pl-c1">0</span>)    
+<span class="pl-k">var</span> foundCount <span class="pl-k">=</span> <span class="pl-c1">0</span>
+
+<span class="pl-k">let</span> hasMoreResults <span class="pl-k">=</span> SKSearchFindMatches(search, limit, <span class="pl-k">&amp;</span>documentIDs, <span class="pl-k">&amp;</span>scores, time, <span class="pl-k">&amp;</span>count)
+
+SKIndexCopyDocumentURLsForDocumentIDs(index, foundCount, <span class="pl-k">&amp;</span>documentIDs, <span class="pl-k">&amp;</span>urls)
+
+<span class="pl-k">let</span> results: [NSURL] <span class="pl-k">=</span> <span class="pl-c1">zip</span>(urls[<span class="pl-c1">0</span> <span class="pl-k">..&lt;</span> foundCount], scores)<span class="pl-k">.</span><span class="pl-c1">flatMap</span>({
+    (cfurl, score) <span class="pl-k">-&gt;</span> NSURL? <span class="pl-k">in</span>
+    <span class="pl-k">guard</span> <span class="pl-k">let</span> url <span class="pl-k">=</span> cfurl?<span class="pl-k">.</span><span class="pl-c1">takeRetainedValue</span>() <span class="pl-k">as</span> NSURL?
+        <span class="pl-k">else</span> { <span class="pl-k">return</span> <span class="pl-c1">nil</span> }
+
+    <span class="pl-c1">print</span>(<span class="pl-s"><span class="pl-pds">"</span>- <span class="pl-pse">\(</span><span class="pl-s1">url</span><span class="pl-pse">)</span>: <span class="pl-pse">\(</span><span class="pl-s1">score</span><span class="pl-pse">)</span><span class="pl-pds">"</span></span>)
+    <span class="pl-k">return</span> url
+})</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSUInteger</span> limit = ...; <span class="pl-c">// Maximum number of results</span>
+<span class="pl-c1">NSTimeInterval</span> time = ...; <span class="pl-c">// Maximum time to get results, in seconds</span>
+SKDocumentID documentIDs[limit];
+<span class="pl-c1">CFURLRef</span> urls[limit];
+<span class="pl-k">float</span> scores[limit];
+<span class="pl-c1">CFIndex</span> foundCount;
+<span class="pl-c1">Boolean</span> hasMoreResults = SKSearchFindMatches(search, limit, documentIDs, scores, time, &amp;foundCount);
+
+<span class="pl-en">SKIndexCopyDocumentURLsForDocumentIDs</span>(index, foundCount, documentIDs, urls);
+
+<span class="pl-c1">NSMutableArray</span> *mutableResults = [<span class="pl-c1">NSMutableArray</span> <span class="pl-c1">array</span>];
+[[<span class="pl-c1">NSIndexSet</span> <span class="pl-c1">indexSetWithIndexesInRange:</span><span class="pl-c1">NSMakeRange</span>(<span class="pl-c1">0</span>, count)] <span class="pl-c1">enumerateIndexesUsingBlock:</span>^(<span class="pl-c1">NSUInteger</span> idx, <span class="pl-c1">BOOL</span> *stop) {
+    <span class="pl-c1">CFURLRef</span> url = urls[idx];
+    <span class="pl-k">float</span> relevance = scores[idx];
+
+    <span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span>- <span class="pl-c1">%@</span>: <span class="pl-c1">%f</span><span class="pl-pds">"</span></span>, url, relevance);
+
+    <span class="pl-k">if</span> (objectID) {
+      [mutableResults <span class="pl-c1">addObject:</span>(<span class="pl-c1">NSURL</span> *)url];
+    }
+
+    <span class="pl-c1">CFRelease</span>(url);
+}];</pre></div>
+
+<blockquote>
+<p>For more examples of Search Kit in action, be sure to check out <a href="https://github.com/indragiek">Indragie Karunaratne's</a> project, <a href="https://github.com/indragiek/SNRSearchIndex">SNRSearchIndex</a>.</p>
+</blockquote>
+
+<hr>
+
+<p>And so this article becomes yet another document in the corpus we call the Internet. By pointing to Search Kit, and explaining even the briefest of its features, this—the strings of tokens you read at this very moment—are (perhaps) making it easier for others to find Search Kit.</p>
+
+<p>...and it's a good thing, too, because Search Kit is a wonderful and all-too-obscure framework, which anyone building a content-based system would do well to investigate.</p>
+</article></div>

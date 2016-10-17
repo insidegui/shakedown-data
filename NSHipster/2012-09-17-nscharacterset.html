@@ -1,0 +1,211 @@
+<div class="announce instapaper_body md" data-path="2012-09-17-nscharacterset.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>NSCharacterSet</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div>Cocoa</div></td>
+
+  <td><div>Foundation boasts one of the best, most complete implementations of strings around. But a string implementation is only as good as the programmer who wields it. So this week, we're going to explore some common uses--and misuses--of an important part of the Foundation string ecosystem: NSCharacterSet.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+
+  <th>reviewed</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>2.0</div></td>
+
+  <td><div>September 9, 2015</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>As mentioned <a href="http://nshipster.com/cfstringtransform/">previously</a>, Foundation boasts one of the best, most complete implementations of strings around.</p>
+
+<p>But a string implementation is only as good as the programmer who wields it. So this week, we're going to explore some common uses--and misuses--of an important part of the Foundation string ecosystem: <code>NSCharacterSet</code>.</p>
+
+<hr>
+
+<blockquote>
+<p>If you're fuzzy on what character encodings are (or even if you have a pretty good working knowledge), you should take this opportunity to read / re-read / skim and read later Joel Spolsky's classic essay <a href="http://www.joelonsoftware.com/articles/Unicode.html">"The Absolute Minimum Every Software Developer Absolutely, Positively Must Know About Unicode and Character Sets (No Excuses!)"</a>. Having that fresh in your mind will give you a much better appreciation of everything we're about to cover.</p>
+</blockquote>
+
+<p><code>NSCharacterSet</code> and its mutable counterpart, <code>NSMutableCharacterSet</code>, provide an object-oriented way of representing sets of Unicode characters. It's most often used with <code>NSString</code> &amp; <code>NSScanner</code> to filter, remove, or split on different kinds of characters. To give you an idea of what those kinds of characters can be, take a look at the class methods provided by <code>NSCharacterSet</code>:</p>
+
+<ul>
+<li><code>alphanumericCharacterSet</code></li>
+<li><code>capitalizedLetterCharacterSet</code></li>
+<li><code>controlCharacterSet</code></li>
+<li><code>decimalDigitCharacterSet</code></li>
+<li><code>decomposableCharacterSet</code></li>
+<li><code>illegalCharacterSet</code></li>
+<li><code>letterCharacterSet</code></li>
+<li><code>lowercaseLetterCharacterSet</code></li>
+<li><code>newlineCharacterSet</code></li>
+<li><code>nonBaseCharacterSet</code></li>
+<li><code>punctuationCharacterSet</code></li>
+<li><code>symbolCharacterSet</code></li>
+<li><code>uppercaseLetterCharacterSet</code></li>
+<li><code>whitespaceAndNewlineCharacterSet</code></li>
+<li><code>whitespaceCharacterSet</code></li>
+</ul>
+
+<p>Contrary to what its name might suggest, <code>NSCharacterSet</code> has <em>nothing</em> to do with <code>NSSet</code>.</p>
+
+<p>However, <code>NSCharacterSet</code> <em>does</em> have quite a bit in common with <code>NSIndexSet</code>, conceptually if not also in its underlying implementation. <code>NSIndexSet</code>, covered <a href="http://nshipster.com/nsindexset/">previously</a>, represents a sorted collection of unique unsigned integers. Unicode characters are likewise unique unsigned integers that roughly correspond to some orthographic representation. Thus, a character set like <code>NSCharacterSet +lowercaseCharacterSet</code> is analogous to the <code>NSIndexSet</code> of the integers 97 to 122.</p>
+
+<p>Now that we're comfortable with the basic concepts of <code>NSCharacterSet</code>, let's see some of those patterns and anti-patterns:</p>
+
+<h2><a id="user-content-stripping-whitespace" class="anchor" href="#stripping-whitespace" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Stripping Whitespace</h2>
+
+<p><code>NSString -stringByTrimmingCharactersInSet:</code> is a method you should know by heart. It's most often passed <code>NSCharacterSet +whitespaceCharacterSet</code> or <code>+whitespaceAndNewlineCharacterSet</code> in order to remove the leading and trailing whitespace of string input.</p>
+
+<p>It's important to note that this method <em>only</em> strips the <em>first</em> and <em>last</em> contiguous sequences of characters in the specified set. That is to say, if you want to remove excess whitespace between words, you need to go a step further.</p>
+
+<h2><a id="user-content-squashing-whitespace" class="anchor" href="#squashing-whitespace" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Squashing Whitespace</h2>
+
+<p>So let's say you do want to get rid of excessive inter-word spacing for that string you just stripped of whitespace. Here's a really easy way to do that:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">var</span> string <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>  Lorem    ipsum dolar   sit  amet. <span class="pl-pds">"</span></span>
+
+<span class="pl-k">let</span> components <span class="pl-k">=</span> string<span class="pl-k">.</span>componentsSeparatedByCharactersInSet(NSCharacterSet<span class="pl-k">.</span>whitespaceCharacterSet())<span class="pl-k">.</span><span class="pl-c1">filter</span> { <span class="pl-k">!</span>$<span class="pl-c1">0</span><span class="pl-k">.</span><span class="pl-c1">isEmpty</span> }
+
+string <span class="pl-k">=</span> components<span class="pl-k">.</span>joinWithSeparator(<span class="pl-s"><span class="pl-pds">"</span> <span class="pl-pds">"</span></span>)</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSString</span> *string = <span class="pl-s"><span class="pl-pds">@"</span>Lorem    ipsum dolar   sit  amet.<span class="pl-pds">"</span></span>;
+string = [string <span class="pl-c1">stringByTrimmingCharactersInSet:</span>[<span class="pl-c1">NSCharacterSet</span> <span class="pl-c1">whitespaceCharacterSet</span>]];
+
+<span class="pl-c1">NSArray</span> *components = [string <span class="pl-c1">componentsSeparatedByCharactersInSet:</span>[<span class="pl-c1">NSCharacterSet</span> <span class="pl-c1">whitespaceCharacterSet</span>]];
+components = [components <span class="pl-c1">filteredArrayUsingPredicate:</span>[<span class="pl-c1">NSPredicate</span> <span class="pl-c1">predicateWithFormat:</span><span class="pl-s"><span class="pl-pds">@"</span>self &lt;&gt; ''<span class="pl-pds">"</span></span>]];
+
+string = [components <span class="pl-c1">componentsJoinedByString:</span><span class="pl-s"><span class="pl-pds">@"</span> <span class="pl-pds">"</span></span>];</pre></div>
+
+<p>First, trim the string of leading and trailing whitespace. Next, use <code>NSString -componentsSeparatedByCharactersInSet:</code> to split on the remaining whitespace to create an <code>NSArray</code>. Next, filter out the blank string components with an <code>NSPredicate</code>. Finally, use <code>NSArray -componentsJoinedByString:</code> to re-join the components with a single space. Note that this only works for languages like English that delimit words with whitespace.</p>
+
+<p>And now for the anti-patterns. Take a gander at <a href="http://stackoverflow.com/questions/758212/how-can-i-strip-all-the-whitespaces-from-a-string-in-objective-c">the answers to this question on StackOverflow</a>.</p>
+
+<p>At the time of writing, the correct answer ranks second by number of votes, with 58 up and 2 down. The top answer edges it out with 84 up and 24 down.</p>
+
+<p>Now, it's not uncommon for the top-voted / accepted answer to not be the correct one, but this question may set records for number of completely distinct answers (10), and number of unique, completely incorrect answers (9).</p>
+
+<p>Without further ado, here are the 9 <em>incorrect</em> answers:</p>
+
+<ul>
+<li>"Use <code>stringByTrimmingCharactersInSet</code>" - <em>Only strips the leading and trailing whitespace, as you know.</em></li>
+<li>"Replace ' ' with ''" - <em>This removes <strong>all</strong> of the spaces. Swing and a miss.</em></li>
+<li>"Use a regular expression" - <em>Kinda works, except it doesn't handle leading and trailing whitespace. A regular expression is overkill anyway.</em></li>
+<li>"Use Regexp Lite" - <em>No seriously, regular expressions are completely unnecessary. And it's definitely not worth the external dependency.</em></li>
+<li>"Use OgreKit" - <em>Ditto any other third-party regexp library.</em></li>
+<li>"Split the string into components, iterate over them to find components with non-zero length, and then re-combine" - <em>So close, but <code>componentsSeparatedByCharactersInSet:</code> already makes the iteration unnecessary.</em></li>
+<li>"Replace two-space strings with single-space strings in a while loop" - <em>Wrong and oh-so computationally wasteful</em>.</li>
+<li>"Manually iterate over each <code>unichar</code> in the string and use <code>NSCharacterSet -characterIsMember:</code>" - <em>Shows a surprising level of sophistication for missing the method that does this in the standard library.</em></li>
+<li>"Find and remove all of the tabs" - <em>Thanks all the same, but who said anything about tabs?</em></li>
+</ul>
+
+<p>I don't mean to rag on any of the answerers personally--this is all to point out how many ways there are to approach these kinds of tasks, and how many of those ways are totally wrong.</p>
+
+<h2><a id="user-content-string-tokenization" class="anchor" href="#string-tokenization" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>String Tokenization</h2>
+
+<p><strong>Do not use <code>NSCharacterSet</code> to tokenize strings.</strong>
+<strong>Use <code>CFStringTokenizer</code> instead.</strong></p>
+
+<p>You can be forgiven for using <code>componentsSeparatedByCharactersInSet:</code> to clean up user input, but do this for anything more complex, and you'll be in a world of pain.</p>
+
+<p>Why? Well, remember that bit about languages not always having whitespace word boundaries? As it turns out, those languages are rather widely used. Just Chinese and Japanese--#1 and #9 in terms of number of speakers, respectively--alone account for 16% of the world population, or well over a billion people.</p>
+
+<p>...and even for languages that do have whitespace word boundaries, tokenization has some obscure edge cases, particularly with compound words and punctuation.</p>
+
+<p>This is all to say: use <code>CFStringTokenizer</code> (or <code>enumerateSubstringsInRange:options:usingBlock:</code>) if you ever intend to split a string by words in any meaningful way.</p>
+
+<h2><a id="user-content-parse-data-from-strings" class="anchor" href="#parse-data-from-strings" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Parse Data From Strings</h2>
+
+<p><code>NSScanner</code> is a class that helps to parse data out of arbitrary or semi-structured strings. When you create a scanner for a string, you can specify a set of characters to skip, thus preventing any of those characters from somehow being included in the values parsed from the string.</p>
+
+<p>For example, let's say you have a string that parses opening hours in the following form:</p>
+
+<pre><code>Mon-Thurs:  8:00 - 18:00
+Fri:        7:00 - 17:00
+Sat-Sun:    10:00 - 15:00
+</code></pre>
+
+<p>You might <code>enumerateLinesUsingBlock:</code> and parse with an <code>NSScanner</code> like so:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> skippedCharacters <span class="pl-k">=</span> NSMutableCharacterSet<span class="pl-k">.</span>punctuationCharacterSet()
+skippedCharacters<span class="pl-k">.</span>formUnionWithCharacterSet(NSCharacterSet<span class="pl-k">.</span>whitespaceCharacterSet())
+
+hours<span class="pl-k">.</span>enumerateLines { (line, _) <span class="pl-k">in</span>
+    <span class="pl-k">let</span> scanner <span class="pl-k">=</span> NSScanner(string: line)
+    scanner<span class="pl-k">.</span>charactersToBeSkipped <span class="pl-k">=</span> skippedCharacters
+
+    <span class="pl-k">var</span> startDay, endDay: NSString?
+    <span class="pl-k">var</span> startHour: <span class="pl-c1">Int</span> <span class="pl-k">=</span> <span class="pl-c1">0</span>
+    <span class="pl-k">var</span> startMinute: <span class="pl-c1">Int</span> <span class="pl-k">=</span> <span class="pl-c1">0</span>
+    <span class="pl-k">var</span> endHour: <span class="pl-c1">Int</span> <span class="pl-k">=</span> <span class="pl-c1">0</span>
+    <span class="pl-k">var</span> endMinute: <span class="pl-c1">Int</span> <span class="pl-k">=</span> <span class="pl-c1">0</span>
+
+    scanner<span class="pl-k">.</span>scanCharactersFromSet(NSCharacterSet<span class="pl-k">.</span>letterCharacterSet(), intoString: <span class="pl-k">&amp;</span>startDay)
+    scanner<span class="pl-k">.</span>scanCharactersFromSet(NSCharacterSet<span class="pl-k">.</span>letterCharacterSet(), intoString: <span class="pl-k">&amp;</span>endDay)
+
+    scanner<span class="pl-k">.</span>scanInteger(<span class="pl-k">&amp;</span>startHour)
+    scanner<span class="pl-k">.</span>scanInteger(<span class="pl-k">&amp;</span>startMinute)
+    scanner<span class="pl-k">.</span>scanInteger(<span class="pl-k">&amp;</span>endHour)
+    scanner<span class="pl-k">.</span>scanInteger(<span class="pl-k">&amp;</span>endMinute)
+}</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSMutableCharacterSet</span> *skippedCharacters = [<span class="pl-c1">NSMutableCharacterSet</span> <span class="pl-c1">punctuationCharacterSet</span>];
+[skippedCharacters <span class="pl-c1">formUnionWithCharacterSet:</span>[<span class="pl-c1">NSCharacterSet</span> <span class="pl-c1">whitespaceCharacterSet</span>]];
+
+[hours <span class="pl-c1">enumerateLinesUsingBlock:</span>^(<span class="pl-c1">NSString</span> *line, <span class="pl-c1">BOOL</span> *stop) {
+    <span class="pl-c1">NSScanner</span> *scanner = [<span class="pl-c1">NSScanner</span> <span class="pl-c1">scannerWithString:</span>line];
+    [scanner <span class="pl-c1">setCharactersToBeSkipped:</span>skippedCharacters];
+
+    <span class="pl-c1">NSString</span> *startDay, *endDay;
+    <span class="pl-c1">NSUInteger</span> startHour, startMinute, endHour, endMinute;
+
+    [scanner <span class="pl-c1">scanCharactersFromSet:</span>[<span class="pl-c1">NSCharacterSet</span> <span class="pl-c1">letterCharacterSet</span>] <span class="pl-c1">intoString:</span>&amp;startDay];
+    [scanner <span class="pl-c1">scanCharactersFromSet:</span>[<span class="pl-c1">NSCharacterSet</span> <span class="pl-c1">letterCharacterSet</span>] <span class="pl-c1">intoString:</span>&amp;endDay];
+
+    [scanner <span class="pl-c1">scanInteger:</span>&amp;startHour];
+    [scanner <span class="pl-c1">scanInteger:</span>&amp;startMinute];
+    [scanner <span class="pl-c1">scanInteger:</span>&amp;endHour];
+    [scanner <span class="pl-c1">scanInteger:</span>&amp;endMinute];
+}];</pre></div>
+
+<p>We first construct an <code>NSMutableCharacterSet</code> from the union of whitespace and punctuation characters. Telling <code>NSScanner</code> to skip these characters greatly reduces the logic necessary to parse values from the string.</p>
+
+<p><code>scanCharactersFromSet:</code> with the letters character set captures the start and (optional) end day of the week for each entry. <code>scanInteger</code> similarly captures the next contiguous integer value.</p>
+
+<p><code>NSCharacterSet</code> and <code>NSScanner</code> allow you to code quickly and confidently. They're really a great combination, those two.</p>
+
+<hr>
+
+<p><code>NSCharacterSet</code> is but one piece to the Foundation string ecosystem, and perhaps the most misused and misunderstood of them all. By keeping these patterns and anti-patterns in mind, however, not only will you be able to do useful things like manage whitespace and scan information from strings, but--more importantly--you'll be able to avoid all of the wrong ways to do it.</p>
+
+<p>And if not being wrong isn't the most important thing about being an NSHipster, then I don't want to be right!</p>
+
+<blockquote>
+<p>Ed. Speaking of (not) being wrong, the original version of this article contained errors in both code samples. These have since been corrected.</p>
+</blockquote>
+</article></div>

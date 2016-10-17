@@ -1,0 +1,219 @@
+<div class="announce instapaper_body md" data-path="2012-10-22-nslinguistictagger.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>tags</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>NSLinguisticTagger</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div>Cocoa</div></td>
+
+  <td><div>nshipster</div></td>
+
+  <td><div>NSLinguisticTagger is a veritable Swiss Army Knife of linguistic functionality, with the ability to tokenize natural language strings into words, determine their part-of-speech &amp; stem, extract names of people, places, &amp; organizations, and tell you the languages &amp; respective writing system used in the string.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+
+  <th>reviewed</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>2.0</div></td>
+
+  <td><div>September 8, 2015</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p><code>NSLinguisticTagger</code> is a veritable Swiss Army Knife of linguistic functionality, with the ability to <a href="http://en.wikipedia.org/wiki/Tokenization">tokenize</a> natural language strings into words, determine their part-of-speech &amp; <a href="http://en.wikipedia.org/wiki/Word_stem">stem</a>, extract names of people, places, &amp; organizations, and tell you the languages &amp; respective <a href="http://en.wikipedia.org/wiki/Writing_system">writing system</a> used in the string.</p>
+
+<p>For most of us, this is far more power than we know what to do with. But perhaps this is just for lack sufficient opportunity to try. After all, almost every application deals with natural language in one way or another--perhaps <code>NSLinguisticTagger</code> could add a new level of polish, or enable brand new features entirely.</p>
+
+<hr>
+
+<p>Introduced with iOS 5, <code>NSLinguisticTagger</code> is a contemporary to Siri, raising speculation that it was a byproduct of the personal assistant's development.</p>
+
+<p>Consider a typical question we might ask Siri:</p>
+
+<blockquote>
+<p>What is the weather in San Francisco?</p>
+</blockquote>
+
+<p>Computers are a long ways off from "understanding" this question literally, but with a few simple tricks, we can do a reasonable job understanding the <em>intention</em> of the question:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> question <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>What is the weather in San Francisco?<span class="pl-pds">"</span></span>
+<span class="pl-k">let</span> options: NSLinguisticTaggerOptions <span class="pl-k">=</span> [<span class="pl-k">.</span>OmitWhitespace, <span class="pl-k">.</span>OmitPunctuation, <span class="pl-k">.</span>JoinNames]
+<span class="pl-k">let</span> schemes <span class="pl-k">=</span> NSLinguisticTagger<span class="pl-k">.</span>availableTagSchemesForLanguage(<span class="pl-s"><span class="pl-pds">"</span>en<span class="pl-pds">"</span></span>)
+<span class="pl-k">let</span> tagger <span class="pl-k">=</span> NSLinguisticTagger(tagSchemes: schemes, options: <span class="pl-c1">Int</span>(options<span class="pl-k">.</span><span class="pl-c1">rawValue</span>))
+tagger<span class="pl-k">.</span>string <span class="pl-k">=</span> question
+tagger<span class="pl-k">.</span>enumerateTagsInRange(NSMakeRange(<span class="pl-c1">0</span>, (question <span class="pl-k">as</span> NSString)<span class="pl-k">.</span><span class="pl-c1">length</span>), scheme: NSLinguisticTagSchemeNameTypeOrLexicalClass, options: options) { (tag, tokenRange, _, _) <span class="pl-k">in</span>
+    <span class="pl-k">let</span> token <span class="pl-k">=</span> (question <span class="pl-k">as</span> NSString)<span class="pl-k">.</span>substringWithRange(tokenRange)
+    println(<span class="pl-s"><span class="pl-pds">"</span><span class="pl-pse">\(</span><span class="pl-s1">token</span><span class="pl-pse">)</span>: <span class="pl-pse">\(</span><span class="pl-s1">tag</span><span class="pl-pse">)</span><span class="pl-pds">"</span></span>)
+}</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSString</span> *question = <span class="pl-s"><span class="pl-pds">@"</span>What is the weather in San Francisco?<span class="pl-pds">"</span></span>;
+<span class="pl-c1">NSLinguisticTaggerOptions</span> options = NSLinguisticTaggerOmitWhitespace | NSLinguisticTaggerOmitPunctuation | NSLinguisticTaggerJoinNames;
+<span class="pl-c1">NSLinguisticTagger</span> *tagger = [[<span class="pl-c1">NSLinguisticTagger</span> <span class="pl-c1">alloc</span>] <span class="pl-c1">initWithTagSchemes:</span> [<span class="pl-c1">NSLinguisticTagger</span> <span class="pl-c1">availableTagSchemesForLanguage:</span><span class="pl-s"><span class="pl-pds">@"</span>en<span class="pl-pds">"</span></span>] <span class="pl-c1">options:</span>options];
+tagger.string = question;
+[tagger <span class="pl-c1">enumerateTagsInRange:</span><span class="pl-c1">NSMakeRange</span>(<span class="pl-c1">0</span>, [question <span class="pl-c1">length</span>]) <span class="pl-c1">scheme:</span><span class="pl-c1">NSLinguisticTagSchemeNameTypeOrLexicalClass</span> <span class="pl-c1">options:</span>options <span class="pl-c1">usingBlock:</span>^(<span class="pl-c1">NSString</span> *tag, <span class="pl-c1">NSRange</span> tokenRange, <span class="pl-c1">NSRange</span> sentenceRange, <span class="pl-c1">BOOL</span> *stop) {
+    <span class="pl-c1">NSString</span> *token = [question <span class="pl-c1">substringWithRange:</span>tokenRange];
+    <span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span><span class="pl-c1">%@</span>: <span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, token, tag);
+}];</pre></div>
+
+<p>This code would print the following:</p>
+
+<blockquote>
+<p>What: <em>Pronoun</em>
+is: <em>Verb</em>
+the: <em>Determiner</em>
+weather: <em>Noun</em>
+in: <em>Preposition</em>
+San Francisco: <em>PlaceName</em></p>
+</blockquote>
+
+<p>If we filter on nouns, verbs, and place name, we get <code>[is, weather, San Francisco]</code>.</p>
+
+<p>Just based on this alone, or perhaps in conjunction with something like the <a href="http://developer.apple.com/library/mac/#documentation/LatentSemanticMapping/Reference/LatentSemanticMapping_header_reference/Reference/reference.html">Latent Semantic Mapping</a> framework, we can conclude that a reasonable course of action would be to make an API request to determine the current weather conditions in San Francisco.</p>
+
+<h2><a id="user-content-tagging-schemes" class="anchor" href="#tagging-schemes" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Tagging Schemes</h2>
+
+<p><code>NSLinguisticTagger</code> can be configured to tag different kinds of information by specifying any of the following tagging schemes:</p>
+
+<ul>
+<li><code>NSLinguisticTagSchemeTokenType</code>: Classifies tokens according to their broad type: word, punctuation, whitespace, etc.</li>
+<li><code>NSLinguisticTagSchemeLexicalClass</code>: Classifies tokens according to class: part of speech for words, type of punctuation or whitespace, etc.</li>
+<li><code>NSLinguisticTagSchemeNameType</code>: Classifies tokens as to whether they are part of named entities of various types or not.</li>
+<li><code>NSLinguisticTagSchemeNameTypeOrLexicalClass</code>: Follows <code>NSLinguisticTagSchemeNameType</code> for names, and <code>NSLinguisticTagSchemeLexicalClass</code> for all other tokens.</li>
+</ul>
+
+<p>Here's a list of the various token types associated with each scheme (<code>NSLinguisticTagSchemeNameTypeOrLexicalClass</code>, as the name implies, is the union between <code>NSLinguisticTagSchemeNameType</code> &amp; <code>NSLinguisticTagSchemeLexicalClass</code>):</p>
+
+<table>
+  <thead>
+    <tr>
+      <th><tt>NSLinguisticTagSchemeTokenType</tt></th>
+      <th><tt>NSLinguisticTagSchemeLexicalClass</tt></th>
+      <th><tt>NSLinguisticTagSchemeNameType</tt></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <ul>
+          <li><tt>NSLinguisticTagWord</tt></li>
+          <li><tt>NSLinguisticTagPunctuation</tt></li>
+          <li><tt>NSLinguisticTagWhitespace</tt></li>
+          <li><tt>NSLinguisticTagOther</tt></li>
+        </ul>
+      </td>
+      <td>
+        <ul>
+          <li><tt>NSLinguisticTagNoun</tt></li>
+          <li><tt>NSLinguisticTagVerb</tt></li>
+          <li><tt>NSLinguisticTagAdjective</tt></li>
+          <li><tt>NSLinguisticTagAdverb</tt></li>
+          <li><tt>NSLinguisticTagPronoun</tt></li>
+          <li><tt>NSLinguisticTagDeterminer</tt></li>
+          <li><tt>NSLinguisticTagParticle</tt></li>
+          <li><tt>NSLinguisticTagPreposition</tt></li>
+          <li><tt>NSLinguisticTagNumber</tt></li>
+          <li><tt>NSLinguisticTagConjunction</tt></li>
+          <li><tt>NSLinguisticTagInterjection</tt></li>
+          <li><tt>NSLinguisticTagClassifier</tt></li>
+          <li><tt>NSLinguisticTagIdiom</tt></li>
+          <li><tt>NSLinguisticTagOtherWord</tt></li>
+          <li><tt>NSLinguisticTagSentenceTerminator</tt></li>
+          <li><tt>NSLinguisticTagOpenQuote</tt></li>
+          <li><tt>NSLinguisticTagCloseQuote</tt></li>
+          <li><tt>NSLinguisticTagOpenParenthesis</tt></li>
+          <li><tt>NSLinguisticTagCloseParenthesis</tt></li>
+          <li><tt>NSLinguisticTagWordJoiner</tt></li>
+          <li><tt>NSLinguisticTagDash</tt></li>
+          <li><tt>NSLinguisticTagOtherPunctuation</tt></li>
+          <li><tt>NSLinguisticTagParagraphBreak</tt></li>
+          <li><tt>NSLinguisticTagOtherWhitespace</tt></li>
+        </ul>
+      </td>
+      <td>
+        <ul>
+          <li><tt>NSLinguisticTagPersonalName</tt></li>
+          <li><tt>NSLinguisticTagPlaceName</tt></li>
+          <li><tt>NSLinguisticTagOrganizationName</tt></li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<p>So for basic tokenization, use <code>NSLinguisticTagSchemeTokenType</code>, which will allow you to distinguish between words and whitespace or punctuation. For information like part-of-speech, or differentiation between different parts of speech, <code>NSLinguisticTagSchemeLexicalClass</code> is your new bicycle.</p>
+
+<p>Continuing with the tagging schemes:</p>
+
+<ul>
+<li><code>NSLinguisticTagSchemeLemma</code>: This tag scheme supplies a stem forms of the words, if known.</li>
+<li><code>NSLinguisticTagSchemeLanguage</code>: Tags tokens according to their script. The tag values will be standard language abbreviations such as <code>"en"</code>, <code>"fr"</code>, <code>"de"</code>, etc., as used with the <code>NSOrthography</code> class. <em>Note that the tagger generally attempts to determine the language of text at the level of an entire sentence or paragraph, rather than word by word.</em></li>
+<li><code>NSLinguisticTagSchemeScript</code>: Tags tokens according to their script. The tag values will be standard script abbreviations such as <code>"Latn"</code>, <code>"Cyrl"</code>, <code>"Jpan"</code>, <code>"Hans"</code>, <code>"Hant"</code>, etc.</li>
+</ul>
+
+<p>As demonstrated in the example above, first you initialize an <code>NSLinguisticTagger</code> with an array of all of the different schemes that you wish to use, and then assign or enumerate each of the tags after specifying the tagger's input string.</p>
+
+<h2><a id="user-content-tagging-options" class="anchor" href="#tagging-options" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Tagging Options</h2>
+
+<p>In addition to the available tagging schemes, there are several options you can pass to <code>NSLinguisticTagger</code> (combined with bitwise OR <code>|</code>) to slightly change its behavior:</p>
+
+<ul>
+<li><code>NSLinguisticTaggerOmitWords</code></li>
+<li><code>NSLinguisticTaggerOmitPunctuation</code></li>
+<li><code>NSLinguisticTaggerOmitWhitespace</code></li>
+<li><code>NSLinguisticTaggerOmitOther</code></li>
+</ul>
+
+<p>Each of these options omit the broad categories of tags described. For example, <code>NSLinguisticTagSchemeLexicalClass</code>, which distinguishes between many different kinds of punctuation, all of those would be omitted with <code>NSLinguisticTaggerOmitPunctuation</code>. This is preferable to manually filtering these tag types in enumeration blocks or with predicates.</p>
+
+<p>The last option is specific to <code>NSLinguisticTagSchemeNameType</code>:</p>
+
+<ul>
+<li><code>NSLinguisticTaggerJoinNames</code></li>
+</ul>
+
+<p>By default, each token in a name is treated as separate instances. In many circumstances, it makes sense to treat names like "San Francisco" as a single token, rather than two separate tokens. Passing this token makes this so.</p>
+
+<hr>
+
+<p>Finally, NSString provides convenience methods that handle the setup and configuration of NSLinguisticTagger on your behalf. For one-off tokenizing, you can save a lot of boilerplate:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">var</span> tokenRanges: NSArray?
+<span class="pl-k">let</span> tags <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>Where in the world is Carmen San Diego?<span class="pl-pds">"</span></span><span class="pl-k">.</span>linguisticTagsInRange(
+                NSMakeRange(<span class="pl-c1">0</span>, (question <span class="pl-k">as</span> NSString)<span class="pl-k">.</span><span class="pl-c1">length</span>), 
+                scheme: NSLinguisticTagSchemeNameTypeOrLexicalClass, 
+                options: options, orthography: <span class="pl-c1">nil</span>, tokenRanges: <span class="pl-k">&amp;</span>tokenRanges
+            )
+<span class="pl-c">// tags: ["Pronoun", "Preposition", "Determiner", "Noun", "Verb", "PersonalName"]</span></pre></div>
+
+<hr>
+
+<p>Natural language is woefully under-utilized in user interface design on mobile devices. When implemented effectively, a single utterance from the user can achieve the equivalent of a handful of touch interactions, in a fraction of the time.</p>
+
+<p>Sure, it's not easy, but if we spent a fraction of the time we use to make our visual interfaces pixel-perfect, we could completely re-imagine how users best interact with apps and devices. And with <code>NSLinguisticTagger</code>, it's never been easier to get started.</p>
+</article></div>

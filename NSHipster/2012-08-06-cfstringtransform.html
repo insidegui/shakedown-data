@@ -1,0 +1,207 @@
+<div class="announce instapaper_body md" data-path="2012-08-06-cfstringtransform.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>tags</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>CFStringTransform</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div>Cocoa</div></td>
+
+  <td><div>nshipster, popular</div></td>
+
+  <td><div>NSString is the crown jewel of Foundation. But as powerful as it is, one would be remiss not to mention its toll-free bridged cousin, CFMutableString—or more specifically, CFStringTransform.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>1.2</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>There are two indicators that tell you everything you need to know about how nice a language is to use:</p>
+
+<ol>
+<li>API Consistency</li>
+<li>Quality of String Implementation</li>
+</ol>
+
+<p><code>NSString</code> is the crown jewel of Foundation. In an age where other languages <em>still</em> struggle to handle Unicode correctly, <code>NSString</code> is especially impressive. Not content to <em>just work</em> with whatever is thrown at it, <code>NSString</code> can parse strings into linguistic tags, determine the dominant language of the content, and convert between every string encoding imaginable. It's unfairly good.</p>
+
+<p>But as powerful as <code>NSString</code> / <code>NSMutableString</code> are, one would be remiss not to mention their <a href="http://developer.apple.com/library/ios/#documentation/CoreFoundation/Conceptual/CFDesignConcepts/Articles/tollFreeBridgedTypes.html">toll-free bridged</a> cousin, <code>CFMutableString</code>—or more specifically, <code>CFStringTransform</code>.</p>
+
+<p>As denoted by the <code>CF</code> prefix, <code>CFStringTransform</code> is part of Core Foundation. The function takes the following arguments, and returns a <code>Boolean</code> for whether or not the transform was successful:</p>
+
+<ul>
+<li><code>string</code>: The string to be transformed. Since this argument is a <code>CFMutableStringRef</code>, an <code>NSMutableString</code> can be passed using toll-free bridging cast.</li>
+<li><code>range</code>: The range of the string over which the transformation should be applied. This argument is a <code>CFRange</code>, rather than an <code>NSRange</code> value.</li>
+<li><code>transform</code>: The transformation to apply. This argument takes an <a href="http://userguide.icu-project.org/transforms/general">ICU transform string</a>, including any one of the string constants described below.</li>
+<li><code>reverse</code>: Whether to run the transformation in reverse, where applicable.</li>
+</ul>
+
+<p><code>CFStringTransform</code> covers a lot of ground with its <code>transform</code> argument. Here's a rundown of what it can do:</p>
+
+<h2><a id="user-content-strip-accents-and-diacritics" class="anchor" href="#strip-accents-and-diacritics" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Strip Accents and Diacritics</h2>
+
+<p>Énġlišh långuãge lẳcks iñterêßţing diaçrïtičş. As such, it can be useful to normalize extended Latin characters into ASCII-friendly representations. Rid any string of its squiggly bits using the <code>kCFStringTransformStripCombiningMarks</code> transformation.</p>
+
+<h2><a id="user-content-name-unicode-characters" class="anchor" href="#name-unicode-characters" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Name Unicode Characters</h2>
+
+<p><code>kCFStringTransformToUnicodeName</code> allows you to determine the Unicode standard name for special characters, including Emoji. For instance, "<g-emoji alias="sheep" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f411.png" ios-version="6.0">🐑</g-emoji><g-emoji alias="dash" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f4a8.png" ios-version="6.0">💨</g-emoji><g-emoji alias="sparkles" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2728.png" ios-version="6.0">✨</g-emoji>" is transformed into "{SHEEP} {DASH SYMBOL} {SPARKLES}", and "<g-emoji alias="pig" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f437.png" ios-version="6.0">🐷</g-emoji>" becomes "{PIG FACE}".</p>
+
+<h2><a id="user-content-transliterate-between-orthographies" class="anchor" href="#transliterate-between-orthographies" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Transliterate Between Orthographies</h2>
+
+<p>With the notable exception of English (and its delightful spelling inconsistencies), writing systems generally encode speech sounds into a consistent written representation. European languages generally use the Latin alphabet (with a few added diacritics), Russian uses Cyrillic, Japanese uses Hiragana &amp; Katakana, and Thai, Korean, &amp; Arabic each have their own scripts.</p>
+
+<p>Although each language has a particular inventory of sounds, some of which other languages may lack, the overlap across all of the major writing systems is remarkably high—enough so that one can rather effectively <a href="http://en.wikipedia.org/wiki/Transliteration">transliterate</a> (not to be confused with <a href="http://en.wikipedia.org/wiki/Translation">translation</a>) from one script to another.</p>
+
+<p><code>CFStringTransform</code> can transliterate back and forth between Latin and Arabic, Cyrillic, Greek, Korean (Hangul), Hebrew, Japanese (Hiragana &amp; Katakana), Mandarin Chinese, and Thai.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Transformation</th>
+      <th>Input</th>
+      <th>Output</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><tt>kCFStringTransformLatinArabic</tt></td>
+      <td>mrḥbạ</td>
+      <td>مرحبا</td>
+    </tr>
+    <tr>
+      <td><tt>kCFStringTransformLatinCyrillic</tt></td>
+      <td>privet</td>
+      <td>привет</td>
+    </tr>
+    <tr>
+      <td><tt>kCFStringTransformLatinGreek</tt></td>
+      <td>geiá sou</td>
+      <td>γειά σου</td>
+    </tr>
+    <tr>
+      <td><tt>kCFStringTransformLatinHangul</tt></td>
+      <td>annyeonghaseyo</td>
+      <td>안녕하세요</td>
+    </tr>
+    <tr>
+      <td><tt>kCFStringTransformLatinHebrew</tt></td>
+      <td>şlwm</td>
+      <td>שלום</td>
+    </tr>
+    <tr>
+      <td><tt>kCFStringTransformLatinHiragana</tt></td>
+      <td>hiragana</td>
+      <td>ひらがな</td>
+    </tr>
+    <tr>
+      <td><tt>kCFStringTransformLatinKatakana</tt></td>
+      <td>katakana</td>
+      <td>カタカナ</td>
+    </tr>
+    <tr>
+      <td><tt>kCFStringTransformLatinThai</tt></td>
+      <td>s̄wạs̄dī</td>
+      <td>สวัสดี</td>
+    </tr>
+    <tr>
+      <td><tt>kCFStringTransformHiraganaKatakana</tt></td>
+      <td>にほんご</td>
+      <td>ニホンゴ</td>
+    </tr>
+    <tr>
+      <td><tt>kCFStringTransformMandarinLatin</tt></td>
+      <td>中文</td>
+      <td>zhōng wén</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+<p>And that's only using the constants defined in Core Foundation! By passing an <a href="http://userguide.icu-project.org/transforms/general#TOC-ICU-Transliterators">ICU transform</a> directly, <code>CFStringTransform</code> can transliterate between Latin and Arabic, Armenian, Bopomofo, Cyrillic, Georgian, Greek, Han, Hangul, Hebrew, Hiragana, Indic ( Devanagari, Gujarati, Gurmukhi, Kannada, Malayalam, Oriya, Tamil, &amp; Telegu), Jamo, Katakana, Syriac, Thaana, &amp; Thai.</p>
+</blockquote>
+
+<h2><a id="user-content-normalize-user-generated-content" class="anchor" href="#normalize-user-generated-content" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Normalize User-Generated Content</h2>
+
+<p>One of the more practical applications for string transformation is to normalize unpredictable user input. Even if your application doesn't specifically deal with other languages, you should be able to intelligently process anything the user types into your app.</p>
+
+<p>For example, let's say you want to build a searchable index of movies on the device, which includes greetings from around the world:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">var</span> mutableString <span class="pl-k">=</span> NSMutableString(string: <span class="pl-s"><span class="pl-pds">"</span>Hello! こんにちは! สวัสดี! مرحبا! 您好!<span class="pl-pds">"</span></span>) <span class="pl-k">as</span> CFMutableStringRef</pre></div>
+
+<ul>
+<li>First, apply the <code>kCFStringTransformToLatin</code> transform to transliterate all non-English text into a Latin alphabetic representation.</li>
+</ul>
+
+<div class="highlight highlight-source-swift"><pre>CFStringTransform(mutableString, <span class="pl-c1">nil</span>, kCFStringTransformToLatin, Boolean(<span class="pl-c1">0</span>))</pre></div>
+
+<blockquote>
+<p>Hello! こんにちは! สวัสดี! مرحبا! 您好! →
+Hello! kon'nichiha! s̄wạs̄dī! mrḥbạ! nín hǎo!</p>
+</blockquote>
+
+<ul>
+<li>Next, apply the <code>kCFStringTransformStripCombiningMarks</code> transform to remove any diacritics or accents.</li>
+</ul>
+
+<div class="highlight highlight-source-swift"><pre>CFStringTransform(mutableString, <span class="pl-c1">nil</span>, kCFStringTransformStripCombiningMarks, Boolean(<span class="pl-c1">0</span>))</pre></div>
+
+<blockquote>
+<p>Hello! kon'nichiha! s̄wạs̄dī! mrḥbạ! nín hǎo! →
+Hello! kon'nichiha! swasdi! mrhba! nin hao!</p>
+</blockquote>
+
+<ul>
+<li>Finally, downcase the text with <code>CFStringLowercase</code>, and split the text into tokens with <a href="https://developer.apple.com/library/mac/#documentation/CoreFoundation/Reference/CFStringTokenizerRef/Reference/reference.html"><code>CFStringTokenizer</code></a> to use as an index for the text.</li>
+</ul>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> tokenizer <span class="pl-k">=</span> CFStringTokenizerCreate(<span class="pl-c1">nil</span>, mutableString, CFRangeMake(<span class="pl-c1">0</span>, CFStringGetLength(mutableString)), <span class="pl-c1">0</span>, CFLocaleCopyCurrent())
+
+<span class="pl-k">var</span> mutableTokens: [<span class="pl-c1">String</span>] <span class="pl-k">=</span> []
+<span class="pl-k">var</span> type: CFStringTokenizerTokenType
+<span class="pl-k">do</span> {
+    type <span class="pl-k">=</span> CFStringTokenizerAdvanceToNextToken(tokenizer)
+    <span class="pl-k">let</span> range <span class="pl-k">=</span> CFStringTokenizerGetCurrentTokenRange(tokenizer)
+    <span class="pl-k">let</span> token <span class="pl-k">=</span> CFStringCreateWithSubstring(<span class="pl-c1">nil</span>, mutableString, range) <span class="pl-k">as</span> NSString
+    mutableTokens<span class="pl-k">.</span>append(token)
+} <span class="pl-k">while</span> type <span class="pl-k">!=</span> <span class="pl-k">.</span>None</pre></div>
+
+<blockquote>
+<p>(hello, kon'nichiha, swasdi, mrhba, nin, hao)</p>
+</blockquote>
+
+<p>By applying the same set of transformations on search text entered by the user, you have a universal way to search regardless of either the language of the search string or content!</p>
+
+<blockquote>
+<p>For anyone wanting to be especially clever, all of the necessary transformations can actually be done in a single pass, by specifying the ICU transform <code>"Any-Latin; Latin-ASCII; Any-Lower"</code>.</p>
+</blockquote>
+
+<hr>
+
+<p><code>CFStringTransform</code> can be an insanely powerful way to bend language to your will. And it's but one of many powerful features that await you if you're brave enough to explore outside of Objective-C's warm OO embrace.</p>
+</article></div>

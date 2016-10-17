@@ -1,0 +1,270 @@
+<div class="announce instapaper_body md" data-path="2014-03-24-nsurl.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>excerpt</th>
+
+  <th>revisions</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>NSURL /<br>NSURLComponents</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div>Cocoa</div></td>
+
+  <td><div>Of all the one-dimensional data types out there, URIs reign supreme. Here, in a single, human-parsable string, is every conceivable piece of information necessary to encode the location of any piece of information that has, does, and will ever exist on a computer.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>2014-03-24</th>
+
+  <th>2015-09-08</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>Original publication.</div></td>
+
+  <td><div>Added Swift translation &amp; section on `stringByAddingPercentEncodingWithAllowedCharacters`.</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+
+  <th>reviewed</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>2.0</div></td>
+
+  <td><div>September 9, 2015</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>There is a simple beauty to—let's call them "one-dimensional data types": numbers or strings formatted to contain multiple values, retrievable through a mathematical operator or parsing routine. Like how the hexadecimal color <tt>#EE8262</tt> can have <a href="http://en.wikipedia.org/wiki/Web_colors">red, green, and blue components</a> extracted by masking and shifting its bits, or how <a href="http://en.wikipedia.org/wiki/Regular_expression">regular expressions</a> can match and capture complex patterns in just a few characters.</p>
+
+<p>Of all the one-dimensional data types out there, <a href="http://en.wikipedia.org/wiki/URI_scheme">URIs</a> reign supreme. Here, in a single, human-parsable string, is every conceivable piece of information necessary to encode the location of any piece of information that has, does, and will ever exist on a computer.</p>
+
+<p>In its most basic form, a URI is comprised of a scheme name and a hierarchical part, with an optional query and fragment:</p>
+
+<pre><code>&lt;scheme name&gt; : &lt;hierarchical part&gt; [ ? &lt;query&gt; ] [ # &lt;fragment&gt; ]
+</code></pre>
+
+<p>Many protocols, including HTTP, specify a regular structure for information like the username, password, port, and path in the hierarchical part:</p>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/nsurl.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/nsurl.png" alt="URL Structure" style="max-width:100%;"></a></p>
+
+<p>A solid grasp of network programming is rooted in an unshakeable familiarity with URL components. As a software developer, this means having a command over the URI functionality in your programming language's standard library.</p>
+
+<blockquote>
+<p>If a programming language does not have a URI module in its standard library, run, don't walk, to a real language that does.</p>
+</blockquote>
+
+<hr>
+
+<p>In Foundation, URLs are represented by <code>NSURL</code>.</p>
+
+<p><code>NSURL</code> instances are created using the <code>NSURL(string:)</code> initializer:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> url <span class="pl-k">=</span> NSURL(string: <span class="pl-s"><span class="pl-pds">"</span>http://example.com/<span class="pl-pds">"</span></span>)</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSURL</span> *url = [<span class="pl-c1">NSURL</span> <span class="pl-c1">URLWithString:</span><span class="pl-s"><span class="pl-pds">@"</span>http://example.com<span class="pl-pds">"</span></span>];</pre></div>
+
+<p>If the passed string is not a valid URL, this initializer will return <code>nil</code>.</p>
+
+<p><code>NSString</code> also has some vestigial functionality for path manipulation, <a href="http://nshipster.com/nstemporarydirectory/">as described a few weeks back</a>, but that's being slowly migrated over to <code>NSURL</code>. While the extra conversion from <code>NSString</code> to <code>NSURL</code> is not the most convenient step, it's always worthwhile. If a value is a URL, it should be stored and passed as an <code>NSURL</code>; conflating the two types is reckless and lazy API design.</p>
+
+<p><code>NSURL</code> also has the initializer <code>NSURL(string:relativeToURL:)</code>, which can be used to construct a URL from a string relative to a base URL. The behavior of this method can be a source of confusion, because of how it treats leading <code>/</code>'s in relative paths.</p>
+
+<p>For reference, here are representative examples of how this method works:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> baseURL <span class="pl-k">=</span> NSURL(string: <span class="pl-s"><span class="pl-pds">"</span>http://example.com/v1/<span class="pl-pds">"</span></span>)
+
+NSURL(string: <span class="pl-s"><span class="pl-pds">"</span>foo<span class="pl-pds">"</span></span>, relativeToURL: baseURL)
+<span class="pl-c">// http://example.com/v1/foo</span>
+
+NSURL(string:<span class="pl-s"><span class="pl-pds">"</span>foo?bar=baz<span class="pl-pds">"</span></span>, relativeToURL: baseURL)
+<span class="pl-c">// http://example.com/v1/foo?bar=baz</span>
+
+NSURL(string:<span class="pl-s"><span class="pl-pds">"</span>/foo<span class="pl-pds">"</span></span>, relativeToURL: baseURL)
+<span class="pl-c">// http://example.com/foo</span>
+
+NSURL(string:<span class="pl-s"><span class="pl-pds">"</span>foo/<span class="pl-pds">"</span></span>, relativeToURL: baseURL)
+<span class="pl-c">// http://example.com/v1/foo/</span>
+
+NSURL(string:<span class="pl-s"><span class="pl-pds">"</span>/foo/<span class="pl-pds">"</span></span>, relativeToURL: baseURL)
+<span class="pl-c">// http://example.com/foo/</span>
+
+NSURL(string:<span class="pl-s"><span class="pl-pds">"</span>http://example2.com/<span class="pl-pds">"</span></span>, relativeToURL: baseURL)
+<span class="pl-c">// http://example2.com/</span></pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSURL</span> *baseURL = [<span class="pl-c1">NSURL</span> <span class="pl-c1">URLWithString:</span><span class="pl-s"><span class="pl-pds">@"</span>http://example.com/v1/<span class="pl-pds">"</span></span>];
+
+[<span class="pl-c1">NSURL</span> <span class="pl-c1">URLWithString:</span><span class="pl-s"><span class="pl-pds">@"</span>foo<span class="pl-pds">"</span></span> <span class="pl-c1">relativeToURL:</span>baseURL];
+<span class="pl-c">// http://example.com/v1/foo</span>
+
+[<span class="pl-c1">NSURL</span> <span class="pl-c1">URLWithString:</span><span class="pl-s"><span class="pl-pds">@"</span>foo?bar=baz<span class="pl-pds">"</span></span> <span class="pl-c1">relativeToURL:</span>baseURL];
+<span class="pl-c">// http://example.com/v1/foo?bar=baz</span>
+
+[<span class="pl-c1">NSURL</span> <span class="pl-c1">URLWithString:</span><span class="pl-s"><span class="pl-pds">@"</span>/foo<span class="pl-pds">"</span></span> <span class="pl-c1">relativeToURL:</span>baseURL];
+<span class="pl-c">// http://example.com/foo</span>
+
+[<span class="pl-c1">NSURL</span> <span class="pl-c1">URLWithString:</span><span class="pl-s"><span class="pl-pds">@"</span>foo/<span class="pl-pds">"</span></span> <span class="pl-c1">relativeToURL:</span>baseURL];
+<span class="pl-c">// http://example.com/v1/foo/</span>
+
+[<span class="pl-c1">NSURL</span> <span class="pl-c1">URLWithString:</span><span class="pl-s"><span class="pl-pds">@"</span>/foo/<span class="pl-pds">"</span></span> <span class="pl-c1">relativeToURL:</span>baseURL];
+<span class="pl-c">// http://example.com/foo/</span>
+
+[<span class="pl-c1">NSURL</span> <span class="pl-c1">URLWithString:</span><span class="pl-s"><span class="pl-pds">@"</span>http://example2.com/<span class="pl-pds">"</span></span> <span class="pl-c1">relativeToURL:</span>baseURL];
+<span class="pl-c">// http://example2.com/</span></pre></div>
+
+<h2><a id="user-content-url-components" class="anchor" href="#url-components" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>URL Components</h2>
+
+<p><code>NSURL</code> provides accessor methods for each of the URL components as defined by <a href="http://www.ietf.org/rfc/rfc2396.txt">RFC 2396</a>:</p>
+
+<ul>
+<li><code>absoluteString</code></li>
+<li><code>absoluteURL</code></li>
+<li><code>baseURL</code></li>
+<li><code>fileSystemRepresentation</code></li>
+<li><code>fragment</code></li>
+<li><code>host</code></li>
+<li><code>lastPathComponent</code></li>
+<li><code>parameterString</code></li>
+<li><code>password</code></li>
+<li><code>path</code></li>
+<li><code>pathComponents</code></li>
+<li><code>pathExtension</code></li>
+<li><code>port</code></li>
+<li><code>query</code></li>
+<li><code>relativePath</code></li>
+<li><code>relativeString</code></li>
+<li><code>resourceSpecifier</code></li>
+<li><code>scheme</code></li>
+<li><code>standardizedURL</code></li>
+<li><code>user</code></li>
+</ul>
+
+<p>The documentation and examples found in <a href="https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSURL_Class/Reference/Reference.html"><code>NSURL</code>'s documentation</a> are a great way to familiarize yourself with all of the different components.</p>
+
+<blockquote>
+<p>Although username &amp; password <em>can</em> be stored in a URL, consider using <code>NSURLCredential</code> when representing user credentials, or persisting them to the keychain.</p>
+</blockquote>
+
+<h2><a id="user-content-nsurlcomponents" class="anchor" href="#nsurlcomponents" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>NSURLComponents</h2>
+
+<p>Quietly added in iOS 7 and OS X Mavericks was <code>NSURLComponents</code>, which can best be described by what it could have been named instead: <code>NSMutableURL</code>.</p>
+
+<p><code>NSURLComponents</code> instances are constructed much in the same way as <code>NSURL</code>, with a provided <code>NSString</code> and optional base URL to resolve against (<code>NSURLComponents(string:)</code> &amp; <code>NSURLComponents(URL:resolvingAgainstBaseURL:)</code>). It can also be initialized without any arguments to create an empty storage container, similar to <a href="http://nshipster.com/nsdatecomponents/"><code>NSDateComponents</code></a>.</p>
+
+<p>The difference here, between <code>NSURL</code> and <code>NSURLComponents</code>, is that component properties are read-write. This provides a safe and direct way to modify individual components of a URL:</p>
+
+<ul>
+<li><code>scheme</code></li>
+<li><code>user</code></li>
+<li><code>password</code></li>
+<li><code>host</code></li>
+<li><code>port</code></li>
+<li><code>path</code></li>
+<li><code>query</code></li>
+<li><code>fragment</code></li>
+</ul>
+
+<blockquote>
+<p>Attempting to set an invalid scheme string or negative port number will throw an exception.</p>
+</blockquote>
+
+<p>In addition, <code>NSURLComponents</code> also has read-write properties for <a href="http://en.wikipedia.org/wiki/Percent-encoding">percent-encoded</a> versions of each component.</p>
+
+<ul>
+<li><code>percentEncodedUser</code></li>
+<li><code>percentEncodedPassword</code></li>
+<li><code>percentEncodedHost</code></li>
+<li><code>percentEncodedPath</code></li>
+<li><code>percentEncodedQuery</code></li>
+<li><code>percentEncodedFragment</code></li>
+</ul>
+
+<blockquote>
+<p>Getting these properties retains any percent encoding these components may have. Setting these properties assumes the component string is already correctly percent encoded. Attempting to set an incorrectly percent encoded string will cause an exception. Although ';' is a legal path character, it is recommended that it be percent-encoded for best compatibility with NSURL (<code>String</code>'s <code>stringByAddingPercentEncodingWithAllowedCharacters(_:)</code> will percent-encode any ';' characters if you pass the <code>URLPathAllowedCharacterSet</code>).</p>
+</blockquote>
+
+<p>More recently, <code>NSURLComponents</code> gained a <code>queryItems</code> array, giving easy access to any key-value pairs encoded in a URL's query string as an array of <code>NSURLQueryItem</code>.</p>
+
+<h2><a id="user-content-percent-encoding" class="anchor" href="#percent-encoding" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Percent-Encoding</h2>
+
+<p>Speaking of percent-encoding...</p>
+
+<p>OS X 10.9 and iOS 7 brought new <code>String</code>/<code>NSString</code> APIs for handling percent-encoding that improve upon (and deprecate) the old encoding-based <code>NSString</code> methods and the <code>CFURL</code>-related C APIs. To percent-encode a string, use the <code>stringByAddingPercentEncodingWithAllowedCharacters(_:)</code> with the relevant <code>NSCharacterSet</code>:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> title <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>NSURL / NSURLComponents<span class="pl-pds">"</span></span>
+<span class="pl-k">if</span> <span class="pl-k">let</span> escapedTitle <span class="pl-k">=</span> title<span class="pl-k">.</span>stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet<span class="pl-k">.</span>URLQueryAllowedCharacterSet()) {
+    components<span class="pl-k">.</span>query <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>title=<span class="pl-pse">\(</span><span class="pl-s1">escapedTitle</span><span class="pl-pse">)</span><span class="pl-pds">"</span></span>
+}</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSString</span> *title = <span class="pl-s"><span class="pl-pds">@"</span>NSURL / NSURLComponents<span class="pl-pds">"</span></span>;
+<span class="pl-c1">NSString</span> *escapedTitle = [title <span class="pl-c1">stringByAddingPercentEncodingWithAllowedCharacters:</span>[<span class="pl-c1">NSCharacterSet</span> <span class="pl-c1">URLQueryAllowedCharacterSet</span>]];
+components.query = [<span class="pl-c1">NSString</span> <span class="pl-c1">stringWithFormat:</span><span class="pl-s"><span class="pl-pds">@"</span>title=<span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, escapedTitle];</pre></div>
+
+<p>Reversing the encoding is even easier, accomplished on an encoded string with <code>stringByRemovingPercentEncoding</code>. New character sets have been added for each of the six URL components that might require percent-encoding:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-c">// Predefined character sets for the six URL components and subcomponents which allow percent encoding. These character sets are passed to -stringByAddingPercentEncodingWithAllowedCharacters:.</span>
+<span class="pl-k">extension</span> NSCharacterSet {
+    <span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-k">func</span> <span class="pl-en">URLUserAllowedCharacterSet</span>() <span class="pl-k">-&gt;</span> NSCharacterSet
+    <span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-k">func</span> <span class="pl-en">URLPasswordAllowedCharacterSet</span>() <span class="pl-k">-&gt;</span> NSCharacterSet
+    <span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-k">func</span> <span class="pl-en">URLHostAllowedCharacterSet</span>() <span class="pl-k">-&gt;</span> NSCharacterSet
+    <span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-k">func</span> <span class="pl-en">URLPathAllowedCharacterSet</span>() <span class="pl-k">-&gt;</span> NSCharacterSet
+    <span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-k">func</span> <span class="pl-en">URLQueryAllowedCharacterSet</span>() <span class="pl-k">-&gt;</span> NSCharacterSet
+    <span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-k">func</span> <span class="pl-en">URLFragmentAllowedCharacterSet</span>() <span class="pl-k">-&gt;</span> NSCharacterSet
+}</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c">// Predefined character sets for the six URL components and subcomponents which allow percent encoding. These character sets are passed to -stringByAddingPercentEncodingWithAllowedCharacters:.</span>
+<span class="pl-k">@interface</span> <span class="pl-en">NSCharacterSet</span> (NSURLUtilities)
++ (<span class="pl-c1">NSCharacterSet</span> *)<span class="pl-en">URLUserAllowedCharacterSet</span>;
++ (<span class="pl-c1">NSCharacterSet</span> *)<span class="pl-en">URLPasswordAllowedCharacterSet</span>;
++ (<span class="pl-c1">NSCharacterSet</span> *)<span class="pl-en">URLHostAllowedCharacterSet</span>;
++ (<span class="pl-c1">NSCharacterSet</span> *)<span class="pl-en">URLPathAllowedCharacterSet</span>;
++ (<span class="pl-c1">NSCharacterSet</span> *)<span class="pl-en">URLQueryAllowedCharacterSet</span>;
++ (<span class="pl-c1">NSCharacterSet</span> *)<span class="pl-en">URLFragmentAllowedCharacterSet</span>;
+<span class="pl-k">@end</span></pre></div>
+
+<h2><a id="user-content-bookmark-urls" class="anchor" href="#bookmark-urls" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Bookmark URLs</h2>
+
+<p>One final topic worth mentioning are bookmark URLs, which can be used to safely reference files between application launches. Think of them as a persistent <a href="http://en.wikipedia.org/wiki/File_descriptor">file descriptor</a>.</p>
+
+<blockquote>
+<p>A bookmark is an opaque data structure, enclosed in an <code>NSData</code> object, that describes the location of a file. Whereas path- and file reference URLs are potentially fragile between launches of your app, a bookmark can usually be used to re-create a URL to a file even in cases where the file was moved or renamed.</p>
+</blockquote>
+
+<p>You can read more about bookmark URLs in <a href="https://developer.apple.com/library/ios/documentation/FileManagement/Conceptual/FileSystemProgrammingGuide/AccessingFilesandDirectories/AccessingFilesandDirectories.html">"Locating Files Using Bookmarks" from Apple's File System Programming Guide</a></p>
+
+<hr>
+
+<p>Forget jet packs and flying cars—my idea of an exciting future is one where everything has a URL, is encoded in Markdown, and stored in Git. If your mind isn't blown by the implications of a <em>universal</em> resource locator, then I would invite you to reconsider.</p>
+
+<p>Like <a href="http://en.wikipedia.org/wiki/Hypertext">hypertext</a>, universal identification is a philosophical concept that both pre-dates and transcends computers. Together, they form the fabric of our information age: a framework for encoding our collective understanding of the universe as a network of individual facts, in a fashion that is hauntingly similar to how the neurons in our brains do much the same.</p>
+
+<p>We are just now crossing the precipice of a <a href="http://en.wikipedia.org/wiki/Cambrian_explosion">Cambrian Explosion</a> in physical computing. In an internet of things, where <a href="http://en.wikipedia.org/wiki/IPv6#Larger_address_space">every object of our lives has a URL</a> and embeds an electronic soul, a digital consciousness will emerge. Not to say, necessarily, that <a href="http://en.wikipedia.org/wiki/The_Singularity_Is_Near">the singularity is near</a>, but we're on the verge of something incredible.</p>
+
+<p>Quite lofty implications for a technology used most often to exchange pictures of cats.</p>
+</article></div>

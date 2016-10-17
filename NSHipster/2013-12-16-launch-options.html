@@ -1,0 +1,294 @@
+<div class="announce instapaper_body md" data-path="2013-12-16-launch-options.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>UIApplicationDelegate launchOptions</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div>Cocoa</div></td>
+
+  <td><div>AppDelegate is the dumping ground for functionality in iOS.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>t.b.c.</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>AppDelegate is the dumping ground for functionality in iOS.</p>
+
+<p>Application lifecycle management? URL routing? Notifications? Core Data incantations? Invasive and monolithic 3rd-party SDK initialization? Random functionality that doesn't seem to fit anywhere else? Just stash it in <code>AppDelegate.m</code>!</p>
+
+<p>And of all of the crowded, over-loaded parts in AppDelegate, <code>-application:didFinishLaunchingWithOptions:</code> is the most congested of all.</p>
+
+<p>For many developers, the <code>launchOptions</code> parameter is akin to the <code>String[] args</code> argument of a Java <code>main</code> method—something ignored in the rush to building an application. Hiding in plain sight, <code>launchOptions</code> contains a wealth of keyed knowledge that speaks to the multitude of ways an app can be launched on iOS.</p>
+
+<p>This week, all will be revealed in this NSHipster tell-all about the least understood parameter of the most important method in UIKit: <code>launchOptions</code>.</p>
+
+<hr>
+
+<p>Every app begins with <code>UIApplicationDelegate -application:didFinishLaunchingWithOptions:</code> (or more accurately, <code>-application:willFinishLaunchingWithOptions:</code>, when implemented). It is called by the application to notify its delegate that the launch process is finishing, and nearly ready to run.</p>
+
+<p>An app launches when its icon is tapped on <a href="http://en.wikipedia.org/wiki/SpringBoard">Springboard</a>, but there are several other occasions in which an app can be launched. For example, an app registered for a custom URL scheme, such as <code>twitter://</code>, could be launched as a result of opening a URL. An app could also be launched in response to a push notification, or a significant change in device location.</p>
+
+<p>Determining why and how an app launched is the responsibility of the <code>launchOptions</code> parameter. Like a <code>userInfo</code> dictionary, <code>-application:didFinishLaunchingWithOptions:</code> can get information for particular named keys in <code>launchOptions</code>.</p>
+
+<blockquote>
+<p>Many of these keys are also available in the  <code>UIApplicationDidFinishLaunchingNotification</code> notification posted on application launch. Check the docs for additional details.</p>
+</blockquote>
+
+<p>Numerous as they are, <code>launchOptions</code> keys can be more easily understood when organized into groups, corresponding to why the app was launched:</p>
+
+<h2><a id="user-content-opening-from-url" class="anchor" href="#opening-from-url" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Opening from URL</h2>
+
+<p>Apps can launch other apps by passing URLs:</p>
+
+<div class="highlight highlight-source-objc"><pre>[[UIApplication <span class="pl-c1">sharedApplication</span>] <span class="pl-c1">openURL:</span>[<span class="pl-c1">NSURL</span> <span class="pl-c1">URLWithString:</span><span class="pl-s"><span class="pl-pds">@"</span>app://...<span class="pl-pds">"</span></span>]];</pre></div>
+
+<p>For example, an <code>http://</code> URL would open in Safari, a <code>mailto://</code> URL would open in Mail, and a <code>tel://</code> URL would open in Phone.</p>
+
+<p>In these circumstances, the <code>UIApplicationLaunchOptionsURLKey</code> key would be populated in <code>launchOptions</code>.</p>
+
+<blockquote>
+<ul>
+<li><code>UIApplicationLaunchOptionsURLKey</code>: Indicates that the app was launched in order to open a URL. The value of this key is an <code>NSURL</code> object containing the URL to open.</li>
+</ul>
+</blockquote>
+
+<p>An app can also be launched through URLs with additional system information. When an app is launched from an <code>UIDocumentInteractionController</code> or via AirDrop, the following keys are set in <code>launchOptions</code>:</p>
+
+<blockquote>
+<ul>
+<li><code>UIApplicationLaunchOptionsSourceApplicationKey</code>: Identifies the app that requested the launch of your app. The value of this key is an <code>NSString</code> object that represents the bundle ID of the app that made the request</li>
+<li><code>UIApplicationLaunchOptionsAnnotationKey</code>: Indicates that custom data was provided by the app that requested the opening of the URL. The value of this key is a property-list object containing the custom data.</li>
+</ul>
+</blockquote>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSURL</span> *fileURL = [[<span class="pl-c1">NSBundle</span> <span class="pl-c1">mainBundle</span>] <span class="pl-c1">URLForResource:</span><span class="pl-s"><span class="pl-pds">@"</span>Document<span class="pl-pds">"</span></span> <span class="pl-c1">withExtension:</span><span class="pl-s"><span class="pl-pds">@"</span>pdf<span class="pl-pds">"</span></span>];
+<span class="pl-k">if</span> (fileURL) {
+    UIDocumentInteractionController *documentInteractionController = [UIDocumentInteractionController <span class="pl-c1">interactionControllerWithURL:</span>fileURL];
+    documentInteractionController.<span class="pl-smi">annotation</span> = @{<span class="pl-s"><span class="pl-pds">@"</span>foo<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">@"</span>bar<span class="pl-pds">"</span></span>};
+    [documentInteractionController <span class="pl-c1">setDelegate:</span><span class="pl-v">self</span>];
+    [documentInteractionController <span class="pl-c1">presentPreviewAnimated:</span><span class="pl-c1">YES</span>];
+}</pre></div>
+
+<h2><a id="user-content-responding-to-notification" class="anchor" href="#responding-to-notification" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Responding to Notification</h2>
+
+<p>Not to be confused with <a href="http://nshipster.com/nsnotification-and-nsnotificationcenter/"><code>NSNotification</code></a>, apps can be sent remote or local notifications.</p>
+
+<h3><a id="user-content-remote-notification" class="anchor" href="#remote-notification" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Remote Notification</h3>
+
+<p>Introduced in iOS 3, remote, or "push" notifications are one of the defining features of the mobile platform.</p>
+
+<p>To register for remote notifications, <code>registerForRemoteNotificationTypes:</code> is called in <code>application:didFinishLaunchingWithOptions:</code>.</p>
+
+<div class="highlight highlight-source-objc"><pre>[application <span class="pl-c1">registerForRemoteNotificationTypes:</span>
+    UIRemoteNotificationTypeBadge |
+    UIRemoteNotificationTypeSound |
+    UIRemoteNotificationTypeAlert];</pre></div>
+
+<p>...which, if successful, calls  <code>-application:didRegisterForRemoteNotificationsWithDeviceToken:</code>. Once the device has been successfully registered, it can receive push notifications at any time.</p>
+
+<p>If an app receives a notification while in the foreground, its delegate will call <code>application:didReceiveRemoteNotification:</code>. However, if the app is launched, perhaps by swiping the alert in notification center, <code>application:didFinishLaunchingWithOptions:</code> is called with the  <code>UIApplicationLaunchOptionsRemoteNotificationKey</code> launch option:</p>
+
+<blockquote>
+<ul>
+<li><code>UIApplicationLaunchOptionsRemoteNotificationKey</code>: Indicates that a remote notification is available for the app to process. The value of this key is an <code>NSDictionary</code> containing the payload of the remote notification.
+&gt; - <code>alert</code>: Either a string for the alert message or a dictionary with two keys: <code>body</code> and <code>show-view</code>.
+&gt; - <code>badge</code>: A number indicating the quantity of data items to download from the provider. This number is to be displayed on the app icon. The absence of a badge property indicates that any number currently badging the icon should be removed.
+&gt; - <code>sound</code>: The name of a sound file in the app bundle to play as an alert sound. If “default” is specified, the default sound should be played.</li>
+</ul>
+</blockquote>
+
+<p>Since this introduces two separate code paths for notification handling, a common approach is to have <code>application:didFinishLaunchingWithOptions:</code> manually call <code>application:didReceiveRemoteNotification:</code>:</p>
+
+<div class="highlight highlight-source-objc"><pre>- (<span class="pl-c1">BOOL</span>)application:(UIApplication *)application
+didFinishLaunchingWithOptions:(<span class="pl-c1">NSDictionary</span> *)launchOptions
+{
+    <span class="pl-c">// ...</span>
+
+    <span class="pl-k">if</span> (launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey]) {
+        [<span class="pl-v">self</span> <span class="pl-c1">application:</span>application <span class="pl-c1">didReceiveRemoteNotification:</span>launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey]];
+    }
+}</pre></div>
+
+<h3><a id="user-content-local-notification" class="anchor" href="#local-notification" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Local Notification</h3>
+
+<p><a href="https://developer.apple.com/library/ios/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Chapters/IPhoneOSClientImp.html#//apple_ref/doc/uid/TP40008194-CH103-SW1">Local notifications</a> were added in iOS 4, and to this day, are still surprisingly misunderstood.</p>
+
+<p>Apps can schedule <code>UILocalNotification</code>s to trigger at some future time or interval. If the app is active in the foreground at that time, the app calls <code>-application:didReceiveLocalNotification:</code> on its delegate. However, if the app is not active, the notification will be posted to Notification Center.</p>
+
+<p>Unlike remote notifications, <code>UIApplication</code> delegate provides a unified code path for handling local notifications. If an app is launched through a local notification, it calls <code>-application:didFinishLaunchingWithOptions:</code> followed by <code>-application:didReceiveLocalNotification:</code> (that is, there is no need to call it from <code>-application:didFinishLaunchingWithOptions:</code> like remote notifications).</p>
+
+<p>A local notification populates the launch options on <code>UIApplicationLaunchOptionsLocalNotificationKey</code>, which contains a payload with the same structure as a remote notification:</p>
+
+<ul>
+<li><code>UIApplicationLaunchOptionsLocalNotificationKey</code>: Indicates that a local notification is available for the app to process. The value of this key is an <code>NSDictionary</code> containing the payload of the local notification.</li>
+</ul>
+
+<p>In the case where it is desirable to show an alert for a local notification delivered when the app is active in the foreground, and otherwise wouldn't provide a visual indication, here's how one might use the information from <code>UILocalNotification</code> to do it manually:</p>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c">// .h</span>
+@import AVFoundation;
+
+<span class="pl-k">@interface</span> <span class="pl-en">AppDelegate</span> ()
+<span class="pl-k">@property</span> (<span class="pl-k">readwrite</span>, <span class="pl-k">nonatomic</span>, <span class="pl-k">assign</span>) SystemSoundID localNotificationSound;
+<span class="pl-k">@end</span>
+
+<span class="pl-c">// .m</span>
+- (<span class="pl-k">void</span>)application:(UIApplication *)application
+didReceiveLocalNotification:(UILocalNotification *)notification
+{
+    <span class="pl-k">if</span> (application.<span class="pl-smi">applicationState</span> == UIApplicationStateActive) {
+        UIAlertView *alertView =
+            [[UIAlertView <span class="pl-c1">alloc</span>] <span class="pl-c1">initWithTitle:</span>notification.alertAction
+                                       <span class="pl-c1">message:</span>notification.alertBody
+                                      <span class="pl-c1">delegate:</span><span class="pl-c1">nil</span>
+                             <span class="pl-c1">cancelButtonTitle:</span>NSLocalizedString(<span class="pl-s"><span class="pl-pds">@"</span>OK<span class="pl-pds">"</span></span>, <span class="pl-c1">nil</span>)
+                             <span class="pl-c1">otherButtonTitles:</span><span class="pl-c1">nil</span>];
+
+        <span class="pl-k">if</span> (!self.<span class="pl-smi">localNotificationSound</span>) {
+            <span class="pl-c1">NSURL</span> *soundURL = [[<span class="pl-c1">NSBundle</span> <span class="pl-c1">mainBundle</span>] <span class="pl-c1">URLForResource:</span><span class="pl-s"><span class="pl-pds">@"</span>Sosumi<span class="pl-pds">"</span></span>
+                                                      <span class="pl-c1">withExtension:</span><span class="pl-s"><span class="pl-pds">@"</span>wav<span class="pl-pds">"</span></span>];
+            <span class="pl-c1">AudioServicesCreateSystemSoundID</span>((__bridge <span class="pl-c1">CFURLRef</span>)soundURL, &amp;_localNotificationSound);
+        }
+        <span class="pl-c1">AudioServicesPlaySystemSound</span>(self.<span class="pl-smi">localNotificationSound</span>);
+
+        [alertView <span class="pl-c1">show</span>];
+    }
+}
+
+- (<span class="pl-k">void</span>)applicationWillTerminate:(UIApplication *)application {
+    <span class="pl-k">if</span> (self.<span class="pl-smi">localNotificationSound</span>) {
+        <span class="pl-c1">AudioServicesDisposeSystemSoundID</span>(self.<span class="pl-smi">localNotificationSound</span>);
+    }
+}</pre></div>
+
+<h2><a id="user-content-location-event" class="anchor" href="#location-event" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Location Event</h2>
+
+<p>Building the next great geomobilelocalsocial check-in photo app? Well, you're about 4 years late to the party.</p>
+
+<p>But fear not! With iOS region monitoring, your app can be launched on location events:</p>
+
+<blockquote>
+<ul>
+<li><code>UIApplicationLaunchOptionsLocationKey</code>: Indicates that the app was launched in response to an incoming location event. The value of this key is an <code>NSNumber</code> object containing a Boolean value. You should use the presence of this key as a signal to create a <code>CLLocationManager</code> object and start location services again. Location data is delivered only to the location manager delegate and not using this key.</li>
+</ul>
+</blockquote>
+
+<p>Here's an example of how an app might go about monitoring for significant location change to determine launch behavior:</p>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c">// .h</span>
+@import CoreLocation;
+
+<span class="pl-k">@interface</span> <span class="pl-en">AppDelegate</span> () &lt;CLLocationManagerDelegate&gt;
+<span class="pl-k">@property</span> (<span class="pl-k">readwrite</span>, <span class="pl-k">nonatomic</span>, <span class="pl-k">strong</span>) CLLocationManager *locationManager;
+<span class="pl-k">@end</span>
+
+<span class="pl-c">// .m</span>
+- (<span class="pl-c1">BOOL</span>)application:(UIApplication *)application
+didFinishLaunchingWithOptions:(<span class="pl-c1">NSDictionary</span> *)launchOptions
+{
+    <span class="pl-c">// ...</span>
+
+    <span class="pl-k">if</span> (![CLLocationManager <span class="pl-c1">locationServicesEnabled</span>]) {
+        [[[UIAlertView <span class="pl-c1">alloc</span>] <span class="pl-c1">initWithTitle:</span>NSLocalizedString(<span class="pl-s"><span class="pl-pds">@"</span>Location Services Disabled<span class="pl-pds">"</span></span>, <span class="pl-c1">nil</span>)
+                                    <span class="pl-c1">message:</span>NSLocalizedString(<span class="pl-s"><span class="pl-pds">@"</span>You currently have all location services for this device disabled. If you proceed, you will be asked to confirm whether location services should be reenabled.<span class="pl-pds">"</span></span>, <span class="pl-c1">nil</span>)
+                                   <span class="pl-c1">delegate:</span><span class="pl-c1">nil</span>
+                          <span class="pl-c1">cancelButtonTitle:</span>NSLocalizedString(<span class="pl-s"><span class="pl-pds">@"</span>OK<span class="pl-pds">"</span></span>, <span class="pl-c1">nil</span>)
+                          <span class="pl-c1">otherButtonTitles:</span><span class="pl-c1">nil</span>] <span class="pl-c1">show</span>];
+    } <span class="pl-k">else</span> {
+        self.<span class="pl-smi">locationManager</span> = [[CLLocationManager <span class="pl-c1">alloc</span>] <span class="pl-c1">init</span>];
+        self.<span class="pl-smi">locationManager</span>.<span class="pl-smi">delegate</span> = self;
+        [<span class="pl-v">self</span>.locationManager <span class="pl-c1">startMonitoringSignificantLocationChanges</span>];
+    }
+
+    <span class="pl-k">if</span> (launchOptions[UIApplicationLaunchOptionsLocationKey]) {
+        [<span class="pl-v">self</span>.locationManager <span class="pl-c1">startUpdatingLocation</span>];
+    }
+}</pre></div>
+
+<h2><a id="user-content-newsstand" class="anchor" href="#newsstand" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Newsstand</h2>
+
+<p><em>All of the Newsstand developers in the house: say "Yeah!"</em></p>
+
+<p><em><code>crickets.aiff</code></em></p>
+
+<p>Well alright, then.</p>
+
+<p>Newsstand can launch when newly-downloaded assets are available.</p>
+
+<p>This is how you register:</p>
+
+<div class="highlight highlight-source-objc"><pre>[application <span class="pl-c1">registerForRemoteNotificationTypes:</span>
+    UIRemoteNotificationTypeNewsstandContentAvailability];</pre></div>
+
+<p>And this is the key to look out for in <code>launchOptions</code>:</p>
+
+<blockquote>
+<ul>
+<li><code>UIApplicationLaunchOptionsNewsstandDownloadsKey</code>: Indicates that newly downloaded Newsstand assets are available for your app. The value of this key is an array of string identifiers that identify the <code>NKAssetDownload</code> objects corresponding to the assets. Although you can use the identifiers for cross-checking purposes, you should obtain the definitive array of <code>NKAssetDownload</code> objects (representing asset downloads in progress or in error) through the downloadingAssets property of the <code>NKLibrary</code> object representing the Newsstand app’s library.</li>
+</ul>
+</blockquote>
+
+<p>Not too much more to say about that.</p>
+
+<h2><a id="user-content-bluetooth" class="anchor" href="#bluetooth" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Bluetooth</h2>
+
+<p>iOS 7 introduced functionality that allows apps to be relaunched by Bluetooth peripherals.</p>
+
+<p>If an app launches, instantiates a <code>CBCentralManager</code> or <code>CBPeripheralManager</code> with a particular identifier, and connects to other Bluetooth peripherals, the app can be re-launched by certain actions from the Bluetooth system. Depending on whether it was a central or peripheral manager that was notified, one of the following keys will be passed into <code>launchOptions</code>:</p>
+
+<blockquote>
+<ul>
+<li><code>UIApplicationLaunchOptionsBluetoothCentralsKey</code>: Indicates that the app previously had one or more <code>CBCentralManager</code> objects and was relaunched by the Bluetooth system to continue actions associated with those objects. The value of this key is an <code>NSArray</code> object containing one or more <code>NSString</code> objects. Each string in the array represents the restoration identifier for a central manager object.</li>
+<li><code>UIApplicationLaunchOptionsBluetoothPeripheralsKey</code>:  Indicates that the app previously had one or more <code>CBPeripheralManager</code> objects and was relaunched by the Bluetooth system to continue actions associated with those objects. The value of this key is an <code>NSArray</code> object containing one or more <code>NSString</code> objects. Each string in the array represents the restoration identifier for a peripheral manager object.</li>
+</ul>
+</blockquote>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c">// .h</span>
+@import CoreBluetooth;
+
+<span class="pl-k">@interface</span> <span class="pl-en">AppDelegate</span> () &lt;CBCentralManagerDelegate&gt;
+<span class="pl-k">@property</span> (<span class="pl-k">readwrite</span>, <span class="pl-k">nonatomic</span>, <span class="pl-k">strong</span>) CBCentralManager *centralManager;
+<span class="pl-k">@end</span>
+
+<span class="pl-c">// .m</span>
+self.centralManager = [[CBCentralManager <span class="pl-c1">alloc</span>] <span class="pl-c1">initWithDelegate:</span><span class="pl-v">self</span> <span class="pl-c1">queue:</span><span class="pl-c1">nil</span> <span class="pl-c1">options:</span>@{CBCentralManagerOptionRestoreIdentifierKey:(launchOptions[UIApplicationLaunchOptionsBluetoothCentralsKey] ?: [[<span class="pl-c1">NSUUID</span> <span class="pl-c1">UUID</span>] <span class="pl-c1">UUIDString</span>])}];
+
+<span class="pl-k">if</span> (self.centralManager.state == CBCentralManagerStatePoweredOn) {
+    <span class="pl-k">static</span> <span class="pl-c1">NSString</span> * <span class="pl-k">const</span> UID = <span class="pl-s"><span class="pl-pds">@"</span>7C13BAA0-A5D4-4624-9397-15BF67161B1C<span class="pl-pds">"</span></span>; <span class="pl-c">// generated with `$ uuidgen`</span>
+    <span class="pl-c1">NSArray</span> *services = @[[CBUUID <span class="pl-c1">UUIDWithString:</span>UID]];
+    <span class="pl-c1">NSDictionary</span> *scanOptions = @{CBCentralManagerScanOptionAllowDuplicatesKey:@<span class="pl-c1">YES</span>};
+    [<span class="pl-v">self</span>.centralManager <span class="pl-c1">scanForPeripheralsWithServices:</span>services <span class="pl-c1">options:</span>scanOptions];
+}</pre></div>
+
+<hr>
+
+<p>Keeping track of all of the various ways and means of application launching can be exhausting. So it's fortunate that any given app will probably only have to handle one or two of these possibilities.</p>
+
+<p>Knowing what's possible is often what it takes to launch an app from concept to implementation, so bear in mind all of your options when the next great idea springs to mind.</p>
+</article></div>

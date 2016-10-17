@@ -1,0 +1,210 @@
+<div class="announce instapaper_body md" data-path="2014-07-07-nscalendarunityear.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>NSCalendarUnitYear</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div>Swift</div></td>
+
+  <td><div>NSHipster.com was launched 2 years ago to the day. Each week since has featured a new article on some obscure topic in Objective-C or Cocoa (with only a couple gaps). Let's celebrate with some cake.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+
+  <th>reviewed</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>2.0</div></td>
+
+  <td><div>September 9, 2015</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>NSHipster.com was launched 2 years ago to the day, with <a href="http://nshipster.com/nsindexset/">a little article about NSIndexSet</a>. Each week since has featured a new article on some obscure topic in Objective-C or Cocoa (with only a couple gaps), which have been read by millions of visitors in over 180 different countries.</p>
+
+<blockquote>
+<p>This is actually the 101st article, which means that <a href="http://en.wikipedia.org/wiki/100_episodes">by television industry standards</a>, this site is now suitable for broadcast syndication. (Coming soon to TBS!)</p>
+</blockquote>
+
+<p>Let's celebrate with some cake:</p>
+
+<p>
+    
+    
+    
+</p>
+
+<p>Cute, right? Let's see what this looks like in code:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">var</span> cakePath <span class="pl-k">=</span> UIBezierPath()
+cakePath<span class="pl-k">.</span>moveToPoint(CGPointMake(<span class="pl-c1">31</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">32</span><span class="pl-k">.</span><span class="pl-c1">5</span>))
+cakePath<span class="pl-k">.</span>addCurveToPoint(CGPointMake(<span class="pl-c1">6</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">66</span><span class="pl-k">.</span><span class="pl-c1">1</span>), controlPoint1: CGPointMake(<span class="pl-c1">31</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">32</span><span class="pl-k">.</span><span class="pl-c1">5</span>), controlPoint2: CGPointMake(<span class="pl-c1">6</span><span class="pl-k">.</span><span class="pl-c1">9</span>, <span class="pl-c1">46</span><span class="pl-k">.</span><span class="pl-c1">3</span>))
+cakePath<span class="pl-k">.</span>addCurveToPoint(CGPointMake(<span class="pl-c1">6</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">66</span><span class="pl-k">.</span><span class="pl-c1">5</span>), controlPoint1: CGPointMake(<span class="pl-c1">6</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">66</span><span class="pl-k">.</span><span class="pl-c1">2</span>), controlPoint2: CGPointMake(<span class="pl-c1">6</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">66</span><span class="pl-k">.</span><span class="pl-c1">3</span>))
+cakePath<span class="pl-k">.</span>addLineToPoint(CGPointMake(<span class="pl-c1">6</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">95</span>))
+
+<span class="pl-k">...</span></pre></div>
+
+<p>Wait, hold up. What is this, Objective-C? Manipulating <code>UIBezierPath</code>s isn't exactly ground-breaking stuff, but with a few dozen more lines to go, we can make this a bit easier for ourselves.</p>
+
+<p>How about we put some syntactic icing on this cake with some <a href="https://developer.apple.com/library/prerelease/ios/documentation/swift/conceptual/swift_programming_language/AdvancedOperators.html#//apple_ref/doc/uid/TP40014097-CH27-XID_28">custom operators</a>?</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">infix</span> <span class="pl-k">operator</span> <span class="pl-k">---&gt;</span> { <span class="pl-k">associativity</span> <span class="pl-k">left</span> }
+<span class="pl-k">func</span> <span class="pl-en">---&gt;</span> (<span class="pl-k">left</span>: UIBezierPath, <span class="pl-k">right</span>: (CGFloat, CGFloat)) <span class="pl-k">-&gt;</span> UIBezierPath {
+    <span class="pl-k">let</span> (x, y) <span class="pl-k">=</span> <span class="pl-k">right</span>
+    <span class="pl-k">left</span><span class="pl-k">.</span>moveToPoint(CGPointMake(x, y))
+
+    <span class="pl-k">return</span> <span class="pl-k">left</span>
+}
+
+<span class="pl-k">infix</span> <span class="pl-k">operator</span> <span class="pl-k">+-</span> { <span class="pl-k">associativity</span> <span class="pl-k">left</span> }
+<span class="pl-k">func</span> <span class="pl-en">+-</span> (<span class="pl-k">left</span>: UIBezierPath, <span class="pl-k">right</span>: (CGFloat, CGFloat)) <span class="pl-k">-&gt;</span> UIBezierPath {
+    <span class="pl-k">let</span> (x, y) <span class="pl-k">=</span> <span class="pl-k">right</span>
+    <span class="pl-k">left</span><span class="pl-k">.</span>addLineToPoint(CGPointMake(x, y))
+
+    <span class="pl-k">return</span> <span class="pl-k">left</span>
+}
+
+<span class="pl-k">infix</span> <span class="pl-k">operator</span> <span class="pl-k">+~</span> { <span class="pl-k">associativity</span> <span class="pl-k">left</span> }
+<span class="pl-k">func</span> <span class="pl-en">+~</span> (<span class="pl-k">left</span>: UIBezierPath, <span class="pl-k">right</span>: ((CGFloat, CGFloat), (CGFloat, CGFloat), (CGFloat, CGFloat))) <span class="pl-k">-&gt;</span> UIBezierPath {
+    <span class="pl-k">let</span> ((x1, y1), (x2, y2), (x3, y3)) <span class="pl-k">=</span> <span class="pl-k">right</span>
+    <span class="pl-k">left</span><span class="pl-k">.</span>addCurveToPoint(CGPointMake(x1, y1), controlPoint1: CGPointMake(x2, y2), controlPoint2: CGPointMake(x3, y3))
+
+    <span class="pl-k">return</span> <span class="pl-k">left</span>
+}</pre></div>
+
+<blockquote>
+<p>Get it? <code>---&gt;</code> replaces <code>moveToPoint</code>, while <code>+-</code> replaces <code>addLineToPoint</code>, and <code>+~</code> replaces <code>addCurveToPoint</code>. This declaration also does away with all of the redundant calls to <code>CGPointMake</code>, opting instead for simple coordinate tuples.</p>
+</blockquote>
+
+<p>Swift offers a great deal of flexibility in how a programmer structures their code. One feature that exemplifies this mantra of minimal constraints is the ability to add custom prefix, infix, and postfix operators. Swift's syntax limits custom operators to be one or more of any of the following characters (provided an operator does not conflict with a reserved symbols, such as the <code>?</code> or <code>!</code> used for optional values):</p>
+
+<p><code>/ = - + * % &lt; &gt; ! &amp; | ^ . ~.</code></p>
+
+<p>Custom operators offer a powerful tool for cutting through cruft, redundancy, unnecessary repetition, and so on and so forth, et cetera. Combine them with other language features like patterns or chaining to craft DSLs perfectly suited to the task at hand.</p>
+
+<p>Just... you know, don't let this power go to your head.</p>
+
+<p>After full Emoji support (<code>let 🐶🐮</code>), custom operators are perhaps the shiniest new feature for anyone coming from Objective-C. And like any shiny new feature, it is destined to provide the most snark fodder for the "get off my lawn" set.</p>
+
+<h3><a id="user-content-a-dramatization-of-the-perils-of-shiny-swift-features" class="anchor" href="#a-dramatization-of-the-perils-of-shiny-swift-features" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>A Dramatization of the Perils of Shiny Swift Features</h3>
+
+<blockquote>
+<p><code>SCENE: SAN FRANCISCO, THE YEAR IS 2017</code></p>
+
+<p><code>GREYBEARD:</code> So I inherited an old Swift codebase today, and I found this line of code—I swear to <code>$DEITY</code>—it just reads <code>😾 |--~~&gt; 💩</code>.</p>
+
+<p><code>BROGRAMMER</code>: <em>shakes head</em></p>
+
+<p><code>GREYBEARD</code>: What the hell am I supposed to make of that? Is, like, the piece of poo throwing a Hadouken, or is it about to get the business end of a corkscrew?</p>
+
+<p><code>BROGRAMMER</code>: Truly, a philosophical quandary if ever there was one.</p>
+
+<p><code>GREYBEARD</code>: Anyway, turns out, that statement just reloads nearby restaurants.</p>
+
+<p><code>BROGRAMMER:</code> Dude, AFNetworking got weird with its 4.0 release.</p>
+
+<p><code>GREYBEARD:</code> Indeed.</p>
+</blockquote>
+
+<p>The moral of that cautionary tale: <strong>use custom operators and emoji sparingly</strong>.</p>
+
+<p>(Or whatever, the very next code sample totally ignores that advice)</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-c">// Happy 2nd Birthday, NSHipster</span>
+<span class="pl-c">// 😗💨🎂✨2️⃣</span>
+
+<span class="pl-k">var</span> 🍰 <span class="pl-k">=</span> UIBezierPath()
+🍰 <span class="pl-k">---&gt;</span> ((<span class="pl-c1">31</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">32</span><span class="pl-k">.</span><span class="pl-c1">5</span>))
+     <span class="pl-k">+~</span> ((<span class="pl-c1">6</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">66</span><span class="pl-k">.</span><span class="pl-c1">1</span>), (<span class="pl-c1">31</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">32</span><span class="pl-k">.</span><span class="pl-c1">5</span>), (<span class="pl-c1">6</span><span class="pl-k">.</span><span class="pl-c1">9</span>, <span class="pl-c1">46</span><span class="pl-k">.</span><span class="pl-c1">3</span>))
+     <span class="pl-k">+~</span> ((<span class="pl-c1">6</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">66</span><span class="pl-k">.</span><span class="pl-c1">5</span>), (<span class="pl-c1">6</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">66</span><span class="pl-k">.</span><span class="pl-c1">2</span>), (<span class="pl-c1">6</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">66</span><span class="pl-k">.</span><span class="pl-c1">3</span>))
+     <span class="pl-k">+-</span> ((<span class="pl-c1">6</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">95</span>))
+     <span class="pl-k">+~</span> ((<span class="pl-c1">8</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">96</span><span class="pl-k">.</span><span class="pl-c1">9</span>), (<span class="pl-c1">6</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">96</span><span class="pl-k">.</span><span class="pl-c1">1</span>), (<span class="pl-c1">7</span><span class="pl-k">.</span><span class="pl-c1">4</span>, <span class="pl-c1">97</span>))
+     <span class="pl-k">+-</span> ((<span class="pl-c1">92</span>, <span class="pl-c1">93</span><span class="pl-k">.</span><span class="pl-c1">1</span>))
+     <span class="pl-k">+~</span> ((<span class="pl-c1">94</span><span class="pl-k">.</span><span class="pl-c1">2</span>, <span class="pl-c1">93</span>), (<span class="pl-c1">93</span><span class="pl-k">.</span><span class="pl-c1">1</span>, <span class="pl-c1">93</span>), (<span class="pl-c1">94</span><span class="pl-k">.</span><span class="pl-c1">1</span>, <span class="pl-c1">93</span>))
+     <span class="pl-k">+~</span> ((<span class="pl-c1">94</span><span class="pl-k">.</span><span class="pl-c1">4</span>, <span class="pl-c1">91</span>), (<span class="pl-c1">94</span><span class="pl-k">.</span><span class="pl-c1">3</span>, <span class="pl-c1">93</span>), (<span class="pl-c1">94</span><span class="pl-k">.</span><span class="pl-c1">4</span>, <span class="pl-c1">92</span><span class="pl-k">.</span><span class="pl-c1">1</span>))
+     <span class="pl-k">+~</span> ((<span class="pl-c1">94</span><span class="pl-k">.</span><span class="pl-c1">4</span>, <span class="pl-c1">64</span><span class="pl-k">.</span><span class="pl-c1">5</span>), (<span class="pl-c1">94</span><span class="pl-k">.</span><span class="pl-c1">4</span>, <span class="pl-c1">91</span>), (<span class="pl-c1">94</span><span class="pl-k">.</span><span class="pl-c1">4</span>, <span class="pl-c1">65</span><span class="pl-k">.</span><span class="pl-c1">5</span>))
+     <span class="pl-k">+~</span> ((<span class="pl-c1">92</span><span class="pl-k">.</span><span class="pl-c1">4</span>, <span class="pl-c1">61</span><span class="pl-k">.</span><span class="pl-c1">5</span>), (<span class="pl-c1">94</span><span class="pl-k">.</span><span class="pl-c1">4</span>, <span class="pl-c1">62</span><span class="pl-k">.</span><span class="pl-c1">5</span>), (<span class="pl-c1">92</span><span class="pl-k">.</span><span class="pl-c1">4</span>, <span class="pl-c1">61</span><span class="pl-k">.</span><span class="pl-c1">5</span>))
+   <span class="pl-k">---&gt;</span> ((<span class="pl-c1">92</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">89</span><span class="pl-k">.</span><span class="pl-c1">4</span>))
+     <span class="pl-k">+~</span> ((<span class="pl-c1">90</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">91</span><span class="pl-k">.</span><span class="pl-c1">4</span>), (<span class="pl-c1">92</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">90</span><span class="pl-k">.</span><span class="pl-c1">4</span>), (<span class="pl-c1">91</span><span class="pl-k">.</span><span class="pl-c1">6</span>, <span class="pl-c1">91</span><span class="pl-k">.</span><span class="pl-c1">3</span>))
+     <span class="pl-k">+-</span> ((<span class="pl-c1">10</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">94</span><span class="pl-k">.</span><span class="pl-c1">9</span>))
+     <span class="pl-k">+~</span> ((<span class="pl-c1">8</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">93</span><span class="pl-k">.</span><span class="pl-c1">1</span>), (<span class="pl-c1">9</span><span class="pl-k">.</span><span class="pl-c1">4</span>, <span class="pl-c1">94</span><span class="pl-k">.</span><span class="pl-c1">9</span>), (<span class="pl-c1">8</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">94</span><span class="pl-k">.</span><span class="pl-c1">1</span>))
+     <span class="pl-k">+~</span> ((<span class="pl-c1">8</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">83</span>), (<span class="pl-c1">8</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">93</span><span class="pl-k">.</span><span class="pl-c1">1</span>), (<span class="pl-c1">8</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">88</span><span class="pl-k">.</span><span class="pl-c1">4</span>))
+     <span class="pl-k">+-</span> ((<span class="pl-c1">92</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">79</span><span class="pl-k">.</span><span class="pl-c1">1</span>))
+     <span class="pl-k">+~</span> ((<span class="pl-c1">92</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">89</span><span class="pl-k">.</span><span class="pl-c1">4</span>), (<span class="pl-c1">92</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">84</span><span class="pl-k">.</span><span class="pl-c1">5</span>), (<span class="pl-c1">92</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">89</span><span class="pl-k">.</span><span class="pl-c1">4</span>))
+🍰<span class="pl-k">.</span>closePath()
+
+🍰 <span class="pl-k">---&gt;</span> ((<span class="pl-c1">92</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">76</span>))
+     <span class="pl-k">+-</span> ((<span class="pl-c1">8</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">80</span>))
+     <span class="pl-k">+~</span> ((<span class="pl-c1">8</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">68</span><span class="pl-k">.</span><span class="pl-c1">2</span>), (<span class="pl-c1">8</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">74</span><span class="pl-k">.</span><span class="pl-c1">2</span>), (<span class="pl-c1">8</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">68</span><span class="pl-k">.</span><span class="pl-c1">7</span>))
+     <span class="pl-k">+~</span> ((<span class="pl-c1">9</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">67</span><span class="pl-k">.</span><span class="pl-c1">1</span>), (<span class="pl-c1">8</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">67</span><span class="pl-k">.</span><span class="pl-c1">3</span>), (<span class="pl-c1">9</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">67</span><span class="pl-k">.</span><span class="pl-c1">1</span>))
+     <span class="pl-k">+-</span> ((<span class="pl-c1">91</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">63</span><span class="pl-k">.</span><span class="pl-c1">5</span>))
+     <span class="pl-k">+~</span> ((<span class="pl-c1">92</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">64</span><span class="pl-k">.</span><span class="pl-c1">4</span>), (<span class="pl-c1">91</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">63</span><span class="pl-k">.</span><span class="pl-c1">5</span>), (<span class="pl-c1">92</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">63</span><span class="pl-k">.</span><span class="pl-c1">5</span>))
+     <span class="pl-k">+~</span> ((<span class="pl-c1">92</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">76</span>), (<span class="pl-c1">92</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">64</span><span class="pl-k">.</span><span class="pl-c1">9</span>), (<span class="pl-c1">92</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">70</span><span class="pl-k">.</span><span class="pl-c1">3</span>))
+🍰<span class="pl-k">.</span>closePath()
+
+
+<span class="pl-k">var</span> 📍 <span class="pl-k">=</span> UIBezierPath()
+📍 <span class="pl-k">---&gt;</span> ((<span class="pl-c1">46</span>, <span class="pl-c1">47</span><span class="pl-k">.</span><span class="pl-c1">5</span>))
+     <span class="pl-k">+~</span> ((<span class="pl-c1">41</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">52</span>), (<span class="pl-c1">46</span>, <span class="pl-c1">50</span>), (<span class="pl-c1">44</span>, <span class="pl-c1">52</span>))
+     <span class="pl-k">+-</span> ((<span class="pl-c1">41</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">52</span>))
+     <span class="pl-k">+~</span> ((<span class="pl-c1">37</span>, <span class="pl-c1">47</span><span class="pl-k">.</span><span class="pl-c1">5</span>), (<span class="pl-c1">39</span>, <span class="pl-c1">52</span>), (<span class="pl-c1">37</span>, <span class="pl-c1">50</span>))
+     <span class="pl-k">+-</span> ((<span class="pl-c1">37</span>, <span class="pl-c1">19</span><span class="pl-k">.</span><span class="pl-c1">8</span>))
+     <span class="pl-k">+~</span> ((<span class="pl-c1">41</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">15</span><span class="pl-k">.</span><span class="pl-c1">3</span>), (<span class="pl-c1">37</span>, <span class="pl-c1">17</span><span class="pl-k">.</span><span class="pl-c1">3</span>), (<span class="pl-c1">39</span>, <span class="pl-c1">15</span><span class="pl-k">.</span><span class="pl-c1">3</span>))
+     <span class="pl-k">+-</span> ((<span class="pl-c1">41</span><span class="pl-k">.</span><span class="pl-c1">5</span>, <span class="pl-c1">15</span><span class="pl-k">.</span><span class="pl-c1">3</span>))
+     <span class="pl-k">+~</span> ((<span class="pl-c1">46</span>, <span class="pl-c1">19</span><span class="pl-k">.</span><span class="pl-c1">8</span>), (<span class="pl-c1">44</span>, <span class="pl-c1">15</span><span class="pl-k">.</span><span class="pl-c1">3</span>), (<span class="pl-c1">46</span>, <span class="pl-c1">17</span><span class="pl-k">.</span><span class="pl-c1">3</span>))
+     <span class="pl-k">+-</span> ((<span class="pl-c1">46</span>, <span class="pl-c1">47</span><span class="pl-k">.</span><span class="pl-c1">5</span>))
+📍<span class="pl-k">.</span>closePath()
+
+
+<span class="pl-k">var</span> 🔥 <span class="pl-k">=</span> UIBezierPath()
+🔥<span class="pl-k">.</span>miterLimit <span class="pl-k">=</span> <span class="pl-c1">4</span>
+
+🔥 <span class="pl-k">---&gt;</span> ((<span class="pl-c1">45</span><span class="pl-k">.</span><span class="pl-c1">8</span>, <span class="pl-c1">8</span><span class="pl-k">.</span><span class="pl-c1">4</span>))
+     <span class="pl-k">+~</span> ((<span class="pl-c1">41</span><span class="pl-k">.</span><span class="pl-c1">7</span>, <span class="pl-c1">14</span>), (<span class="pl-c1">45</span><span class="pl-k">.</span><span class="pl-c1">8</span>, <span class="pl-c1">12</span><span class="pl-k">.</span><span class="pl-c1">5</span>), (<span class="pl-c1">44</span>, <span class="pl-c1">14</span>))
+     <span class="pl-k">+~</span> ((<span class="pl-c1">37</span><span class="pl-k">.</span><span class="pl-c1">6</span>, <span class="pl-c1">8</span><span class="pl-k">.</span><span class="pl-c1">4</span>), (<span class="pl-c1">39</span><span class="pl-k">.</span><span class="pl-c1">4</span>, <span class="pl-c1">14</span>), (<span class="pl-c1">37</span><span class="pl-k">.</span><span class="pl-c1">6</span>, <span class="pl-c1">12</span><span class="pl-k">.</span><span class="pl-c1">5</span>))
+     <span class="pl-k">+~</span> ((<span class="pl-c1">41</span><span class="pl-k">.</span><span class="pl-c1">8</span>, <span class="pl-c1">1</span>), (<span class="pl-c1">37</span><span class="pl-k">.</span><span class="pl-c1">6</span>, <span class="pl-c1">4</span><span class="pl-k">.</span><span class="pl-c1">3</span>), (<span class="pl-c1">41</span><span class="pl-k">.</span><span class="pl-c1">8</span>, <span class="pl-c1">1</span>))
+     <span class="pl-k">+~</span> ((<span class="pl-c1">45</span><span class="pl-k">.</span><span class="pl-c1">8</span>, <span class="pl-c1">8</span><span class="pl-k">.</span><span class="pl-c1">4</span>), (<span class="pl-c1">41</span><span class="pl-k">.</span><span class="pl-c1">8</span>, <span class="pl-c1">1</span>), (<span class="pl-c1">45</span><span class="pl-k">.</span><span class="pl-c1">8</span>, <span class="pl-c1">4</span><span class="pl-k">.</span><span class="pl-c1">3</span>))
+🔥<span class="pl-k">.</span>closePath()
+
+
+UIColor<span class="pl-k">.</span>blackColor()<span class="pl-k">.</span>setFill()
+🍰<span class="pl-k">.</span>fill()
+🔥<span class="pl-k">.</span>fill()
+
+UIColor<span class="pl-k">.</span>whiteColor()<span class="pl-k">.</span>setFill()
+UIColor<span class="pl-k">.</span>blackColor()<span class="pl-k">.</span>setStroke()
+📍<span class="pl-k">.</span>fill()
+📍<span class="pl-k">.</span>stroke()</pre></div>
+
+<p>I'm as amazed as anyone that this actually compiles.</p>
+
+<p>Everything is terrible.</p>
+
+<hr>
+
+<p>Anyway, Happy 2nd Birthday, NSHipster!</p>
+
+<p>Thank you for helping to make these last couple years the insanely great experience it's been. I'll do my part to keep things up for years to come.</p>
+</article></div>

@@ -1,0 +1,177 @@
+<div class="announce instapaper_body md" data-path="2013-04-08-bool.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>tags</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>BOOL / bool / Boolean / NSCFBoolean</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div>Objective-C</div></td>
+
+  <td><div>nshipster, popular</div></td>
+
+  <td><div>Once again, encoding our logical universe into the cold, calculating bytecode of computers forces us to deal with these questions one way or another. And as you'll see from our discussion of boolean types in Objective-C and its kin, truth is indeed stranger than fiction.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>n/a</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>We've talked before about the <a href="http://nshipster.com/nil/">philosophical and technical concerns of nothingness in programming</a>. This week, our attention turns to another fundamental matter: Truth.</p>
+
+<p>Truth. <em>Vēritās</em>. The entire charter of Philosophy is founded upon the pursuit of it, and yet its exact meaning and implications still elude us. Does truth exist independently, or is it defined contingently against falsity? Can a proposition be at once both true <em>and</em> false? Is there absolute truth in anything, or is everything relative?</p>
+
+<p>Once again, encoding our logical universe into the cold, calculating bytecode of computers forces us to deal with these questions one way or another. And as you'll see from our discussion of boolean types in Objective-C and its kin, truth is indeed stranger than fiction.</p>
+
+<hr>
+
+<p>Objective-C defines <code>BOOL</code> to encode truth value. It is a <code>typedef</code> of a <code>signed char</code>, with the macros <code>YES</code> and <code>NO</code> to represent true and false, respectively.</p>
+
+<p>Boolean values are used in conditionals, such as <code>if</code> or <code>while</code> statements, to conditionally perform logic or repeat execution. When evaluating a conditional statement, the value <code>0</code> is considered "false", while any other value is considered "true". Because <code>NULL</code> and <code>nil</code> are defined as <code>0</code>, conditional statements on these nonexistent values are also evaluated as "false".</p>
+
+<p><strong>In Objective-C, use the <code>BOOL</code> type for parameters, properties, and instance variables dealing with truth values. When assigning literal values, use the <code>YES</code> and <code>NO</code> macros.</strong></p>
+
+<h2><a id="user-content-the-wrong-answer-to-the-wrong-question" class="anchor" href="#the-wrong-answer-to-the-wrong-question" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>The Wrong Answer to the Wrong Question</h2>
+
+<p>Novice programmers often include an equality operator when evaluating conditionals:</p>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-k">if</span> ([a <span class="pl-c1">isEqual:</span>b] == <span class="pl-c1">YES</span>) {
+  ...
+}</pre></div>
+
+<p>Not only is this unnecessary, but depending on the left-hand value, it may also cause unexpected results, as described in the <a href="http://blog.bignerdranch.com/564-bools-sharp-corners/">Big Nerd Ranch blog post, "BOOL's Sharp Edges"</a>:</p>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-k">static</span> <span class="pl-c1">BOOL</span> <span class="pl-en">different</span> (<span class="pl-k">int</span> a, <span class="pl-k">int</span> b) {
+    <span class="pl-k">return</span> a - b;
+}</pre></div>
+
+<p>An overly clever C programmer might take some satisfaction in the simplicity of this approach: indeed, two integers are equal if and only if their difference is <code>0</code>.</p>
+
+<p>However, because of the reality of <code>BOOL</code> being <code>typedef</code>'d as a <code>signed char</code>, this will not behave as expected:</p>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-k">if</span> (different(<span class="pl-c1">11</span>, <span class="pl-c1">10</span>) == <span class="pl-c1">YES</span>) {
+  <span class="pl-c1">printf</span> (<span class="pl-s"><span class="pl-pds">"</span>11 != 10<span class="pl-cce">\n</span><span class="pl-pds">"</span></span>);
+} <span class="pl-k">else</span> {
+  <span class="pl-c1">printf</span> (<span class="pl-s"><span class="pl-pds">"</span>11 == 10<span class="pl-cce">\n</span><span class="pl-pds">"</span></span>);
+}
+
+<span class="pl-k">if</span> (different(<span class="pl-c1">10</span>, <span class="pl-c1">11</span>) == <span class="pl-c1">YES</span>) {
+  <span class="pl-c1">printf</span> (<span class="pl-s"><span class="pl-pds">"</span>10 != 11<span class="pl-cce">\n</span><span class="pl-pds">"</span></span>);
+} <span class="pl-k">else</span> {
+  <span class="pl-c1">printf</span> (<span class="pl-s"><span class="pl-pds">"</span>10 == 11<span class="pl-cce">\n</span><span class="pl-pds">"</span></span>);
+}
+
+<span class="pl-k">if</span> (different(<span class="pl-c1">512</span>, <span class="pl-c1">256</span>) == <span class="pl-c1">YES</span>) {
+  <span class="pl-c1">printf</span> (<span class="pl-s"><span class="pl-pds">"</span>512 != 256<span class="pl-cce">\n</span><span class="pl-pds">"</span></span>);
+} <span class="pl-k">else</span> {
+  <span class="pl-c1">printf</span> (<span class="pl-s"><span class="pl-pds">"</span>512 == 256<span class="pl-cce">\n</span><span class="pl-pds">"</span></span>);
+}</pre></div>
+
+<p>This evaluates to:</p>
+
+<pre><code>11 != 10
+10 == 11
+512 == 256
+</code></pre>
+
+<p>Now, <a href="https://www.destroyallsoftware.com/talks/wat">this might be acceptable for JavaScript</a>, but Objective-C don't suffer fools gladly.</p>
+
+<p>Deriving truth value directly from an arithmetic operation is never a good idea. Like the sentence <a href="http://en.wikipedia.org/wiki/Colorless_green_ideas_sleep_furiously">"Colorless green ideas sleep furiously"</a>, it may be grammatical (after all, <code>BOOL</code> is a <code>signed char</code> like any other, so it <em>could</em> be treated as a number), but it doesn't make sense semantically. Instead, use the result of the <code>==</code> operator, or cast values into booleans with the <code>!</code> (or <code>!!</code>) operator.</p>
+
+<h2><a id="user-content-the-truth-about-nsnumber-and-bool" class="anchor" href="#the-truth-about-nsnumber-and-bool" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>The Truth About <code>NSNumber</code> and <code>BOOL</code></h2>
+
+<p>Pop quiz: what is the output of the following expression?</p>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span><span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, [@(<span class="pl-c1">YES</span>) <span class="pl-c1">class</span>]);</pre></div>
+
+<p>The answer:</p>
+
+<pre><code>__NSCFBoolean
+</code></pre>
+
+<p>Wait, what?</p>
+
+<p>All this time, we've been led to believe that <code>NSNumber</code> <a href="http://nshipster.com/nsvalue/">boxes</a> primitives into an object representation. Any other integer- or float-derived <code>NSNumber</code> object shows its class to be <code>__NSCFNumber</code>. What gives?</p>
+
+<p><code>NSCFBoolean</code> is a private class in the <code>NSNumber</code> <a href="http://nshipster.com/nsorderedset/">class cluster</a>. It is a bridge to the <a href="https://developer.apple.com/library/mac/#documentation/CoreFoundation/Reference/CFBooleanRef/Reference/reference.html"><code>CFBooleanRef</code> type</a>, which is used to wrap boolean values for Core Foundation property lists and collections. <code>CFBoolean</code> defines the constants <code>kCFBooleanTrue</code> and <code>kCFBooleanFalse</code>. Because <code>CFNumberRef</code> and <code>CFBooleanRef</code> are different types in Core Foundation, it makes sense that they are represented by different bridging classes in <code>NSNumber</code>.</p>
+
+<p>For most people, boolean values and boxed objects "just work", and don't really care what goes into making the sausage. But here at NSHipster, we're all about sausages.</p>
+
+<hr>
+
+<p>So, to recap, here is a table of all of the truth types and values in Objective-C:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Typedef
+      </th><th>Header</th>
+      <th>True Value</th>
+      <th>False Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><tt>BOOL</tt></td>
+      <td><tt>signed char</tt></td>
+      <td>objc.h</td>
+      <td><tt>YES</tt></td>
+      <td><tt>NO</tt></td>
+    </tr>
+    <tr>
+      <td><tt>bool</tt></td>
+      <td><tt>_Bool</tt> (<tt>int</tt>)</td>
+      <td>stdbool.h</td>
+      <td><tt>true</tt></td>
+      <td><tt>false</tt></td>
+    </tr>
+    <tr>
+      <td><tt>Boolean</tt></td>
+      <td><tt>unsigned char</tt></td>
+      <td>MacTypes.h</td>
+      <td><tt>TRUE</tt></td>
+      <td><tt>FALSE</tt></td>
+    </tr>
+    <tr>
+      <td><tt>NSNumber</tt></td>
+      <td><tt>__NSCFBoolean</tt></td>
+      <td>Foundation.h</td>
+      <td><tt>@(YES)</tt></td>
+      <td><tt>@(NO)</tt></td>
+    </tr>
+    <tr>
+      <td><tt>CFBooleanRef</tt></td>
+      <td><tt>struct</tt></td>
+      <td>CoreFoundation.h</td>
+      <td><tt>kCFBooleanTrue</tt></td>
+      <td><tt>kCFBooleanFalse</tt></td>
+    </tr>
+  </tbody>
+</table>
+</article></div>

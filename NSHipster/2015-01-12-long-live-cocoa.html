@@ -1,0 +1,125 @@
+<div class="announce instapaper_body md" data-path="2015-01-12-long-live-cocoa.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>excerpt</th>
+
+  <th>hiddenlang</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>Long Live Cocoa</div></td>
+
+  <td><div>Nate Cook</div></td>
+
+  <td><div></div></td>
+
+  <td><div>Swift is an exciting language for many of us, but it's still brand new. The stability of Objective-C and the history and strength of Cocoa mean that Swift isn't ready to be the driving force behind a major change, at least not quite yet. Cocoa's depth and the power it affords, along with the way it and Swift go hand in hand, make Cocoa as relevant and as promising as ever.</div></td>
+
+  <td><div></div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>1.0</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>It's the start of a new year—2015, the year of Watch, the first full year for Swift, and a bit of a new start for NSHipster. Before we get caught up in the excitement of new devices and the next beta of Xcode or start planning our trips to WWDC 2015, let's take a moment to look at our tools as they are today: Objective-C, Swift, and most importantly, Cocoa.</p>
+
+<p>Swift is an exciting language for many of us, but it's still brand new. The stability of Objective-C and the history and strength of Cocoa mean that Swift isn't ready to be the driving force behind a <a href="/the-death-of-cocoa/">major change</a>, at least not quite yet. Cocoa's depth and the power it affords, along with the way it and Swift go hand in hand, make Cocoa as relevant and as promising as ever. In fact, I don't think there's been a more exciting time to be a Cocoa developer.</p>
+
+<hr>
+
+<p>Cocoa is an impressively deep API—dig a little below the surface of any common tool and you unearth a trove of functionality. You need look no further for proof than the incredible work <a href="http://nshipster.com/authors/mattt-thompson/">Mattt</a> has done in these very pages over the last few years, illuminating what we didn't know Cocoa could do. To name just a few:</p>
+
+<ul>
+<li>The foundations of natural language interfaces with <a href="/nslinguistictagger/"><code>NSLinguisticTagger</code></a> and <a href="/avspeechsynthesizer/"><code>AVSpeechSynthesizer</code></a></li>
+<li>Simple data persistence with <a href="/nscoding/"><code>NSCoding</code> and <code>NSKeyedArchiver</code></a></li>
+<li>Object-oriented concurrent execution with <a href="/nsoperation/"><code>NSOperation</code></a></li>
+<li>Normalizing and transliterating multi-language input with <a href="/cfstringtransform/"><code>CFStringTransform</code></a></li>
+<li>Detection of all sorts of data with <a href="/nsdatadetector/"><code>NSDataDetector</code></a></li>
+<li>Native custom sharing and editing controls with <a href="/uiactivityviewcontroller/"><code>UIActivityViewController</code></a> and <a href="/uimenucontroller/"><code>UIMenuController</code></a></li>
+<li>Built-in <a href="/nsurlcache/">network caching</a> for our <a href="/nsurl/"><code>NSURL</code></a> requests</li>
+</ul>
+
+<p>The list goes on and on. (Check it out—right there on the <a href="/#archive">front page</a>.)</p>
+
+<h3><a id="user-content-hand-in-hand" class="anchor" href="#hand-in-hand" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Hand in Hand</h3>
+
+<p>What's more, Cocoa and Swift are practically—and in Swift's case, literally—made for each other.</p>
+
+<p>On the Cocoa side, changes to the toolset over the past few years paved the way for Cocoa to be Swift-friendly right out of the gate. Shifting to LLVM/Clang, adding block syntax to Objective-C, pushing the <code>NS_ENUM</code> &amp; <code>NS_OPTIONS</code> macros, converting initializers to return <code>instancetype</code>—all these steps make the Cocoa APIs we're using today far more compatible with Swift than they could have been even a few years ago. Whenever you supply a Swift closure as a <code>NSURLSession</code> completion handler, or use the suggested completions for <code>UIModalTransitionStyle</code>, you're building on that work, done years ago when Swift was still behind closed doors (or in Chris Lattner's head).</p>
+
+<p>Swift was then designed from the ground up to be used with Cocoa. If I could nominate a single Swift feature as <a href="http://stackoverflow.com/search?q=swift+unwrapped+unexpectedly">most confusing to newcomers</a>, it would be Optionals, with their extra punctuation and unwrapping requirements. Even so, Optionals represent a crowning achievement, one so foundational it fades into the woodwork: Swift is a brand-new language that <em>doesn't</em> require a brand-new API. It's a type-safe, memory-safe language whose primary purpose is interacting directly with the enormous C-based Cocoa API, with pointers and raw memory lying all over the place.</p>
+
+<p>This is no small feat. The developer tools team at Apple has been busy annotating the entire API with information about memory management for parameters and return values. Once annotated, functions can be used safely from within Swift, since the compiler knows how to bridge types back and forth from Swift to annotated C code.</p>
+
+<p>Here's an example of similar annotated and unannotated functions. First, the C versions:</p>
+
+<div class="highlight highlight-source-c"><pre><span class="pl-c">// Creates an immutable copy of a string.</span>
+<span class="pl-c1">CFStringRef</span> <span class="pl-en">CFStringCreateCopy</span> ( <span class="pl-c1">CFAllocatorRef</span> alloc, <span class="pl-c1">CFStringRef</span> theString );
+<span class="pl-c">// Encodes an OSType into a string suitable for use as a tag argument.</span>
+<span class="pl-c1">CFStringRef</span> <span class="pl-en">UTCreateStringForOSType</span> ( <span class="pl-c1">OSType</span> inOSType );</pre></div>
+
+<p>Both of these functions return a <code>CFStringRef</code>—a reference to a <code>CFString</code>. A <code>CFStringRef</code> can be bridged to a Swift <code>CFString</code> instance, but this is <em>only</em> safe if the method has been annotated. In Swift, you can readily see the difference:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-c">// annotated: returns a memory-managed Swift `CFString`</span>
+<span class="pl-k">func</span> <span class="pl-en">CFStringCreateCopy</span>(alloc: CFAllocator<span class="pl-k">!</span>, theString: CFString<span class="pl-k">!</span>) <span class="pl-k">-&gt;</span> CFString!
+<span class="pl-c">// unannotated: returns an *unmanaged* `CFString`</span>
+<span class="pl-k">func</span> <span class="pl-en">UTCreateStringForOSType</span>(inOSType: OSType) <span class="pl-k">-&gt;</span> <span class="pl-c1">Unmanaged</span>&lt;CFString&gt;!</pre></div>
+
+<p>Upon receiving an <code>Unmanaged&lt;CFString&gt;!</code>, you need to follow up with <code>.takeRetainedValue()</code> or <code>.takeUnretainedValue()</code> to get a memory-managed <code>CFString</code> instance. Which to call? To know that, you have to read the documentation or know the conventions governing whether the result you get back is retained or unretained. By annotating these functions, Apple has done that work for you, already guaranteeing memory safety across a huge swath of Cocoa.</p>
+
+<hr>
+
+<p>Moreover, Swift doesn't just embrace Cocoa APIs, it actively improves them. Take the venerable <code>CGRect</code>, for example. As a C struct, it can't contain any instance methods, so all the <a href="/cggeometry/">tools to manipulate <code>CGRect</code>s</a> live in top-level functions. These tools are powerful, but you need to know they exist and how to put them to use. These four lines of code, dividing a <code>CGRect</code> into two smaller pieces, might require three trips to the documentation:</p>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">CGRect</span> nextRect;
+<span class="pl-c1">CGRect</span> remainingRect;
+<span class="pl-en">CGRectDivide</span>(sourceRect, &amp;nextRect, &amp;remainingRect, <span class="pl-c1">250</span>, <span class="pl-c1">CGRectMinXEdge</span>);
+<span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">"</span>Remaining rect: <span class="pl-ii">%</span>@<span class="pl-pds">"</span></span>, NSStringFromCGRect(remainingRect));</pre></div>
+
+<p>In Swift, structs happily contain both static and instance methods and computed properties, so Core Graphics extends <code>CGRect</code> to make finding and using those tools far easier. Because <code>CGRect*</code> functions are mapped to instance methods or properties, the code above is reduced to this:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> (nextRect, remainingRect) <span class="pl-k">=</span> sourceRect<span class="pl-k">.</span>rectsByDividing(<span class="pl-c1">250</span>, CGRectEdge<span class="pl-k">.</span>MinXEdge)
+println(<span class="pl-s"><span class="pl-pds">"</span>Remaining rect: <span class="pl-pse">\(</span><span class="pl-s1">remainingRect</span><span class="pl-pse">)</span><span class="pl-pds">"</span></span>)</pre></div>
+
+<h3><a id="user-content-getting-better-all-the-time" class="anchor" href="#getting-better-all-the-time" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Getting Better All The Time</h3>
+
+<p>To be sure, working with Cocoa and Swift together is sometimes awkward. Where that does happen, it often comes from using patterns that are idiomatic to Objective-C. Delegates, target-selector, and <code>NSInvocation</code> still have their place, but with closures so easy in Swift, it can feel like overkill to add a whole method (or three) just to accomplish something simple. Bringing more closure- or block-based methods to existing Cocoa types can easily smooth out these bumps.</p>
+
+<p>For example, <code>NSTimer</code> has a perfectly fine interface, but it suffers from requiring an Objective-C method to call, either via target-selector or invocation. When defining a timer, chances are I already have everything ready to go. <a href="https://gist.github.com/natecook1000/b0285b518576b22c4dc8">With a simple <code>NSTimer</code> extension</a> using its toll-free bridged Core Foundation counterpart, <code>CFTimer</code>, we're in business in no time:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> message <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>Are we there yet?<span class="pl-pds">"</span></span>
+<span class="pl-k">let</span> alert <span class="pl-k">=</span> UIAlertController(title: message, message: <span class="pl-c1">nil</span>, preferredStyle: <span class="pl-k">.</span>Alert)
+alert<span class="pl-k">.</span>addAction(UIAlertAction(title: <span class="pl-s"><span class="pl-pds">"</span>No<span class="pl-pds">"</span></span>, style: <span class="pl-k">.</span>Default, handler: <span class="pl-c1">nil</span>))
+
+NSTimer<span class="pl-k">.</span>scheduledTimerWithTimeInterval(<span class="pl-c1">10</span>, repeats: <span class="pl-c1">true</span>) { [<span class="pl-k">weak</span> <span class="pl-k">self</span>] timer <span class="pl-k">in</span>
+    <span class="pl-k">if</span> <span class="pl-k">self</span>?<span class="pl-k">.</span>presentedViewController <span class="pl-k">==</span> <span class="pl-c1">nil</span> {
+        <span class="pl-k">self</span>?<span class="pl-k">.</span>presentViewController(alert, animated: <span class="pl-c1">true</span>, completion: <span class="pl-c1">nil</span>)
+    }
+}
+<span class="pl-c">// I swear I'll turn this car around.</span></pre></div>
+
+<hr>
+
+<p>None of this is to refute <a href="/the-death-of-cocoa/">Mattt's last post</a>, though—on an infinite time scale, we'll surely be coding against Cocoa's successor on our 42" iPads while looking out across the Titan moonscape. But as long as Cocoa's still around, isn't it <em>great?</em></p>
+</article></div>

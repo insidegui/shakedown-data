@@ -1,0 +1,194 @@
+<div class="announce instapaper_body md" data-path="2012-09-10-uiaccessibility.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>tags</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>UIAccessibility</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div>Cocoa</div></td>
+
+  <td><div>nshipster</div></td>
+
+  <td><div>Accessibility, like internationalization, is one of those topics that's difficult to get developers excited about. But as you know, NSHipster is all about getting developers excited about this kind of stuff.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>n/a</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<blockquote>
+<p>We all want to help one another, human beings are like that.</p>
+
+<ul>
+<li><a href="http://en.wikiquote.org/wiki/Charlie_Chaplin">Charlie Chaplin</a></li>
+</ul>
+</blockquote>
+
+<p>You know what I wish everyone would copy from Apple? Their assistive technologies.</p>
+
+<p>iPhones and iPads--magical as they are--become downright <em>life-changing</em> for individuals with disabilities and their families because of Apple's commitment to accessibility. Look no further than the <a href="http://www.youtube.com/watch?v=MbP_pxR5cMk">WWDC 2012 Introduction Video</a>, which opens with Per Busch, a blind man who walks the woods of Kassel, Germany with the aid of <a href="http://www.ariadnegps.eu">Ariadne GPS</a>. It's a lovely reminder of the kind of impact our work can have on others.</p>
+
+<p>Accessibility, like <a href="http://nshipster.com/nslocale/">internationalization</a>, is one of those topics that's difficult to get developers excited about. But as you know, NSHipster is <em>all about</em> getting developers excited about this kind of stuff. Let's get started:</p>
+
+<hr>
+
+<p><code>UIAccessibility</code> is an informal protocol in <code>UIKit</code> that provides accessibility information about user interface elements. This information is used by VoiceOver and other assistive technologies to help users with disabilities interact with your application.</p>
+
+<p>All of the standard views and controls in UIKit implement <code>UIAccessibility</code>, so applications are accessible by default. As a result, the task of improving the accessibility of your application is one of minor adjustments rather than wholesale re-implementation.</p>
+
+<p>Here's a list of all of the properties in <code>UIAccessibility</code>:</p>
+
+<ul>
+<li><code>accessibilityLabel</code></li>
+<li><code>accessibilityHint</code></li>
+<li><code>accessibilityValue</code></li>
+<li><code>accessibilityLanguage</code></li>
+<li><code>accessibilityTraits</code></li>
+<li><code>accessibilityFrame</code></li>
+<li><code>accessibilityActivationPoint</code></li>
+<li><code>accessibilityElementsHidden</code></li>
+<li><code>accessibilityViewIsModal</code></li>
+</ul>
+
+<h2><a id="user-content-enabling-accessibility" class="anchor" href="#enabling-accessibility" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Enabling Accessibility</h2>
+
+<p>Before we go any further, take a couple minutes to play with VoiceOver, and understand how accessibility information is conveyed to the user. Open the Settings app, tap General, scroll to the bottom and tap Accessibility. In Accessibility, you'll see settings for assistive technologies grouped by category: Vision, Hearing, Learning, and Physical &amp; Motor.</p>
+
+<p>Tap VoiceOver, and then tap the VoiceOver switch to turn it on. An alert will pop up telling you that enabling VoiceOver changes the way you control your device. Dismiss the alert, and now VoiceOver is now enabled on your device.</p>
+
+<p>Don't Panic--unlike setting your device to another language, there's no real risk of not being able to figure out how to turn VoiceOver off.</p>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/uiaccessibility-voiceover.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/uiaccessibility-voiceover.png" alt="VoiceOver Settings" style="max-width:100%;"></a></p>
+
+<p>Using the device in VoiceOver mode is a bit different than you're used to:</p>
+
+<ul>
+<li>Tap once to select an item</li>
+<li>Double-Tap to activate the selected item</li>
+<li>Swipe with three fingers to scroll</li>
+</ul>
+
+<p>Press the Home button and start exploring!</p>
+
+<p>You'll notice that all of the stock Apple apps--Messages, Calendar, Weather--each is fully-usable in VoiceOver mode. Heck, <em>even Camera is usable</em>, with <a href="http://svan.ca/blog/2012/blind/">VoiceOver telling you where faces are in your camera's viewport</a>!</p>
+
+<p>By contrast (perhaps), try some of the apps you've downloaded from the App Store. You may be surprised that some (but certainly not all) of the most visually-stunning apps, with all of their custom controls and interactions are completely unusable in this mode.</p>
+
+<p>So now that you have an idea of what you're working with, let's talk about implementation:</p>
+
+<h2><a id="user-content-label--hint" class="anchor" href="#label--hint" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Label &amp; Hint</h2>
+
+<p>If there was just one thing you could do to improve the accessibility of your app, paying attention to accessibility labels and hints of UI elements would be it.</p>
+
+<p>Accessibility labels and hints tell VoiceOver what to say when selecting user interface elements. This information should be helpful, but concise.</p>
+
+<ul>
+<li><strong><code>accessibilityLabel</code></strong> identifies a user interface element. Every accessible view and control <em>must</em> supply a label.</li>
+<li><strong><code>accessibilityHint</code></strong> describes the results of interacting with a user interface element. A hint should be supplied <em>only</em> if the result of an interaction is not obvious from the element's label.</li>
+</ul>
+
+<p>The <a href="http://developer.apple.com/library/ios/#documentation/UserExperience/Conceptual/iPhoneAccessibility/Making_Application_Accessible/Making_Application_Accessible.html">Accessibility Programming Guide</a> provides the following guidelines for labels and hints:</p>
+
+<blockquote>
+<h3><a id="user-content-guidelines-for-creating-labels" class="anchor" href="#guidelines-for-creating-labels" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Guidelines for Creating Labels</h3>
+
+<p>If you provide a custom control or view, or if you display a custom icon in a standard control or view, you need to provide a label that:</p>
+
+<ul>
+<li><strong>Very briefly describes the element.</strong> Ideally, the label consists of a single word, such as Add, Play, Delete, Search, Favorites, or Volume.</li>
+<li><strong>Does not include the type of the control or view.</strong> The type information is contained in the traits attribute of the element and should never be repeated in the label.</li>
+<li><strong>Begins with a capitalized word.</strong> This helps VoiceOver read the label with the appropriate inflection.</li>
+<li><strong>Does not end with a period.</strong> The label is not a sentence and therefore should not end with a period.</li>
+<li><strong>Is localized.</strong> Be sure to make your application available to as wide an audience as possible by localizing all strings, including accessibility attribute strings. In general, VoiceOver speaks in the language that the user specifies in International settings.</li>
+</ul>
+
+<h3><a id="user-content-guidelines-for-creating-hints" class="anchor" href="#guidelines-for-creating-hints" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Guidelines for Creating Hints</h3>
+
+<p>The hint attribute describes the results of performing an action on a control or view. You should provide a hint only when the results of an action are not obvious from the element’s label.</p>
+
+<ul>
+<li><strong>Very briefly describes the results.</strong> Even though few controls and views need hints, strive to make the hints you do need to provide as brief as possible. Doing so decreases the amount of time users must spend listening before they can use the element.</li>
+<li><strong>Begins with a verb and omits the subject.</strong> Be sure to use the third-person singular declarative form of a verb, such as “Plays,” and not the imperative, such as “Play.” You want to avoid using the imperative, because using it can make the hint sound like a command.</li>
+<li><strong>Begins with a capitalized word and ends with a period.</strong> Even though a hint is a phrase, not a sentence, ending the hint with a period helps VoiceOver speak it with the appropriate inflection.</li>
+<li><strong>Does not include the name of the action or gesture.</strong> A hint does not tell users how to perform the action, it tells users what will happen when that action occurs.</li>
+<li><strong>Does not include the name of the control or view.</strong> The user gets this information from the label attribute, so you should not repeat it in the hint.</li>
+<li><strong>Is localized</strong>. As with accessibility labels, hints should be available in the user’s preferred language.</li>
+</ul>
+</blockquote>
+
+<h2><a id="user-content-traits" class="anchor" href="#traits" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Traits</h2>
+
+<p>If you are using custom controls, or have taken liberties with non-standard use of a standard control, you should make sure to specify the correct accessibility traits.</p>
+
+<p>Accessibility traits describe a set of traits that characterize how a control behaves or should be treated. Examples include distinctions like:</p>
+
+<ul>
+<li>Button</li>
+<li>Link</li>
+<li>Search Field</li>
+<li>Keyboard Key</li>
+<li>Static Text</li>
+<li>Image</li>
+<li>Plays Sound</li>
+<li>Selected</li>
+<li>Summary Element</li>
+<li>Updates Frequently</li>
+<li>Causes Page Turn</li>
+<li>Not Enabled</li>
+<li>None</li>
+</ul>
+
+<p>The <code>accessibilityTraits</code> property takes a bitmask of <code>UIAccessibilityTraits</code> values, which can be combined in ways specified in the documentation.</p>
+
+<p>For example, if a custom button control displays an image and plays a sound when tapped, you should define the traits for "Button", "Image", and "Plays Sound". Or, if you were to use a <code>UISlider</code> for purely decorative purposes, you should set the "Not Enabled" trait.</p>
+
+<h2><a id="user-content-frame--activation-point" class="anchor" href="#frame--activation-point" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Frame &amp; Activation Point</h2>
+
+<p>As a general rule, the cleverness of a custom UI element is directly proportional to how gnarly its implementation is. Overlapping &amp; invisible views, table view hacks, first responder shenanigans: sometimes it's better not to ask how something works.</p>
+
+<p>However, when it comes to accessibility, it's important to set the record straight.</p>
+
+<p><code>accessibilityFrame</code> and <code>accessibilityActivationPoint</code> are used to define the accessible portions and locations of UI elements, without changing their outward appearance.</p>
+
+<p>As you try out your app in VoiceOver mode, try interacting with all of the elements on each screen. If the selection target is not what you expected, you can use <code>accessibilityFrame</code> and <code>accessibilityActivationPoint</code> to adjust accordingly.</p>
+
+<h2><a id="user-content-value" class="anchor" href="#value" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Value</h2>
+
+<p>Accessibility value corresponds to the content of a user interface element. For a label, the value is its text. For a <code>UISlider</code>, it's the current numeric value represented by the control.</p>
+
+<p>Want to know a quick way to improve the accessibility of your table views? Try setting the <code>accessibilityValue</code> property for cells to be a localized summary of the cell's content. For example, if you had a table view that showed status updates, you might set the <code>accessibilityLabel</code> to "Update from #{User Name}", and the <code>accessibilityValue</code> to the content of that status update.</p>
+
+<hr>
+
+<p>Apple has done a great service to humanity in making accessibility a first-class citizen in its hardware and software. You're missing out on some of the best engineering, design, and technical writing that Apple has ever done if you ignore <code>UIAccessibility</code>.</p>
+
+<p>Do yourself a favor and read the <em>excellent</em> <a href="http://developer.apple.com/library/ios/#documentation/UserExperience/Conceptual/iPhoneAccessibility/Introduction/Introduction.html">Accessibility Programming Guide for iOS</a>. It only takes an hour or two to get the hang of everything.</p>
+
+<p>Who knows? You may end up changing someone's life because of it.</p>
+</article></div>

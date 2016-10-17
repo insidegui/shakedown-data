@@ -1,0 +1,416 @@
+<div class="announce instapaper_body md" data-path="2014-07-21-xctestcase.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>excerpt</th>
+
+  <th>revisions</th>
+
+  <th>hiddenlang</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>XCTestCase /<br>XCTestExpectation /<br> measureBlock()</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div>Xcode</div></td>
+
+  <td><div>This week, we'll take a look at `XCTest`, the testing framework built into Xcode, as well as the exciting new additions in Xcode 6: `XCTestExpectation` and performance tests.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>2015-04-07</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>Added note about location of call to `fulfill()`; new Objective-C examples</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+
+  <td><div></div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+
+  <th>reviewed</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>1.2</div></td>
+
+  <td><div>June 25, 2015</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>Although iOS 8 and Swift has garnered the lion's share of attention of the WWDC 2014 announcements, the additions and improvements to testing in Xcode 6 may end up making some of the most profound impact in the long-term.</p>
+
+<p>This week, we'll take a look at <code>XCTest</code>, the testing framework built into Xcode, as well as the exciting new additions in Xcode 6: <code>XCTestExpectation</code> and performance tests.</p>
+
+<hr>
+
+<p>Most Xcode project templates now support testing out-of-the-box. For example, when a new iOS app is created in Xcode with <code>⇧⌘N</code>, the resulting project file will be configured with two top-level groups (in addition to the "Products" group): "AppName" &amp; "AppNameTests". The project's auto-generated scheme enables the shortcut <code>⌘R</code> to build and run the executable target, and <code>⌘U</code> to build and run the test target.</p>
+
+<p>Within the test target is a single file, named "AppNameTests", which contains an example <code>XCTestCase</code> class, complete with boilerplate <code>setUp</code> &amp; <code>tearDown</code> methods, as well as an example functional and performance test cases.</p>
+
+<h2><a id="user-content-xctestcase" class="anchor" href="#xctestcase" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>XCTestCase</h2>
+
+<p>Xcode unit tests are contained within an <code>XCTestCase</code> subclass. By convention, each <code>XCTestCase</code> subclass encapsulates a particular set of concerns, such as a feature, use case, or flow of an application.</p>
+
+<blockquote>
+<p>Dividing up tests logically across a manageable number of test cases makes a huge difference as codebases grow and evolve.</p>
+</blockquote>
+
+<h3><a id="user-content-setup--teardown" class="anchor" href="#setup--teardown" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>setUp &amp; tearDown</h3>
+
+<p><code>setUp</code> is called before each test in an <code>XCTestCase</code> is run, and when that test finishes running, <code>tearDown</code> is called:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">class</span> Tests: XCTestCase {
+    <span class="pl-k">override</span> <span class="pl-k">func</span> <span class="pl-en">setUp</span>() {
+        <span class="pl-k">super</span><span class="pl-k">.</span>setUp()
+        <span class="pl-c">// Put setup code here. This method is called before the invocation of each test method in the class.</span>
+    }
+
+    <span class="pl-k">override</span> <span class="pl-k">func</span> <span class="pl-en">tearDown</span>() {
+        <span class="pl-c">// Put teardown code here. This method is called after the invocation of each test method in the class.</span>
+        <span class="pl-k">super</span><span class="pl-k">.</span>tearDown()
+    }
+}</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-k">@interface</span> <span class="pl-en">Tests</span> : <span class="pl-e">XCTestCase</span>
+
+<span class="pl-k">@property</span> <span class="pl-c1">NSCalendar</span> *calendar;
+<span class="pl-k">@property</span> <span class="pl-c1">NSLocale</span> *locale;
+
+<span class="pl-k">@end</span>
+
+<span class="pl-k">@implementation</span> <span class="pl-en">Tests</span>
+
+- (<span class="pl-k">void</span>)<span class="pl-en">setUp</span> {
+    [<span class="pl-v">super</span> <span class="pl-c1">setUp</span>];
+    <span class="pl-c">// Put setup code here. This method is called before the invocation of each test method in the class.</span>
+}
+
+- (<span class="pl-k">void</span>)<span class="pl-en">tearDown</span> {
+    <span class="pl-c">// Put teardown code here. This method is called after the invocation of each test method in the class.</span>
+    [<span class="pl-v">super</span> <span class="pl-c1">tearDown</span>];
+}
+
+<span class="pl-k">@end</span></pre></div>
+
+<p>These methods are useful for creating objects common to all of the tests for a test case:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">var</span> calendar: NSCalendar?
+<span class="pl-k">var</span> locale: NSLocale?
+
+<span class="pl-k">override</span> <span class="pl-k">func</span> <span class="pl-en">setUp</span>() {
+    <span class="pl-k">super</span><span class="pl-k">.</span>setUp()
+
+    calendar <span class="pl-k">=</span> NSCalendar(identifier: NSCalendarIdentifierGregorian)
+    locale <span class="pl-k">=</span> NSLocale(localeIdentifier: <span class="pl-s"><span class="pl-pds">"</span>en_US<span class="pl-pds">"</span></span>)
+}</pre></div>
+
+<div class="highlight highlight-source-objc"><pre>- (<span class="pl-k">void</span>)setUp {
+    [<span class="pl-v">super</span> <span class="pl-c1">setUp</span>];
+
+    self.<span class="pl-smi">calendar</span> = [<span class="pl-c1">NSCalendar</span> <span class="pl-c1">calendarWithIdentifier:</span><span class="pl-c1">NSCalendarIdentifierGregorian</span>];
+    self.<span class="pl-smi">locale</span> = [<span class="pl-c1">NSLocale</span> <span class="pl-c1">localeWithLocaleIdentifier:</span><span class="pl-s"><span class="pl-pds">@"</span>en_US<span class="pl-pds">"</span></span>];
+}</pre></div>
+
+<blockquote>
+<p>Since <code>XCTestCase</code> is not intended to be initialized directly from within a test case definition, shared properties initialized in <code>setUp</code> are declared as optional <code>var</code>s in Swift. As such, it's often much simpler to forgo <code>setUp</code> and assign default values instead:</p>
+</blockquote>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">var</span> calendar: NSCalendar <span class="pl-k">=</span> NSCalendar(identifier: NSGregorianCalendar)
+<span class="pl-k">var</span> locale: NSLocale <span class="pl-k">=</span> NSLocale(localeIdentifier: <span class="pl-s"><span class="pl-pds">"</span>en_US<span class="pl-pds">"</span></span>)</pre></div>
+
+<h3><a id="user-content-functional-testing" class="anchor" href="#functional-testing" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Functional Testing</h3>
+
+<p>Each method in a test case with a name that begins with "test" is recognized as a test, and will evaluate any assertions within that function to determine whether it passed or failed.</p>
+
+<p>For example, the function <code>testOnePlusOneEqualsTwo</code> will pass if <code>1 + 1</code> is equal to <code>2</code>:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">func</span> <span class="pl-en">testOnePlusOneEqualsTwo</span>() {
+    XCTAssertEqual(<span class="pl-c1">1</span> <span class="pl-k">+</span> <span class="pl-c1">1</span>, <span class="pl-c1">2</span>, <span class="pl-s"><span class="pl-pds">"</span>one plus one should equal two<span class="pl-pds">"</span></span>)
+}</pre></div>
+
+<div class="highlight highlight-source-objc"><pre>- (<span class="pl-k">void</span>)testOnePlusOneEqualsTwo {
+    <span class="pl-c1">XCTAssertEqual</span>(<span class="pl-c1">1</span> + <span class="pl-c1">1</span>, <span class="pl-c1">2</span>, <span class="pl-s"><span class="pl-pds">"</span>one plus one should equal two<span class="pl-pds">"</span></span>);
+}</pre></div>
+
+<h3><a id="user-content-all-of-the-xctest-assertions-you-really-need-to-know" class="anchor" href="#all-of-the-xctest-assertions-you-really-need-to-know" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>All of the XCTest Assertions You <em>Really</em> Need To Know</h3>
+
+<p><code>XCTest</code> comes with a number of built-in assertions, but one could narrow them down to just a few essentials:</p>
+
+<h4><a id="user-content-fundamental-test" class="anchor" href="#fundamental-test" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Fundamental Test</h4>
+
+<p>To be entirely reductionist, all of the <code>XCTest</code> assertions come down to a single, base assertion:</p>
+
+<div class="highlight highlight-source-swift"><pre>XCTAssert(expression, format<span class="pl-k">...</span>)</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-en">XCTAssert</span>(expression, format...);</pre></div>
+
+<p>If the expression evaluates to <code>true</code>, the test passes. Otherwise, the test fails, printing the <code>format</code>ted message.</p>
+
+<p>Although a developer could get away with only using <code>XCTAssert</code>, the following helper assertions provide some useful semantics to help clarify what exactly is being tested. When possible, use the most specific assertion available, falling back to <code>XCTAssert</code> only in cases where it better expresses the intent.</p>
+
+<h4><a id="user-content-boolean-tests" class="anchor" href="#boolean-tests" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Boolean Tests</h4>
+
+<p>For <code>Bool</code> values, or simple boolean expressions, use <code>XCTAssertTrue</code> &amp; <code>XCTAssertFalse</code>:</p>
+
+<div class="highlight highlight-source-swift"><pre>XCTAssertTrue(expression, format<span class="pl-k">...</span>)
+XCTAssertFalse(expression, format<span class="pl-k">...</span>)</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-en">XCTAssertTrue</span>(expression, format...);
+<span class="pl-en">XCTAssertFalse</span>(expression, format...);</pre></div>
+
+<blockquote>
+<p><code>XCTAssert</code> is equivalent to <code>XCTAssertTrue</code>.</p>
+</blockquote>
+
+<h4><a id="user-content-equality-tests" class="anchor" href="#equality-tests" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Equality Tests</h4>
+
+<p>When testing whether two values are equal, use <code>XCTAssert[Not]Equal</code> for scalar values and <code>XCTAssert[Not]EqualObjects</code> for objects:</p>
+
+<div class="highlight highlight-source-swift"><pre>XCTAssertEqual(expression1, expression2, format<span class="pl-k">...</span>)
+XCTAssertNotEqual(expression1, expression2, format<span class="pl-k">...</span>)</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-en">XCTAssertEqual</span>(expression1, expression2, format...);
+<span class="pl-en">XCTAssertNotEqual</span>(expression1, expression2, format...);
+
+<span class="pl-en">XCTAssertEqualObjects</span>(expression1, expression2, format...);
+<span class="pl-en">XCTAssertNotEqualObjects</span>(expression1, expression2, format...);</pre></div>
+
+<blockquote>
+<p><code>XCTAssert[Not]EqualObjects</code> is not necessary in Swift, since there is no distinction between scalars and objects.</p>
+</blockquote>
+
+<p>When specifically testing whether two <code>Double</code>, <code>Float</code>, or other floating-point values are equal, use <code>XCTAssert[Not]EqualWithAccuracy</code>, to account for any issues with <a href="http://en.wikipedia.org/wiki/Floating_point#Representable_numbers.2C_conversion_and_rounding">floating point accuracy</a>:</p>
+
+<div class="highlight highlight-source-swift"><pre>XCTAssertEqualWithAccuracy(expression1, expression2, accuracy, format<span class="pl-k">...</span>)
+XCTAssertNotEqualWithAccuracy(expression1, expression2, accuracy, format<span class="pl-k">...</span>)</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-en">XCTAssertEqualWithAccuracy</span>(expression1, expression2, accuracy, format...);
+<span class="pl-en">XCTAssertNotEqualWithAccuracy</span>(expression1, expression2, accuracy, format...);</pre></div>
+
+<blockquote>
+<p>In addition to the aforementioned equality assertions, there are <code>XCTAssertGreaterThan[OrEqual]</code> &amp; <code>XCTAssertLessThan[OrEqual]</code>, which supplement <code>==</code> with <code>&gt;</code>, <code>&gt;=</code>, <code>&lt;</code>, &amp; <code>&lt;=</code> equivalents for comparable values.</p>
+</blockquote>
+
+<h4><a id="user-content-nil-tests" class="anchor" href="#nil-tests" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Nil Tests</h4>
+
+<p>Use <code>XCTAssert[Not]Nil</code> to assert the existence (or non-existence) of a given value:</p>
+
+<div class="highlight highlight-source-swift"><pre>XCTAssertNil(expression, format<span class="pl-k">...</span>)
+XCTAssertNotNil(expression, format<span class="pl-k">...</span>)</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-en">XCTAssertNil</span>(expression, format...);
+<span class="pl-en">XCTAssertNotNil</span>(expression, format...);</pre></div>
+
+<h4><a id="user-content-unconditional-failure" class="anchor" href="#unconditional-failure" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Unconditional Failure</h4>
+
+<p>Finally, the <code>XCTFail</code> assertion will always fail:</p>
+
+<div class="highlight highlight-source-swift"><pre>XCTFail(format<span class="pl-k">...</span>)</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-en">XCTFail</span>(format...);</pre></div>
+
+<p><code>XCTFail</code> is most commonly used to denote a placeholder for a test that should be made to pass. It is also useful for handling error cases already accounted by other flow control structures, such as the <code>else</code> clause of an <code>if</code> statement testing for success.</p>
+
+<h3><a id="user-content-performance-testing" class="anchor" href="#performance-testing" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Performance Testing</h3>
+
+<p>New in Xcode 6 is the ability to <a href="http://nshipster.com/benchmarking/">benchmark the performance of code</a>:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">func</span> <span class="pl-en">testDateFormatterPerformance</span>() {
+    <span class="pl-k">let</span> dateFormatter <span class="pl-k">=</span> NSDateFormatter()
+    dateFormatter<span class="pl-k">.</span>dateStyle <span class="pl-k">=</span> <span class="pl-k">.</span>LongStyle
+    dateFormatter<span class="pl-k">.</span>timeStyle <span class="pl-k">=</span> <span class="pl-k">.</span>ShortStyle
+
+    <span class="pl-k">let</span> date <span class="pl-k">=</span> NSDate()
+
+    measureBlock() {
+        <span class="pl-k">let</span> string <span class="pl-k">=</span> dateFormatter<span class="pl-k">.</span>stringFromDate(date)
+    }
+}</pre></div>
+
+<div class="highlight highlight-source-objc"><pre>- (<span class="pl-k">void</span>)testDateFormatterPerformance {
+    <span class="pl-c1">NSDateFormatter</span> *dateFormatter = [[<span class="pl-c1">NSDateFormatter</span> <span class="pl-c1">alloc</span>] <span class="pl-c1">init</span>];
+    dateFormatter.<span class="pl-smi">dateStyle</span> = NSDateFormatterLongStyle;
+    dateFormatter.<span class="pl-smi">timeStyle</span> = NSDateFormatterShortStyle;
+
+    <span class="pl-c1">NSDate</span> *date = [<span class="pl-c1">NSDate</span> <span class="pl-c1">date</span>];
+
+    [<span class="pl-v">self</span> <span class="pl-c1">measureBlock:</span>^{
+        <span class="pl-c1">NSString</span> *string = [dateFormatter <span class="pl-c1">stringFromDate:</span>date];
+    }];
+}</pre></div>
+
+<p>The measured block is executed ten times and the test output shows the average execution time as well as individual run times and standard deviation:</p>
+
+<pre><code>Test Case '-[_Tests testDateFormatterPerformance]' started.
+&lt;unknown&gt;:0: Test Case '-[_Tests testDateFormatterPerformance]' measured [Time, seconds] average: 0.000, relative standard deviation: 242.006%, values: [0.000441, 0.000014, 0.000011, 0.000010, 0.000010, 0.000010, 0.000010, 0.000010, 0.000010, 0.000010], performanceMetricID:com.apple.XCTPerformanceMetric_WallClockTime, baselineName: "", baselineAverage: , maxPercentRegression: 10.000%, maxPercentRelativeStandardDeviation: 10.000%, maxRegression: 0.100, maxStandardDeviation: 0.100
+Test Case '-[_Tests testDateFormatterPerformance]' passed (0.274 seconds).
+</code></pre>
+
+<p>Performance tests help establish a per-device baseline of performance for hot code paths and will fail if execution time becomes significantly slower. Sprinkle them into your test cases to ensure that significant algorithms and procedures remain performant as time goes on.</p>
+
+<h2><a id="user-content-xctestexpectation" class="anchor" href="#xctestexpectation" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>XCTestExpectation</h2>
+
+<p>Perhaps the most exciting feature added in Xcode 6 is built-in support for asynchronous testing, with the <code>XCTestExpectation</code> class. Now, tests can wait for a specified length of time for certain conditions to be satisfied, without resorting to complicated GCD incantations.</p>
+
+<p>To make a test asynchronous, first create an expectation with <code>expectationWithDescription</code>:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> expectation <span class="pl-k">=</span> expectationWithDescription(<span class="pl-s"><span class="pl-pds">"</span>...<span class="pl-pds">"</span></span>)</pre></div>
+
+<div class="highlight highlight-source-objc"><pre>XCTestExpectation *expectation = [<span class="pl-v">self</span> <span class="pl-c1">expectationWithDescription:</span><span class="pl-s"><span class="pl-pds">@"</span>...<span class="pl-pds">"</span></span>];</pre></div>
+
+<p>Then, at the bottom of the method, add the <code>waitForExpectationsWithTimeout</code> method, specifying a timeout, and optionally a handler to execute when either the conditions of your test are met or the timeout is reached (a timeout is automatically treated as a failed test):</p>
+
+<div class="highlight highlight-source-swift"><pre>waitForExpectationsWithTimeout(<span class="pl-c1">10</span>) { error <span class="pl-k">in</span>
+    <span class="pl-c">// ...</span>
+}</pre></div>
+
+<div class="highlight highlight-source-objc"><pre>[<span class="pl-v">self</span> <span class="pl-c1">waitForExpectationsWithTimeout:</span><span class="pl-c1">10</span> <span class="pl-c1">handler:</span>^(<span class="pl-c1">NSError</span> *error) {
+    <span class="pl-c">// ...</span>
+}];</pre></div>
+
+<p>Now, the only remaining step is to <code>fulfill</code> that <code>expecation</code> in the relevant callback of the asynchronous method being tested:</p>
+
+<div class="highlight highlight-source-swift"><pre>expectation<span class="pl-k">.</span>fulfill()</pre></div>
+
+<div class="highlight highlight-source-objc"><pre>[expectation <span class="pl-c1">fulfill</span>];</pre></div>
+
+<blockquote>
+<p>Always call <code>fulfill()</code> at the end of the asynchronous callback—fulfilling the expectation earlier can set up a race condition where the run loop may exit before completing the test. If the test has more than one expectation, it will not pass unless each expectation executes <code>fulfill()</code> within the timeout specified in <code>waitForExpectationsWithTimeout()</code>.</p>
+</blockquote>
+
+<p>Here's an example of how the response of an asynchronous networking request can be tested with the new <code>XCTestExpectation</code> APIs:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">func</span> <span class="pl-en">testAsynchronousURLConnection</span>() {
+    <span class="pl-k">let</span> URL <span class="pl-k">=</span> NSURL(string: <span class="pl-s"><span class="pl-pds">"</span>http://nshipster.com/<span class="pl-pds">"</span></span>)<span class="pl-k">!</span>
+    <span class="pl-k">let</span> expectation <span class="pl-k">=</span> expectationWithDescription(<span class="pl-s"><span class="pl-pds">"</span>GET <span class="pl-pse">\(</span><span class="pl-s1">URL</span><span class="pl-pse">)</span><span class="pl-pds">"</span></span>)
+
+    <span class="pl-k">let</span> session <span class="pl-k">=</span> NSURLSession<span class="pl-k">.</span>sharedSession()
+    <span class="pl-k">let</span> task <span class="pl-k">=</span> session<span class="pl-k">.</span>dataTaskWithURL(URL) { data, response, error <span class="pl-k">in</span>
+        XCTAssertNotNil(data, <span class="pl-s"><span class="pl-pds">"</span>data should not be nil<span class="pl-pds">"</span></span>)
+        XCTAssertNil(error, <span class="pl-s"><span class="pl-pds">"</span>error should be nil<span class="pl-pds">"</span></span>)
+
+        <span class="pl-k">if</span> <span class="pl-k">let</span> HTTPResponse <span class="pl-k">=</span> response <span class="pl-k">as?</span> NSHTTPURLResponse,
+            responseURL <span class="pl-k">=</span> HTTPResponse<span class="pl-k">.</span>URL,
+            MIMEType <span class="pl-k">=</span> HTTPResponse<span class="pl-k">.</span>MIMEType
+        {
+            XCTAssertEqual(responseURL<span class="pl-k">.</span>absoluteString, URL<span class="pl-k">.</span>absoluteString, <span class="pl-s"><span class="pl-pds">"</span>HTTP response URL should be equal to original URL<span class="pl-pds">"</span></span>)
+            XCTAssertEqual(HTTPResponse<span class="pl-k">.</span>statusCode, <span class="pl-c1">200</span>, <span class="pl-s"><span class="pl-pds">"</span>HTTP response status code should be 200<span class="pl-pds">"</span></span>)
+            XCTAssertEqual(MIMEType, <span class="pl-s"><span class="pl-pds">"</span>text/html<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>HTTP response content type should be text/html<span class="pl-pds">"</span></span>)
+        } <span class="pl-k">else</span> {
+            XCTFail(<span class="pl-s"><span class="pl-pds">"</span>Response was not NSHTTPURLResponse<span class="pl-pds">"</span></span>)
+        }
+
+        expectation<span class="pl-k">.</span>fulfill()
+    }
+
+    task<span class="pl-k">.</span>resume()
+
+    waitForExpectationsWithTimeout(task<span class="pl-k">.</span>originalRequest<span class="pl-k">!.</span>timeoutInterval) { error <span class="pl-k">in</span>
+        <span class="pl-k">if</span> <span class="pl-k">let</span> error <span class="pl-k">=</span> error {
+            <span class="pl-c1">print</span>(<span class="pl-s"><span class="pl-pds">"</span>Error: <span class="pl-pse">\(</span><span class="pl-s1">error<span class="pl-k">.</span>localizedDescription</span><span class="pl-pse">)</span><span class="pl-pds">"</span></span>)
+        }
+        task<span class="pl-k">.</span>cancel()
+    }
+}</pre></div>
+
+<div class="highlight highlight-source-objc"><pre>- (<span class="pl-k">void</span>)testAsynchronousURLConnection {
+    <span class="pl-c1">NSURL</span> *URL = [<span class="pl-c1">NSURL</span> <span class="pl-c1">URLWithString:</span><span class="pl-s"><span class="pl-pds">@"</span>http://nshipster.com/<span class="pl-pds">"</span></span>];
+    <span class="pl-c1">NSString</span> *description = [<span class="pl-c1">NSString</span> <span class="pl-c1">stringWithFormat:</span><span class="pl-s"><span class="pl-pds">@"</span>GET <span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, URL];
+    XCTestExpectation *expectation = [<span class="pl-v">self</span> <span class="pl-c1">expectationWithDescription:</span>description];
+
+    <span class="pl-c1">NSURLSession</span> *session = [<span class="pl-c1">NSURLSession</span> <span class="pl-c1">sharedSession</span>];
+    <span class="pl-c1">NSURLSessionDataTask</span> *task = [session <span class="pl-c1">dataTaskWithURL:</span>URL
+                                        <span class="pl-c1">completionHandler:</span>^(<span class="pl-c1">NSData</span> *data, <span class="pl-c1">NSURLResponse</span> *response, <span class="pl-c1">NSError</span> *error)
+    {
+        <span class="pl-c1">XCTAssertNotNil</span>(data, <span class="pl-s"><span class="pl-pds">"</span>data should not be nil<span class="pl-pds">"</span></span>);
+        <span class="pl-c1">XCTAssertNil</span>(error, <span class="pl-s"><span class="pl-pds">"</span>error should be nil<span class="pl-pds">"</span></span>);
+
+        <span class="pl-k">if</span> ([response <span class="pl-c1">isKindOfClass:</span>[<span class="pl-c1">NSHTTPURLResponse</span> <span class="pl-c1">class</span>]]) {
+            <span class="pl-c1">NSHTTPURLResponse</span> *httpResponse = (<span class="pl-c1">NSHTTPURLResponse</span> *)response;
+            <span class="pl-c1">XCTAssertEqual</span>(httpResponse.<span class="pl-smi">statusCode</span>, <span class="pl-c1">200</span>, <span class="pl-s"><span class="pl-pds">@"</span>HTTP response status code should be 200<span class="pl-pds">"</span></span>);
+            <span class="pl-c1">XCTAssertEqualObjects</span>(httpResponse.<span class="pl-smi">URL</span>.<span class="pl-smi">absoluteString</span>, URL.<span class="pl-smi">absoluteString</span>, <span class="pl-s"><span class="pl-pds">@"</span>HTTP response URL should be equal to original URL<span class="pl-pds">"</span></span>);
+            <span class="pl-c1">XCTAssertEqualObjects</span>(httpResponse.<span class="pl-smi">MIMEType</span>, <span class="pl-s"><span class="pl-pds">@"</span>text/html<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">@"</span>HTTP response content type should be text/html<span class="pl-pds">"</span></span>);
+        } <span class="pl-k">else</span> {
+            <span class="pl-c1">XCTFail</span>(<span class="pl-s"><span class="pl-pds">@"</span>Response was not NSHTTPURLResponse<span class="pl-pds">"</span></span>);
+        }
+
+        [expectation <span class="pl-c1">fulfill</span>];
+    }];
+
+    [task <span class="pl-c1">resume</span>];
+
+    [<span class="pl-v">self</span> <span class="pl-c1">waitForExpectationsWithTimeout:</span>task.originalRequest.timeoutInterval <span class="pl-c1">handler:</span>^(<span class="pl-c1">NSError</span> *error) {
+        <span class="pl-k">if</span> (error != <span class="pl-c1">nil</span>) {
+            <span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span>Error: <span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, error.<span class="pl-smi">localizedDescription</span>);    
+        }
+        [task <span class="pl-c1">cancel</span>];
+    }];
+}</pre></div>
+
+<h2><a id="user-content-mocking-in-swift" class="anchor" href="#mocking-in-swift" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Mocking in Swift</h2>
+
+<p>With first-class support for asynchronous testing, Xcode 6 seems to have fulfilled all of the needs of a modern test-driven developer. Well, perhaps save for one: <a href="http://en.wikipedia.org/wiki/Mock_object">mocking</a>.</p>
+
+<p>Mocking can be a useful technique for isolating and controlling behavior in systems that, for reasons of complexity, non-determinism, or performance constraints, do not usually lend themselves to testing. Examples include simulating specific networking interactions, intensive database queries, or inducing states that might emerge under a particular race condition.</p>
+
+<p>There are a couple of <a href="http://nshipster.com/unit-testing/#open-source-libraries">open source libraries</a> for creating mock objects and <a href="http://en.wikipedia.org/wiki/Test_stub">stubbing</a> method calls, but these libraries largely rely on Objective-C runtime manipulation, something that is not currently possible with Swift.</p>
+
+<p>However, this may not actually be necessary in Swift, due to its less-constrained syntax.</p>
+
+<p>In Swift, classes can be declared within the definition of a function, allowing for mock objects to be extremely self-contained. Just declare a mock inner-class, <code>override</code> and necessary methods:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">func</span> <span class="pl-en">testFetchRequestWithMockedManagedObjectContext</span>() {
+    <span class="pl-k">class</span> MockNSManagedObjectContext: NSManagedObjectContext {
+        <span class="pl-k">override</span> <span class="pl-k">func</span> <span class="pl-en">executeFetchRequest</span>(request: NSFetchRequest<span class="pl-k">!</span>, error: AutoreleasingUnsafePointer<span class="pl-k">&lt;</span>NSError?<span class="pl-k">&gt;</span>) <span class="pl-k">-&gt;</span> [<span class="pl-c1">AnyObject</span>]! {
+            <span class="pl-k">return</span> [[<span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Johnny Appleseed<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>email<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>johnny@apple.com<span class="pl-pds">"</span></span>]]
+        }
+    }
+
+    <span class="pl-k">let</span> mockContext <span class="pl-k">=</span> MockNSManagedObjectContext()
+    <span class="pl-k">let</span> fetchRequest <span class="pl-k">=</span> NSFetchRequest(entityName: <span class="pl-s"><span class="pl-pds">"</span>User<span class="pl-pds">"</span></span>)
+    fetchRequest<span class="pl-k">.</span>predicate <span class="pl-k">=</span> NSPredicate(format: <span class="pl-s"><span class="pl-pds">"</span>email ENDSWITH[cd] %@<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>@apple.com<span class="pl-pds">"</span></span>)
+    fetchRequest<span class="pl-k">.</span>resultType <span class="pl-k">=</span> <span class="pl-k">.</span>DictionaryResultType
+
+    <span class="pl-k">var</span> error: NSError?
+    <span class="pl-k">let</span> results <span class="pl-k">=</span> mockContext<span class="pl-k">.</span>executeFetchRequest(fetchRequest, error: <span class="pl-k">&amp;</span>error)
+
+    XCTAssertNil(error, <span class="pl-s"><span class="pl-pds">"</span>error should be nil<span class="pl-pds">"</span></span>)
+    XCTAssertEqual(results<span class="pl-k">.</span><span class="pl-c1">count</span>, <span class="pl-c1">1</span>, <span class="pl-s"><span class="pl-pds">"</span>fetch request should only return 1 result<span class="pl-pds">"</span></span>)
+
+    <span class="pl-k">let</span> result <span class="pl-k">=</span> results[<span class="pl-c1">0</span>] <span class="pl-k">as</span> [<span class="pl-c1">String</span>: <span class="pl-c1">String</span>]
+    XCTAssertEqual(result[<span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>] <span class="pl-k">as</span> <span class="pl-c1">String</span>, <span class="pl-s"><span class="pl-pds">"</span>Johnny Appleseed<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>name should be Johnny Appleseed<span class="pl-pds">"</span></span>)
+    XCTAssertEqual(result[<span class="pl-s"><span class="pl-pds">"</span>email<span class="pl-pds">"</span></span>] <span class="pl-k">as</span> <span class="pl-c1">String</span>, <span class="pl-s"><span class="pl-pds">"</span>johnny@apple.com<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>email should be johnny@apple.com<span class="pl-pds">"</span></span>)
+}</pre></div>
+
+<hr>
+
+<p>With Xcode 6, we've finally arrived: <strong>the built-in testing tools are now good enough to use on their own</strong>. That is to say, there are no particularly compelling reasons to use any additional abstractions in order to provide acceptable test coverage for the vast majority apps and libraries. Except in extreme cases that require extensive stubbing, mocking, or other exotic test constructs, XCTest assertions, expectations, and performance measurements should be sufficient.</p>
+
+<p>But no matter how good the testing tools have become, they're only good as <em>how you actually use them</em>.</p>
+
+<p>If you're new to testing on iOS or OS X, start by adding a few assertions to that automatically-generated test case file and hitting <code>⌘U</code>. You might be surprised at how easy and—dare I say—enjoyable you'll find the whole experience.</p>
+</article></div>

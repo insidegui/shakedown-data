@@ -1,0 +1,254 @@
+<div class="announce instapaper_body md" data-path="2013-11-18-nsfilemanager.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>tags</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>NSFileManager</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div>Cocoa</div></td>
+
+  <td><div>nshipster</div></td>
+
+  <td><div>File systems are a complex topic, with decades of history, vestigial complexities, and idiosyncrasies, and is well outside the scope of a single article. And since most applications don't often interact with the file system much beyond simple file operations, one can get away with only knowing the basics.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>t.b.c.</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p><code>NSFileManager</code> is Foundation's high-level API for working with file systems. It abstracts Unix and Finder internals, providing a convenient way to create, read, move, copy, and delete files &amp; directories on local or networked drives, as well as iCloud ubiquitous containers.</p>
+
+<p>File systems are a complex topic, with decades of history, vestigial complexities, and idiosyncrasies, and is well outside the scope of a single article. And since most applications don't often interact with the file system much beyond simple file operations, one can get away with only knowing the basics.</p>
+
+<p>What follows are some code samples for your copy-pasting pleasure. Use them as a foundation for understanding how to adjust parameters to your particular use case:</p>
+
+<h2><a id="user-content-common-tasks" class="anchor" href="#common-tasks" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Common Tasks</h2>
+
+<blockquote>
+<p>Throughout the code samples is the magical incantation <code>NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)</code>. This may be tied with KVO as one of the worst APIs in Cocoa. Just know that this returns an array containing the user documents directory as the first object. Thank goodness for the inclusion of <code>NSArray -firstObject</code>.</p>
+</blockquote>
+
+<h3><a id="user-content-determining-if-a-file-exists" class="anchor" href="#determining-if-a-file-exists" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Determining If A File Exists</h3>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSFileManager</span> *fileManager = [<span class="pl-c1">NSFileManager</span> <span class="pl-c1">defaultManager</span>];
+<span class="pl-c1">NSString</span> *documentsPath = [<span class="pl-c1">NSSearchPathForDirectoriesInDomains</span>(NSDocumentDirectory, NSUserDomainMask, <span class="pl-c1">YES</span>) <span class="pl-c1">firstObject</span>];
+<span class="pl-c1">NSString</span> *filePath = [documentsPath <span class="pl-c1">stringByAppendingPathComponent:</span><span class="pl-s"><span class="pl-pds">@"</span>file.txt<span class="pl-pds">"</span></span>];
+<span class="pl-c1">BOOL</span> fileExists = [fileManager <span class="pl-c1">fileExistsAtPath:</span>filePath];</pre></div>
+
+<h3><a id="user-content-listing-all-files-in-a-directory" class="anchor" href="#listing-all-files-in-a-directory" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Listing All Files In A Directory</h3>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSFileManager</span> *fileManager = [<span class="pl-c1">NSFileManager</span> <span class="pl-c1">defaultManager</span>];
+<span class="pl-c1">NSURL</span> *bundleURL = [[<span class="pl-c1">NSBundle</span> <span class="pl-c1">mainBundle</span>] <span class="pl-c1">bundleURL</span>];
+<span class="pl-c1">NSArray</span> *contents = [fileManager <span class="pl-c1">contentsOfDirectoryAtURL:</span>bundleURL
+                               <span class="pl-c1">includingPropertiesForKeys:</span>@[]
+                                                  <span class="pl-c1">options:</span>NSDirectoryEnumerationSkipsHiddenFiles
+                                                    <span class="pl-c1">error:</span><span class="pl-c1">nil</span>];
+
+<span class="pl-c1">NSPredicate</span> *predicate = [<span class="pl-c1">NSPredicate</span> <span class="pl-c1">predicateWithFormat:</span><span class="pl-s"><span class="pl-pds">@"</span>pathExtension == 'png'<span class="pl-pds">"</span></span>];
+<span class="pl-k">for</span> (<span class="pl-c1">NSURL</span> *fileURL in [contents <span class="pl-c1">filteredArrayUsingPredicate:</span>predicate]) {
+    <span class="pl-c">// Enumerate each .png file in directory</span>
+}</pre></div>
+
+<h2><a id="user-content-recursively-enumerating-files-in-a-directory" class="anchor" href="#recursively-enumerating-files-in-a-directory" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Recursively Enumerating Files In A Directory</h2>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSFileManager</span> *fileManager = [<span class="pl-c1">NSFileManager</span> <span class="pl-c1">defaultManager</span>];
+<span class="pl-c1">NSURL</span> *bundleURL = [[<span class="pl-c1">NSBundle</span> <span class="pl-c1">mainBundle</span>] <span class="pl-c1">bundleURL</span>];
+<span class="pl-c1">NSDirectoryEnumerator</span> *enumerator = [fileManager <span class="pl-c1">enumeratorAtURL:</span>bundleURL
+                                      <span class="pl-c1">includingPropertiesForKeys:</span>@[<span class="pl-c1">NSURLNameKey</span>, <span class="pl-c1">NSURLIsDirectoryKey</span>]
+                                                         <span class="pl-c1">options:</span>NSDirectoryEnumerationSkipsHiddenFiles
+                                                    <span class="pl-c1">errorHandler:</span>^<span class="pl-c1">BOOL</span>(<span class="pl-c1">NSURL</span> *url, <span class="pl-c1">NSError</span> *error)
+{
+    <span class="pl-k">if</span> (error) {
+        <span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span>[Error] <span class="pl-c1">%@</span> (<span class="pl-c1">%@</span>)<span class="pl-pds">"</span></span>, error, url);
+        <span class="pl-k">return</span> <span class="pl-c1">NO</span>;
+    }
+
+    <span class="pl-k">return</span> <span class="pl-c1">YES</span>;
+}];
+
+<span class="pl-c1">NSMutableArray</span> *mutableFileURLs = [<span class="pl-c1">NSMutableArray</span> <span class="pl-c1">array</span>];
+<span class="pl-k">for</span> (<span class="pl-c1">NSURL</span> *fileURL in enumerator) {
+    <span class="pl-c1">NSString</span> *filename;
+    [fileURL <span class="pl-c1">getResourceValue:</span>&amp;filename <span class="pl-c1">forKey:</span><span class="pl-c1">NSURLNameKey</span> <span class="pl-c1">error:</span><span class="pl-c1">nil</span>];
+
+    <span class="pl-c1">NSNumber</span> *isDirectory;
+    [fileURL <span class="pl-c1">getResourceValue:</span>&amp;isDirectory <span class="pl-c1">forKey:</span><span class="pl-c1">NSURLIsDirectoryKey</span> <span class="pl-c1">error:</span><span class="pl-c1">nil</span>];
+
+    <span class="pl-c">// Skip directories with '_' prefix, for example</span>
+    <span class="pl-k">if</span> ([filename <span class="pl-c1">hasPrefix:</span><span class="pl-s"><span class="pl-pds">@"</span>_<span class="pl-pds">"</span></span>] &amp;&amp; [isDirectory <span class="pl-c1">boolValue</span>]) {
+        [enumerator <span class="pl-c1">skipDescendants</span>];
+        <span class="pl-k">continue</span>;
+    }
+
+    <span class="pl-k">if</span> (![isDirectory <span class="pl-c1">boolValue</span>]) {
+        [mutableFileURLs <span class="pl-c1">addObject:</span>fileURL];
+    }
+}</pre></div>
+
+<h3><a id="user-content-creating-a-directory" class="anchor" href="#creating-a-directory" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Creating a Directory</h3>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSFileManager</span> *fileManager = [<span class="pl-c1">NSFileManager</span> <span class="pl-c1">defaultManager</span>];
+<span class="pl-c1">NSString</span> *documentsPath = [<span class="pl-c1">NSSearchPathForDirectoriesInDomains</span>(NSDocumentDirectory, NSUserDomainMask, <span class="pl-c1">YES</span>) <span class="pl-c1">firstObject</span>];
+<span class="pl-c1">NSString</span> *imagesPath = [documentsPath <span class="pl-c1">stringByAppendingPathComponent:</span><span class="pl-s"><span class="pl-pds">@"</span>images<span class="pl-pds">"</span></span>];
+<span class="pl-k">if</span> (![fileManager <span class="pl-c1">fileExistsAtPath:</span>imagesPath]) {
+    [fileManager <span class="pl-c1">createDirectoryAtPath:</span>imagesPath <span class="pl-c1">withIntermediateDirectories:</span><span class="pl-c1">NO</span> <span class="pl-c1">attributes:</span><span class="pl-c1">nil</span> <span class="pl-c1">error:</span><span class="pl-c1">nil</span>];
+}</pre></div>
+
+<h3><a id="user-content-deleting-a-file" class="anchor" href="#deleting-a-file" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Deleting a File</h3>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSFileManager</span> *fileManager = [<span class="pl-c1">NSFileManager</span> <span class="pl-c1">defaultManager</span>];
+<span class="pl-c1">NSString</span> *documentsPath = [<span class="pl-c1">NSSearchPathForDirectoriesInDomains</span>(NSDocumentDirectory, NSUserDomainMask, <span class="pl-c1">YES</span>) <span class="pl-c1">firstObject</span>];
+<span class="pl-c1">NSString</span> *filePath = [documentsPath <span class="pl-c1">stringByAppendingPathComponent:</span><span class="pl-s"><span class="pl-pds">@"</span>image.png<span class="pl-pds">"</span></span>];
+<span class="pl-c1">NSError</span> *error = <span class="pl-c1">nil</span>;
+
+<span class="pl-k">if</span> (![fileManager <span class="pl-c1">removeItemAtPath:</span>filePath <span class="pl-c1">error:</span>&amp;error]) {
+    <span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span>[Error] <span class="pl-c1">%@</span> (<span class="pl-c1">%@</span>)<span class="pl-pds">"</span></span>, error, filePath);
+}</pre></div>
+
+<h3><a id="user-content-determining-the-creation-date-of-a-file" class="anchor" href="#determining-the-creation-date-of-a-file" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Determining the Creation Date of a File</h3>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSFileManager</span> *fileManager = [<span class="pl-c1">NSFileManager</span> <span class="pl-c1">defaultManager</span>];
+<span class="pl-c1">NSString</span> *documentsPath = [<span class="pl-c1">NSSearchPathForDirectoriesInDomains</span>(NSDocumentDirectory, NSUserDomainMask, <span class="pl-c1">YES</span>) <span class="pl-c1">firstObject</span>];
+<span class="pl-c1">NSString</span> *filePath = [documentsPath <span class="pl-c1">stringByAppendingPathComponent:</span><span class="pl-s"><span class="pl-pds">@"</span>Document.pages<span class="pl-pds">"</span></span>];
+
+<span class="pl-c1">NSDate</span> *creationDate = <span class="pl-c1">nil</span>;
+<span class="pl-k">if</span> ([fileManager <span class="pl-c1">fileExistsAtPath:</span>filePath]) {
+    <span class="pl-c1">NSDictionary</span> *attributes = [fileManager <span class="pl-c1">attributesOfItemAtPath:</span>filePath <span class="pl-c1">error:</span><span class="pl-c1">nil</span>];
+    creationDate = attributes[<span class="pl-c1">NSFileCreationDate</span>];
+}</pre></div>
+
+<p>There are a number of file attributes that are made accessible through <code>NSFileManager</code>, which can be fetched with <code>-attributesOfItemAtPath:error:</code>, and other methods:</p>
+
+<h4><a id="user-content-file-attribute-keys" class="anchor" href="#file-attribute-keys" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>File Attribute Keys</h4>
+
+<blockquote>
+<ul>
+<li><code>NSFileAppendOnly</code>: The key in a file attribute dictionary whose value indicates whether the file is read-only.</li>
+<li><code>NSFileBusy</code>: The key in a file attribute dictionary whose value indicates whether the file is busy.</li>
+<li><code>NSFileCreationDate</code>: The key in a file attribute dictionary whose value indicates the file's creation date.</li>
+<li><code>NSFileOwnerAccountName</code>: The key in a file attribute dictionary whose value indicates the name of the file's owner.</li>
+<li><code>NSFileGroupOwnerAccountName</code>: The key in a file attribute dictionary whose value indicates the group name of the file's owner.</li>
+<li><code>NSFileDeviceIdentifier</code>: The key in a file attribute dictionary whose value indicates the identifier for the device on which the file resides.</li>
+<li><code>NSFileExtensionHidden</code>: The key in a file attribute dictionary whose value indicates whether the file's extension is hidden.</li>
+<li><code>NSFileGroupOwnerAccountID</code>: The key in a file attribute dictionary whose value indicates the file's group ID.</li>
+<li><code>NSFileHFSCreatorCode</code>: The key in a file attribute dictionary whose value indicates the file's HFS creator code.</li>
+<li><code>NSFileHFSTypeCode</code>: The key in a file attribute dictionary whose value indicates the file's HFS type code.</li>
+<li><code>NSFileImmutable</code>: The key in a file attribute dictionary whose value indicates whether the file is mutable.</li>
+<li><code>NSFileModificationDate</code>: The key in a file attribute dictionary whose value indicates the file's last modified date.</li>
+<li><code>NSFileOwnerAccountID</code>: The key in a file attribute dictionary whose value indicates the file's owner's account ID.</li>
+<li><code>NSFilePosixPermissions</code>: The key in a file attribute dictionary whose value indicates the file's Posix permissions.</li>
+<li><code>NSFileReferenceCount</code>: The key in a file attribute dictionary whose value indicates the file's reference count.</li>
+<li><code>NSFileSize</code>: The key in a file attribute dictionary whose value indicates the file's size in bytes.</li>
+<li><code>NSFileSystemFileNumber</code>: The key in a file attribute dictionary whose value indicates the file's filesystem file number.</li>
+<li><p><code>NSFileType</code>: The key in a file attribute dictionary whose value indicates the file's type.</p></li>
+<li><p><code>NSDirectoryEnumerationSkipsSubdirectoryDescendants</code>: Perform a shallow enumeration; do not descend into directories.</p></li>
+<li><code>NSDirectoryEnumerationSkipsPackageDescendants</code>: Do not descend into packages.</li>
+<li><code>NSDirectoryEnumerationSkipsHiddenFiles</code>: Do not enumerate hidden files.</li>
+</ul>
+</blockquote>
+
+<h2><a id="user-content-nsfilemanagerdelegate" class="anchor" href="#nsfilemanagerdelegate" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>NSFileManagerDelegate</h2>
+
+<p><code>NSFileManager</code> may optionally set a delegate to verify that it should perform a particular file operation. This allows the business logic of, for instance, which files to protect from deletion, to be factored out of the controller.</p>
+
+<p>There are four kinds of methods in the <code>&lt;NSFileManagerDelegate&gt;</code> protocol, each with a variation for working with paths, as well as methods for error handling:</p>
+
+<ul>
+<li><code>-fileManager:shouldMoveItemAtURL:toURL:</code></li>
+<li><code>-fileManager:shouldCopyItemAtURL:toURL:</code></li>
+<li><code>-fileManager:shouldRemoveItemAtURL:</code></li>
+<li><code>-fileManager:shouldLinkItemAtURL:toURL:</code></li>
+</ul>
+
+<p>If you were wondering when you might <code>alloc init</code> your own <code>NSFileManager</code> rather than using the shared instance, this is it. As per the documentation:</p>
+
+<blockquote>
+<p>If you use a delegate to receive notifications about the status of move, copy, remove, and link operations, you should create a unique instance of the file manager object, assign your delegate to that object, and use that file manager to initiate your operations.</p>
+</blockquote>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSFileManager</span> *fileManager = [[<span class="pl-c1">NSFileManager</span> <span class="pl-c1">alloc</span>] <span class="pl-c1">init</span>];
+fileManager.delegate = delegate;
+
+<span class="pl-c1">NSURL</span> *bundleURL = [[<span class="pl-c1">NSBundle</span> <span class="pl-c1">mainBundle</span>] <span class="pl-c1">bundleURL</span>];
+<span class="pl-c1">NSArray</span> *contents = [fileManager <span class="pl-c1">contentsOfDirectoryAtURL:</span>bundleURL
+                               <span class="pl-c1">includingPropertiesForKeys:</span>@[]
+                                                  <span class="pl-c1">options:</span>NSDirectoryEnumerationSkipsHiddenFiles
+                                                    <span class="pl-c1">error:</span><span class="pl-c1">nil</span>];
+
+<span class="pl-k">for</span> (<span class="pl-c1">NSString</span> *filePath in contents) {
+    [fileManager <span class="pl-c1">removeItemAtPath:</span>filePath <span class="pl-c1">error:</span><span class="pl-c1">nil</span>];
+}</pre></div>
+
+<h4><a id="user-content-customfilemanagerdelegatem" class="anchor" href="#customfilemanagerdelegatem" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>CustomFileManagerDelegate.m</h4>
+
+<div class="highlight highlight-source-objc"><pre>#<span class="pl-k">pragma mark</span> - NSFileManagerDelegate
+
+- (<span class="pl-c1">BOOL</span>)fileManager:(<span class="pl-c1">NSFileManager</span> *)fileManager
+shouldRemoveItemAtURL:(<span class="pl-c1">NSURL</span> *)URL
+{
+    <span class="pl-k">return</span> ![[[URL <span class="pl-c1">lastPathComponent</span>] <span class="pl-c1">pathExtension</span>] <span class="pl-c1">isEqualToString:</span><span class="pl-s"><span class="pl-pds">@"</span>pdf<span class="pl-pds">"</span></span>];
+}</pre></div>
+
+<h2><a id="user-content-ubiquitous-storage" class="anchor" href="#ubiquitous-storage" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Ubiquitous Storage</h2>
+
+<p>Documents can also be moved to iCloud. If you guessed that this would be anything but straight forward, you'd be 100% correct.</p>
+
+<p>This is another occasion when you'd <code>alloc init</code> your own <code>NSFileManager</code> rather than using the shared instance. Because <code>URLForUbiquityContainerIdentifier:</code> and <code>setUbiquitous:itemAtURL:destinationURL:error:</code> are blocking calls, this entire operation needs to be dispatched to a background queue.</p>
+
+<h3><a id="user-content-moving-an-item-to-ubiquitous-storage" class="anchor" href="#moving-an-item-to-ubiquitous-storage" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Moving an Item to Ubiquitous Storage</h3>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-en">dispatch_async</span>(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, <span class="pl-c1">0</span>), ^{
+    <span class="pl-c1">NSFileManager</span> *fileManager = [[<span class="pl-c1">NSFileManager</span> <span class="pl-c1">alloc</span>] <span class="pl-c1">init</span>];
+    <span class="pl-c1">NSString</span> *documentsPath = [<span class="pl-c1">NSSearchPathForDirectoriesInDomains</span>(NSDocumentDirectory, NSUserDomainMask, <span class="pl-c1">YES</span>) <span class="pl-c1">firstObject</span>];
+    <span class="pl-c1">NSURL</span> *fileURL = [<span class="pl-c1">NSURL</span> <span class="pl-c1">fileURLWithPath:</span>[documentsPath <span class="pl-c1">stringByAppendingPathComponent:</span><span class="pl-s"><span class="pl-pds">@"</span>Document.pages<span class="pl-pds">"</span></span>]];
+
+    <span class="pl-c">// Defaults to first listed in entitlements when `nil`; should replace with real identifier</span>
+    <span class="pl-c1">NSString</span> *identifier = <span class="pl-c1">nil</span>;
+
+    <span class="pl-c1">NSURL</span> *ubiquitousContainerURL = [fileManager <span class="pl-c1">URLForUbiquityContainerIdentifier:</span>identifier];
+    <span class="pl-c1">NSURL</span> *ubiquitousFileURL = [ubiquitousContainerURL <span class="pl-c1">URLByAppendingPathComponent:</span><span class="pl-s"><span class="pl-pds">@"</span>Document.pages<span class="pl-pds">"</span></span>];
+
+    <span class="pl-c1">NSError</span> *error = <span class="pl-c1">nil</span>;
+    <span class="pl-c1">BOOL</span> success = [fileManager <span class="pl-c1">setUbiquitous:</span><span class="pl-c1">YES</span>
+                                    <span class="pl-c1">itemAtURL:</span>fileURL
+                               <span class="pl-c1">destinationURL:</span>ubiquitousFileURL
+                                        <span class="pl-c1">error:</span>&amp;error];
+    <span class="pl-k">if</span> (!success) {
+        <span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span>[Error] <span class="pl-c1">%@</span> (<span class="pl-c1">%@</span>) (<span class="pl-c1">%@</span>)<span class="pl-pds">"</span></span>, error, fileURL, ubiquitousFileURL);
+    }
+});</pre></div>
+
+<blockquote>
+<p>You can find more information about ubiquitous document storage in Apple's "iCloud File Management" document.</p>
+</blockquote>
+
+<hr>
+
+<p>There's a lot to know about file systems, but as an app developer, it's mostly an academic exercise. Now don't get me wrong—academic exercises are great! But they don't ship code. <code>NSFileManager</code> allows you to ignore most of the subtlety of all of this and get things done.</p>
+</article></div>

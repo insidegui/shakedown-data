@@ -1,0 +1,132 @@
+<div class="announce instapaper_body md" data-path="2012-10-01-pragma.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>tags</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>#pragma</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div>Objective-C</div></td>
+
+  <td><div>nshipster</div></td>
+
+  <td><div>`#pragma` declarations are a mark of craftsmanship in Objective-C. Although originally purposed for compiling source code across many different compilers, the modern Xcode-savvy programmer uses #pragma declarations to very different ends.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>n/a</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p><code>#pragma</code> declarations are a mark of craftsmanship in Objective-C. Although originally used to make source code compatible between different compilers, the Xcode-savvy coder uses <code>#pragma</code> declarations to very different ends.</p>
+
+<p>In this modern context, <code>#pragma</code> skirts the line between comment and code. As a preprocessor directive, <code>#pragma</code> evaluates at compile-time. But unlike other macros, such as <code>#ifdef...#endif</code>, the way <code>#pragma</code> is used will not change the runtime behavior of your application. Instead, <code>#pragma</code> declarations are used by Xcode to accomplish two primary tasks: organizing code and inhibiting compiler warnings.</p>
+
+<blockquote>
+<p>In addition to the <code>#pragma</code> syntax, both <a href="http://gcc.gnu.org/onlinedocs/cpp/Pragmas.html">GCC</a> and <a href="http://clang.llvm.org/docs/UsersManual.html#controlling-diagnostics-via-pragmas">Clang</a> have added the C99 <code>_Pragma</code> operator.</p>
+</blockquote>
+
+<h2><a id="user-content-organizing-your-code" class="anchor" href="#organizing-your-code" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Organizing Your Code</h2>
+
+<p>Code organization is a matter of hygiene. How you structure your code is a reflection on you and your work. A lack of convention and internal consistency indicates either carelessness or incompetence--and worse, makes a project difficult to maintain and collaborate on.</p>
+
+<p>Good habits start with <code>#pragma mark</code>. Like so:</p>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-k">@implementation</span> <span class="pl-en">ViewController</span>
+
+- (<span class="pl-c1">id</span>)<span class="pl-en">init</span> {
+  ...
+}
+
+#<span class="pl-k">pragma mark</span> - UIViewController
+
+- (<span class="pl-k">void</span>)<span class="pl-en">viewDidLoad</span> {
+  ...
+}
+
+#<span class="pl-k">pragma mark</span> - IBAction
+
+- (<span class="pl-k">IBAction</span>)<span class="pl-en">cancel</span><span class="pl-en">:</span>(<span class="pl-c1">id</span>)<span class="pl-smi">sender</span> {
+  ...
+}
+
+#<span class="pl-k">pragma mark</span> - UITableViewDataSource
+
+- (<span class="pl-c1">NSInteger</span>)<span class="pl-en">tableView</span><span class="pl-en">:</span>(UITableView *)<span class="pl-smi">tableView</span> <span class="pl-en">numberOfRowsInSection</span><span class="pl-en">:</span>(<span class="pl-c1">NSInteger</span>)<span class="pl-smi">section</span> {
+  ...
+}
+
+#<span class="pl-k">pragma mark</span> - UITableViewDelegate
+
+- (<span class="pl-k">void</span>)<span class="pl-en">tableView</span><span class="pl-en">:</span>(UITableView *)<span class="pl-smi">tableView</span> <span class="pl-en">didSelectRowAtIndexPath</span><span class="pl-en">:</span>(<span class="pl-c1">NSIndexPath</span> *)<span class="pl-smi">indexPath</span> {
+  ...
+}</pre></div>
+
+<p>Use <code>#pragma mark</code> in your <code>@implementation</code> to divide code into logical sections. Not only do these sections make it easier to read through the code itself, but it also adds visual cues to the Xcode source navigator (<code>#pragma mark</code> declarations starting with a dash (<code>-</code>) are preceded with a horizontal divider).</p>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/pragma-xcode-sections.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/pragma-xcode-sections.png" alt="Xcode Sections" style="max-width:100%;"></a></p>
+
+<p>If your class conforms to any <code>@protocols</code>, start by grouping all of the methods within each protocol together, and adding a <code>#pragma mark</code> header with the name of that protocol. Another good convention is to group subclassed methods according to their respective superclass. For example, an <code>NSInputStream</code> subclass should have a group marked <code>NSInputStream</code>, followed by a group marked <code>NSStream</code>. Things like <code>IBAction</code> outlets, or methods corresponding to target / action, notification, or KVO selectors probably deserve their own sections as well.</p>
+
+<p>Your code should be clean enough to eat off of. So take the time to leave your <code>.m</code> files better than how you found them.</p>
+
+<h2><a id="user-content-inhibiting-warnings" class="anchor" href="#inhibiting-warnings" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Inhibiting Warnings</h2>
+
+<p><code>#pragma mark</code> is pretty mainstream. On the other hand, <code>#pragma</code> declarations to inhibit warnings from the compiler &amp; static analyzer--now that's pretty fresh.</p>
+
+<p>You know what's even more annoying than poorly-formatted code? Code that generates warnings. Especially 3rd-party code. There are few things as irksome as that one vendor library that takes forever to compile, and finishes with 200+ warnings. Even shipping code with 1 warning is in poor form.</p>
+
+<blockquote>
+<p>Pro tip: Try setting the <code>-Weverything</code> flag and checking the "Treat Warnings as Errors" box your build settings. This turns on Hard Mode in Xcode.</p>
+</blockquote>
+
+<p>But sometimes there's no avoiding compiler warnings. Deprecation notices and retain-cycle false positives are two common situations where this might happen. In those rare cases where you are <em>absolutely</em> certain that a particular compiler or static analyzer warning should be inhibited, <code>#pragma</code> comes to the rescue:</p>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c">// completionBlock is manually nilled out in AFURLConnectionOperation to break the retain cycle.</span>
+#<span class="pl-k">pragma</span> clang diagnostic push
+#<span class="pl-k">pragma</span> clang diagnostic ignored "-Warc-retain-cycles"
+    self.completionBlock = ^ {
+        ...
+    };
+#<span class="pl-k">pragma</span> clang diagnostic pop</pre></div>
+
+<p>This code sample <a href="https://github.com/AFNetworking/AFNetworking/blob/master/AFNetworking/AFHTTPRequestOperation.m#L247">from AFNetworking</a> (contributed by <a href="https://github.com/steipete">Peter Steinberger</a>) is an example of an otherwise unavoidable warning from the static analyzer. Clang notices a strong reference to <code>self</code> within the block, and warns about a possible <a href="http://www.quora.com/What-is-a-retain-cycle">retain cycle</a>. However, the <code>super</code> implementation of <code>setCompletionBlock</code> takes care of this by <code>nil</code>-ing out the strong reference after the completion block is finished.</p>
+
+<p>Fortunately, Clang provides a convenient way to get around all of this. Using <code>#pragma clang diagnostic push/pop</code>, you can tell the compiler to ignore certain warnings, <em>only</em> for a particular section of code (the original diagnostic settings are restored with the final <code>pop</code>).</p>
+
+<blockquote>
+<p>You can read more about the LLVM's use of <code>#pragma</code> in the <a href="http://clang.llvm.org/docs/UsersManual.html#diagnostics_pragmas">Clang Compiler User's Manual</a>.</p>
+</blockquote>
+
+<p>Just don't use this as a way to sweep legitimate warnings under the rug--that will only come back to bite you later.</p>
+
+<hr>
+
+<p>So there you go: two ways you can markedly improve your code using <code>#pragma</code> declarations.</p>
+
+<p>Like the thrift store 8-track player you turned into that lamp in the foyer, <code>#pragma</code> remains a curious vestige of the past: Once the secret language of compilers, now re-purposed to better-communicate intent to other programmers. How delightfully vintage!</p>
+</article></div>

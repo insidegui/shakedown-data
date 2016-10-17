@@ -1,0 +1,223 @@
+<div class="announce instapaper_body md" data-path="2013-06-02-nsdatadetector.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>tags</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>NSDataDetector</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div>Cocoa</div></td>
+
+  <td><div>nshipster</div></td>
+
+  <td><div>Until humanity embraces RDF for all of their daily interactions, a large chunk of artificial intelligence is going to go into figuring out what the heck we're all talking about. Fortunately for Cocoa developers, there's NSDataDetector.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+
+  <th>reviewed</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>2.0</div></td>
+
+  <td><div>September 8, 2015</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>Machines speak in binary, while humans speak in riddles, half-truths, and omissions.</p>
+
+<p>And until humanity embraces <a href="http://en.wikipedia.org/wiki/Resource_Description_Framework">RDF</a> for all of their daily interactions, a large chunk of artificial intelligence is going to go into figuring out what the heck we're all talking about.</p>
+
+<p>Because in the basic interactions of our daily lives—meeting people, making plans, finding information online—there is immense value in automatically converting from implicit human language to explicit structured data, so that it can be easily added to our calendars, address books, maps, and reminders.</p>
+
+<p>Fortunately for Cocoa developers, there's an easy solution: <code>NSDataDetector</code>.</p>
+
+<hr>
+
+<p><code>NSDataDetector</code> is a subclass of <a href="https://developer.apple.com/library/mac/#documentation/Foundation/Reference/NSRegularExpression_Class/Reference/Reference.html"><code>NSRegularExpression</code></a>, but instead of matching on an ICU pattern, it detects semi-structured information: dates, addresses, links, phone numbers and transit information.</p>
+
+<p>It does all of this with frightening accuracy. <code>NSDataDetector</code> will match flight numbers, address snippets, oddly formatted digits, and even relative deictic expressions like "next Saturday at 5".</p>
+
+<p>You can think of it as a regexp matcher with incredibly complicated expressions that can extract information from natural language (though its actual implementation details may be somewhat more complicated than that).</p>
+
+<p><code>NSDataDetector</code> objects are initialized with a bitmask of types of information to check, and then passed strings to match on. Like <code>NSRegularExpression</code>, each match found in a string is represented by a <code>NSTextCheckingResult</code>, which has details like character range and match type. However, <code>NSDataDetector</code>-specific types may also contain metadata such as address or date components.</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> string <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>123 Main St. / (555) 555-5555<span class="pl-pds">"</span></span>
+<span class="pl-k">let</span> types: NSTextCheckingType <span class="pl-k">=</span> [<span class="pl-k">.</span>Address, <span class="pl-k">.</span>PhoneNumber]
+<span class="pl-k">let</span> detector <span class="pl-k">=</span> <span class="pl-k">try</span>? NSDataDetector(types: types<span class="pl-k">.</span><span class="pl-c1">rawValue</span>)
+detector?<span class="pl-k">.</span>enumerateMatchesInString(string, options: [], range: NSMakeRange(<span class="pl-c1">0</span>, (string <span class="pl-k">as</span> NSString)<span class="pl-k">.</span><span class="pl-c1">length</span>)) { (result, flags, _) <span class="pl-k">in</span>
+    <span class="pl-c1">print</span>(result)
+}</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSError</span> *error = <span class="pl-c1">nil</span>;
+<span class="pl-c1">NSDataDetector</span> *detector = [<span class="pl-c1">NSDataDetector</span> <span class="pl-c1">dataDetectorWithTypes:</span>NSTextCheckingTypeAddress
+                                                        | NSTextCheckingTypePhoneNumber
+                                                           <span class="pl-c1">error:</span>&amp;error];
+
+<span class="pl-c1">NSString</span> *string = <span class="pl-s"><span class="pl-pds">@"</span>123 Main St. / (555) 555-5555<span class="pl-pds">"</span></span>;
+[detector <span class="pl-c1">enumerateMatchesInString:</span>string
+                           <span class="pl-c1">options:</span><span class="pl-c1">kNilOptions</span>
+                             <span class="pl-c1">range:</span><span class="pl-c1">NSMakeRange</span>(<span class="pl-c1">0</span>, [string <span class="pl-c1">length</span>])
+                        <span class="pl-c1">usingBlock:</span>
+^(<span class="pl-c1">NSTextCheckingResult</span> *result, <span class="pl-c1">NSMatchingFlags</span> flags, <span class="pl-c1">BOOL</span> *stop) {
+  <span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span>Match: <span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, result);
+}];</pre></div>
+
+<blockquote>
+<p>When initializing <code>NSDataDetector</code>, be sure to specify only the types you're interested in. With each additional type to be checked comes a nontrivial performance cost.</p>
+</blockquote>
+
+<h2><a id="user-content-data-detector-match-types" class="anchor" href="#data-detector-match-types" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Data Detector Match Types</h2>
+
+<p>Because of how much <code>NSTextCheckingResult</code> is used for, it's not immediately clear which properties are specific to <code>NSDataDetector</code>. For your reference, here is a table of the different <code>NSTextCheckingTypes</code> for <code>NSDataDetector</code> matches, and their associated properties:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Properties</th>
+    </tr>
+  </thead>
+  <tbody>
+
+    <tr>
+      <td><tt>NSTextCheckingTypeDate</tt></td>
+      <td>
+        <ul>
+          <li><tt>date</tt></li>
+          <li><tt>duration</tt></li>
+          <li><tt>timeZone</tt></li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><tt>NSTextCheckingTypeAddress</tt></td>
+      <td>
+        <ul>
+          <li><tt>addressComponents</tt><sup>*</sup></li>
+          <ul>
+            <li><tt>NSTextCheckingNameKey</tt></li>
+            <li><tt>NSTextCheckingJobTitleKey</tt></li>
+            <li><tt>NSTextCheckingOrganizationKey</tt></li>
+            <li><tt>NSTextCheckingStreetKey</tt></li>
+            <li><tt>NSTextCheckingCityKey</tt></li>
+            <li><tt>NSTextCheckingStateKey</tt></li>
+            <li><tt>NSTextCheckingZIPKey</tt></li>
+            <li><tt>NSTextCheckingCountryKey</tt></li>
+            <li><tt>NSTextCheckingPhoneKey</tt></li>
+          </ul>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><tt>NSTextCheckingTypeLink</tt></td>
+      <td>
+        <ul>
+          <li><tt>url</tt></li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><tt>NSTextCheckingTypePhoneNumber</tt></td>
+      <td>
+        <ul>
+          <li><tt>phoneNumber</tt></li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><tt>NSTextCheckingTypeTransitInformation</tt></td>
+      <td>
+        <ul>
+          <li><tt>components</tt><sup>*</sup></li>
+          <ul>
+            <li><tt>NSTextCheckingAirlineKey</tt></li>
+            <li><tt>NSTextCheckingFlightKey</tt></li>
+          </ul>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="2"><sup>*</sup> <tt>NSDictionary</tt> properties have values at defined keys.
+  </td></tr></tfoot>
+</table>
+
+<h2><a id="user-content-data-detection-on-ios" class="anchor" href="#data-detection-on-ios" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Data Detection on iOS</h2>
+
+<p>Somewhat confusingly, iOS also defines <code>UIDataDetectorTypes</code>. A bitmask of these values can be set as the <code>dataDetectorTypes</code> of a <code>UITextView</code> to have detected data automatically linked in the displayed text.</p>
+
+<p><code>UIDataDetectorTypes</code> is distinct from <code>NSTextCheckingTypes</code> in that equivalent enum constants (e.g. <code>UIDataDetectorTypePhoneNumber</code> and <code>NSTextCheckingTypePhoneNumber</code>) do not have the same integer value, and not all values in one are found in the other. Converting from <code>UIDataDetectorTypes</code> to <code>NSTextCheckingTypes</code> can be accomplished with a function:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">func</span> <span class="pl-en">NSTextCheckingTypesFromUIDataDetectorTypes</span>(dataDetectorType: UIDataDetectorTypes) <span class="pl-k">-&gt;</span> NSTextCheckingType {
+    <span class="pl-k">var</span> textCheckingType: NSTextCheckingType <span class="pl-k">=</span> []
+
+    <span class="pl-k">if</span> dataDetectorType<span class="pl-k">.</span><span class="pl-c1">contains</span>(<span class="pl-k">.</span>Address) {
+        textCheckingType<span class="pl-k">.</span><span class="pl-c1">insert</span>(<span class="pl-k">.</span>Address)
+    }
+
+    <span class="pl-k">if</span> dataDetectorType<span class="pl-k">.</span><span class="pl-c1">contains</span>(<span class="pl-k">.</span>CalendarEvent) {
+        textCheckingType<span class="pl-k">.</span><span class="pl-c1">insert</span>(<span class="pl-k">.</span>Date)
+    }
+
+    <span class="pl-k">if</span> dataDetectorType<span class="pl-k">.</span><span class="pl-c1">contains</span>(<span class="pl-k">.</span>Link) {
+        textCheckingType<span class="pl-k">.</span><span class="pl-c1">insert</span>(<span class="pl-k">.</span>Link)
+    }
+
+    <span class="pl-k">if</span> dataDetectorType<span class="pl-k">.</span><span class="pl-c1">contains</span>(<span class="pl-k">.</span>PhoneNumber) {
+        textCheckingType<span class="pl-k">.</span><span class="pl-c1">insert</span>(<span class="pl-k">.</span>PhoneNumber)
+    }
+
+    <span class="pl-k">return</span> textCheckingType
+}</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-k">static</span> <span class="pl-k">inline</span> <span class="pl-c1">NSTextCheckingType</span> <span class="pl-en">NSTextCheckingTypesFromUIDataDetectorTypes</span>(UIDataDetectorTypes dataDetectorType) {
+    <span class="pl-c1">NSTextCheckingType</span> textCheckingType = <span class="pl-c1">0</span>;
+    <span class="pl-k">if</span> (dataDetectorType &amp; UIDataDetectorTypeAddress) {
+        textCheckingType |= NSTextCheckingTypeAddress;
+    }
+
+    <span class="pl-k">if</span> (dataDetectorType &amp; UIDataDetectorTypeCalendarEvent) {
+        textCheckingType |= NSTextCheckingTypeDate;
+    }
+
+    <span class="pl-k">if</span> (dataDetectorType &amp; UIDataDetectorTypeLink) {
+        textCheckingType |= NSTextCheckingTypeLink;
+    }
+
+    <span class="pl-k">if</span> (dataDetectorType &amp; UIDataDetectorTypePhoneNumber) {
+        textCheckingType |= NSTextCheckingTypePhoneNumber;
+    }
+
+    <span class="pl-k">return</span> textCheckingType;
+}</pre></div>
+
+<hr>
+
+<p>Do I detect some disbelief of how easy it is to translate between natural language and structured data? This should not be surprising, given how <a href="http://nshipster.com/cfstringtransform/">insanely</a> <a href="http://nshipster.com/nslinguistictagger/">great</a> Cocoa's linguistic APIs are.</p>
+
+<p>Don't make your users re-enter information by hand just because of a programming oversight. Take advantage of <code>NSDataDetector</code> in your app to unlock the structured information already hiding in plain sight.</p>
+</article></div>

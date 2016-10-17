@@ -1,0 +1,276 @@
+<div class="announce instapaper_body md" data-path="2014-09-30-uialertcontroller.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>UIAlertController</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div>Cocoa</div></td>
+
+  <td><div>Did you know that `UIAlertView` and `UIActionSheet` (as well as their respective delegate protocols) are deprecated in iOS 8? It's true.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>1.0</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>Did you know that <code>UIAlertView</code> and <code>UIActionSheet</code> (as well as their respective delegate protocols) are deprecated in iOS 8?</p>
+
+<p>It's true. ⌘-click on <code>UIAlertView</code> or <code>UIActionSheet</code> in your code, and check out the top-level comment:</p>
+
+<blockquote>
+<p><code>UIAlertView</code> is deprecated. Use <code>UIAlertController</code> with a <code>preferredStyle</code> of <code>UIAlertControllerStyleAlert</code> instead.</p>
+</blockquote>
+
+<p>Wondering why Xcode didn't alert you to this change? Just read down to the next line:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">@availability</span>(iOS, introduced<span class="pl-k">=</span><span class="pl-c1">2</span><span class="pl-k">.</span><span class="pl-c1">0</span>)</pre></div>
+
+<p>Although these classes are technically deprecated, this is not communicated in the <code>@availability</code> attribute. This should be of little surprise, though; <code>UIAlertView</code> has always played it fast and loose.</p>
+
+<p>From its very inception, <code>UIAlertView</code> has been laden with vulgar concessions, sacrificing formality and correctness for the whims of an eager developer audience. Its <code>delegate</code> protocol conformance was commented out of its initializer (<code>delegate:(id /* &lt;UIAlertViewDelegate&gt; */)delegate</code>). And what protocol methods that did exist triggered when a <code>buttonAtIndex:</code> "clicked" rather than "tapped". This, and trailing variable-length arguments for <code>otherButtonTitles</code>, awkward management of button indexes, a <code>-show</code> method with no regard for the view hierarchy... the list goes on.</p>
+
+<p><code>UIActionSheet</code> was nearly as bad, though developers can't be bothered to remember what the heck that control is called half the time, much less complain about its awkward parts.</p>
+
+<p>As such, the introduction of <code>UIAlertController</code> should be met like an army liberating a city from occupation. Not only does it improve on the miserable APIs of its predecessors, but it carves a path forward to deal with the UIKit interface singularity brought on by the latest class of devices.</p>
+
+<p>This week's article takes a look at <code>UIAlertController</code>, showing first how to port existing alert behavior, and then how this behavior can be extended.</p>
+
+<hr>
+
+<p><code>UIAlertController</code> replaces both <code>UIAlertView</code> and <code>UIActionSheet</code>, thereby unifying the concept of alerts across the system, whether presented modally or in a popover.</p>
+
+<p>Unlike the classes it replaces, <code>UIAlertController</code> is a subclass of <code>UIViewController</code>. As such, alerts now benefit from the configurable functionality provided with view controller presentation.</p>
+
+<p><code>UIAlertController</code> is initialized with a <code>title</code>, <code>message</code>, and whether it prefers to be displayed as an alert or action sheet. Alert views are presented modally in the center of their presenting view controllers, whereas action sheets are anchored to the bottom. Alerts can have both buttons and text fields, while action sheets only support buttons.</p>
+
+<p>Rather than specifying all of an alert's buttons in an initializer, instances of a new class, <code>UIAlertAction</code>, are added after the fact. Refactoring the API in this way allows for greater control over the number, type, and order of buttons. It also does away with the delegate pattern favored by <code>UIAlertView</code> &amp; <code>UIActionSheet</code> in favor of much more convenient completion handlers.</p>
+
+<h2><a id="user-content-comparing-the-old-and-new-ways-to-alerts" class="anchor" href="#comparing-the-old-and-new-ways-to-alerts" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Comparing the Old and New Ways to Alerts</h2>
+
+<h3><a id="user-content-a-standard-alert" class="anchor" href="#a-standard-alert" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>A Standard Alert</h3>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/uialertcontroller-alert-defautl-style.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/uialertcontroller-alert-defautl-style.png" alt="A Standard Alert" style="max-width:100%;"></a></p>
+
+<h4><a id="user-content-the-old-way-uialertview" class="anchor" href="#the-old-way-uialertview" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>The Old Way: UIAlertView</h4>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> alertView <span class="pl-k">=</span> UIAlertView(title: <span class="pl-s"><span class="pl-pds">"</span>Default Style<span class="pl-pds">"</span></span>, message: <span class="pl-s"><span class="pl-pds">"</span>A standard alert.<span class="pl-pds">"</span></span>, delegate: <span class="pl-k">self</span>, cancelButtonTitle: <span class="pl-s"><span class="pl-pds">"</span>Cancel<span class="pl-pds">"</span></span>, otherButtonTitles: <span class="pl-s"><span class="pl-pds">"</span>OK<span class="pl-pds">"</span></span>)
+alertView<span class="pl-k">.</span>alertViewStyle <span class="pl-k">=</span> <span class="pl-k">.</span>Default
+alertView<span class="pl-k">.</span>show()
+
+<span class="pl-c">// MARK: UIAlertViewDelegate</span>
+
+<span class="pl-k">func</span> <span class="pl-en">alertView</span>(alertView: UIAlertView, <span class="pl-en">clickedButtonAtIndex</span> <span class="pl-smi">buttonIndex</span>: <span class="pl-c1">Int</span>) {
+    <span class="pl-k">switch</span> buttonIndex {
+        <span class="pl-c">// ...</span>
+    }
+}</pre></div>
+
+<h4><a id="user-content-the-new-way-uialertcontroller" class="anchor" href="#the-new-way-uialertcontroller" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>The New Way: UIAlertController</h4>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> alertController <span class="pl-k">=</span> UIAlertController(title: <span class="pl-s"><span class="pl-pds">"</span>Default Style<span class="pl-pds">"</span></span>, message: <span class="pl-s"><span class="pl-pds">"</span>A standard alert.<span class="pl-pds">"</span></span>, preferredStyle: <span class="pl-k">.</span>Alert)
+
+<span class="pl-k">let</span> cancelAction <span class="pl-k">=</span> UIAlertAction(title: <span class="pl-s"><span class="pl-pds">"</span>Cancel<span class="pl-pds">"</span></span>, style: <span class="pl-k">.</span>Cancel) { (action) <span class="pl-k">in</span>
+    <span class="pl-c">// ...</span>
+}
+alertController<span class="pl-k">.</span>addAction(cancelAction)
+
+<span class="pl-k">let</span> OKAction <span class="pl-k">=</span> UIAlertAction(title: <span class="pl-s"><span class="pl-pds">"</span>OK<span class="pl-pds">"</span></span>, style: <span class="pl-k">.</span>Default) { (action) <span class="pl-k">in</span>
+    <span class="pl-c">// ...</span>
+}
+alertController<span class="pl-k">.</span>addAction(OKAction)
+
+<span class="pl-k">self</span><span class="pl-k">.</span>presentViewController(alertController, animated: <span class="pl-c1">true</span>) {
+    <span class="pl-c">// ...</span>
+}</pre></div>
+
+<h3><a id="user-content-a-standard-action-sheet" class="anchor" href="#a-standard-action-sheet" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>A Standard Action Sheet</h3>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/uialertcontroller-action-sheet-automatic-style.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/uialertcontroller-action-sheet-automatic-style.png" alt="A Standard Action Sheet" style="max-width:100%;"></a></p>
+
+<h4><a id="user-content-the-old-way-uiactionsheet" class="anchor" href="#the-old-way-uiactionsheet" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>The Old Way: UIActionSheet</h4>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> actionSheet <span class="pl-k">=</span> UIActionSheet(title: <span class="pl-s"><span class="pl-pds">"</span>Takes the appearance of the bottom bar if specified; otherwise, same as UIActionSheetStyleDefault.<span class="pl-pds">"</span></span>, delegate: <span class="pl-k">self</span>, cancelButtonTitle: <span class="pl-s"><span class="pl-pds">"</span>Cancel<span class="pl-pds">"</span></span>, destructiveButtonTitle: <span class="pl-s"><span class="pl-pds">"</span>Destroy<span class="pl-pds">"</span></span>, otherButtonTitles: <span class="pl-s"><span class="pl-pds">"</span>OK<span class="pl-pds">"</span></span>)
+actionSheet<span class="pl-k">.</span>actionSheetStyle <span class="pl-k">=</span> <span class="pl-k">.</span>Default
+actionSheet<span class="pl-k">.</span>showInView(<span class="pl-k">self</span><span class="pl-k">.</span>view)
+
+<span class="pl-c">// MARK: UIActionSheetDelegate</span>
+
+<span class="pl-k">func</span> <span class="pl-en">actionSheet</span>(actionSheet: UIActionSheet, <span class="pl-en">clickedButtonAtIndex</span> <span class="pl-smi">buttonIndex</span>: <span class="pl-c1">Int</span>) {
+    <span class="pl-k">switch</span> buttonIndex {
+        <span class="pl-k">...</span>
+    }
+}</pre></div>
+
+<h4><a id="user-content-the-new-way-uialertcontroller-1" class="anchor" href="#the-new-way-uialertcontroller-1" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>The New Way: UIAlertController</h4>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> alertController <span class="pl-k">=</span> UIAlertController(title: <span class="pl-c1">nil</span>, message: <span class="pl-s"><span class="pl-pds">"</span>Takes the appearance of the bottom bar if specified; otherwise, same as UIActionSheetStyleDefault.<span class="pl-pds">"</span></span>, preferredStyle: <span class="pl-k">.</span>ActionSheet)
+
+<span class="pl-k">let</span> cancelAction <span class="pl-k">=</span> UIAlertAction(title: <span class="pl-s"><span class="pl-pds">"</span>Cancel<span class="pl-pds">"</span></span>, style: <span class="pl-k">.</span>Cancel) { (action) <span class="pl-k">in</span>
+    <span class="pl-c">// ...</span>
+}
+alertController<span class="pl-k">.</span>addAction(cancelAction)
+
+<span class="pl-k">let</span> OKAction <span class="pl-k">=</span> UIAlertAction(title: <span class="pl-s"><span class="pl-pds">"</span>OK<span class="pl-pds">"</span></span>, style: <span class="pl-k">.</span>Default) { (action) <span class="pl-k">in</span>
+    <span class="pl-c">// ...</span>
+}
+alertController<span class="pl-k">.</span>addAction(OKAction)
+
+<span class="pl-k">let</span> destroyAction <span class="pl-k">=</span> UIAlertAction(title: <span class="pl-s"><span class="pl-pds">"</span>Destroy<span class="pl-pds">"</span></span>, style: <span class="pl-k">.</span>Destructive) { (action) <span class="pl-k">in</span>
+    println(action)
+}
+alertController<span class="pl-k">.</span>addAction(destroyAction)
+
+<span class="pl-k">self</span><span class="pl-k">.</span>presentViewController(alertController, animated: <span class="pl-c1">true</span>) {
+    <span class="pl-c">// ...</span>
+}</pre></div>
+
+<h2><a id="user-content-new-functionality" class="anchor" href="#new-functionality" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>New Functionality</h2>
+
+<p><code>UIAlertController</code> is not just a cleanup of pre-existing APIs, it's a generalization of them. Previously, one was constrained to whatever presets were provided (swizzling in additional functionality at their own risk). With <code>UIAlertController</code>, it's possible to do a lot more out-of-the-box:</p>
+
+<h3><a id="user-content-alert-with-destructive-button" class="anchor" href="#alert-with-destructive-button" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Alert with Destructive Button</h3>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/uialertcontroller-alert-cancel-destroy.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/uialertcontroller-alert-cancel-destroy.png" alt="Alert with Destructive Button" style="max-width:100%;"></a></p>
+
+<p>The type of an action is specified by <code>UIAlertActionStyle</code>, which has three values:</p>
+
+<blockquote>
+<ul>
+<li><code>.Default</code>: Apply the default style to the action’s button.</li>
+<li><code>.Cancel</code>: Apply a style that indicates the action cancels the operation and leaves things unchanged.</li>
+<li><code>.Destructive</code>: Apply a style that indicates the action might change or delete data.</li>
+</ul>
+</blockquote>
+
+<p>So, to add a destructive action to a modal alert, just add a <code>UIAlertAction</code> with style <code>.Destructive</code>:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> alertController <span class="pl-k">=</span> UIAlertController(title: <span class="pl-s"><span class="pl-pds">"</span>Title<span class="pl-pds">"</span></span>, message: <span class="pl-s"><span class="pl-pds">"</span>Message<span class="pl-pds">"</span></span>, preferredStyle: <span class="pl-k">.</span>Alert)
+
+<span class="pl-k">let</span> cancelAction <span class="pl-k">=</span> UIAlertAction(title: <span class="pl-s"><span class="pl-pds">"</span>Cancel<span class="pl-pds">"</span></span>, style: <span class="pl-k">.</span>Cancel) { (action) <span class="pl-k">in</span>
+    println(action)
+}
+alertController<span class="pl-k">.</span>addAction(cancelAction)
+
+<span class="pl-k">let</span> destroyAction <span class="pl-k">=</span> UIAlertAction(title: <span class="pl-s"><span class="pl-pds">"</span>Destroy<span class="pl-pds">"</span></span>, style: <span class="pl-k">.</span>Destructive) { (action) <span class="pl-k">in</span>
+    println(action)
+}
+alertController<span class="pl-k">.</span>addAction(destroyAction)
+
+<span class="pl-k">self</span><span class="pl-k">.</span>presentViewController(alertController, animated: <span class="pl-c1">true</span>) {
+    <span class="pl-c">// ...</span>
+}</pre></div>
+
+<h3><a id="user-content-alert-with-2-buttons" class="anchor" href="#alert-with-2-buttons" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Alert with &gt;2 Buttons</h3>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/uialertcontroller-alert-one-two-three-cancel.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/uialertcontroller-alert-one-two-three-cancel.png" alt="Alert with More Than 2 Buttons" style="max-width:100%;"></a></p>
+
+<p>With one or two actions, buttons in an alert are stacked horizontally. Any more than that, though, and it takes on a display characteristic closer to an action sheet:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> oneAction <span class="pl-k">=</span> UIAlertAction(title: <span class="pl-s"><span class="pl-pds">"</span>One<span class="pl-pds">"</span></span>, style: <span class="pl-k">.</span>Default) { (_) <span class="pl-k">in</span> }
+<span class="pl-k">let</span> twoAction <span class="pl-k">=</span> UIAlertAction(title: <span class="pl-s"><span class="pl-pds">"</span>Two<span class="pl-pds">"</span></span>, style: <span class="pl-k">.</span>Default) { (_) <span class="pl-k">in</span> }
+<span class="pl-k">let</span> threeAction <span class="pl-k">=</span> UIAlertAction(title: <span class="pl-s"><span class="pl-pds">"</span>Three<span class="pl-pds">"</span></span>, style: <span class="pl-k">.</span>Default) { (_) <span class="pl-k">in</span> }
+<span class="pl-k">let</span> cancelAction <span class="pl-k">=</span> UIAlertAction(title: <span class="pl-s"><span class="pl-pds">"</span>Cancel<span class="pl-pds">"</span></span>, style: <span class="pl-k">.</span>Cancel) { (_) <span class="pl-k">in</span> }
+
+alertController<span class="pl-k">.</span>addAction(oneAction)
+alertController<span class="pl-k">.</span>addAction(twoAction)
+alertController<span class="pl-k">.</span>addAction(threeAction)
+alertController<span class="pl-k">.</span>addAction(cancelAction)</pre></div>
+
+<h3><a id="user-content-creating-a-login-form" class="anchor" href="#creating-a-login-form" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Creating a Login Form</h3>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/uialertcontroller-alert-username-password-login-forgot-password-cancel.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/uialertcontroller-alert-username-password-login-forgot-password-cancel.png" alt="Creating a Login Form" style="max-width:100%;"></a></p>
+
+<p>iOS 5 added the <code>alertViewStyle</code> property to <code>UIAlertView</code>, which exposed much sought-after private APIs that allowed login and password fields to be displayed in an alert, as seen in several built-in system apps.</p>
+
+<p>In iOS 8, <code>UIAlertController</code> can add text fields with the <code>addTextFieldWithConfigurationHandler</code> method:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> loginAction <span class="pl-k">=</span> UIAlertAction(title: <span class="pl-s"><span class="pl-pds">"</span>Login<span class="pl-pds">"</span></span>, style: <span class="pl-k">.</span>Default) { (_) <span class="pl-k">in</span>
+    <span class="pl-k">let</span> loginTextField <span class="pl-k">=</span> alertController<span class="pl-k">.</span>textFields<span class="pl-k">!</span>[<span class="pl-c1">0</span>] <span class="pl-k">as</span> UITextField
+    <span class="pl-k">let</span> passwordTextField <span class="pl-k">=</span> alertController<span class="pl-k">.</span>textFields<span class="pl-k">!</span>[<span class="pl-c1">1</span>] <span class="pl-k">as</span> UITextField
+
+    login(loginTextField<span class="pl-k">.</span>text, passwordTextField<span class="pl-k">.</span>text)
+}
+loginAction<span class="pl-k">.</span>enabled <span class="pl-k">=</span> <span class="pl-c1">false</span>
+
+<span class="pl-k">let</span> forgotPasswordAction <span class="pl-k">=</span> UIAlertAction(title: <span class="pl-s"><span class="pl-pds">"</span>Forgot Password<span class="pl-pds">"</span></span>, style: <span class="pl-k">.</span>Destructive) { (_) <span class="pl-k">in</span> }
+<span class="pl-k">let</span> cancelAction <span class="pl-k">=</span> UIAlertAction(title: <span class="pl-s"><span class="pl-pds">"</span>Cancel<span class="pl-pds">"</span></span>, style: <span class="pl-k">.</span>Cancel) { (_) <span class="pl-k">in</span> }
+
+alertController<span class="pl-k">.</span>addTextFieldWithConfigurationHandler { (textField) <span class="pl-k">in</span>
+    textField<span class="pl-k">.</span>placeholder <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>Login<span class="pl-pds">"</span></span>
+
+    NSNotificationCenter<span class="pl-k">.</span>defaultCenter()<span class="pl-k">.</span>addObserverForName(UITextFieldTextDidChangeNotification, object: textField, queue: NSOperationQueue<span class="pl-k">.</span>mainQueue()) { (notification) <span class="pl-k">in</span>
+        loginAction<span class="pl-k">.</span>enabled <span class="pl-k">=</span> textField<span class="pl-k">.</span>text <span class="pl-k">!=</span> <span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>
+    }
+}
+
+alertController<span class="pl-k">.</span>addTextFieldWithConfigurationHandler { (textField) <span class="pl-k">in</span>
+    textField<span class="pl-k">.</span>placeholder <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>Password<span class="pl-pds">"</span></span>
+    textField<span class="pl-k">.</span>secureTextEntry <span class="pl-k">=</span> <span class="pl-c1">true</span>
+}
+
+alertController<span class="pl-k">.</span>addAction(loginAction)
+alertController<span class="pl-k">.</span>addAction(forgotPasswordAction)
+alertController<span class="pl-k">.</span>addAction(cancelAction)</pre></div>
+
+<h3><a id="user-content-creating-a-sign-up-form" class="anchor" href="#creating-a-sign-up-form" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Creating a Sign Up Form</h3>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/uialertcontroller-alert-sign-up.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/uialertcontroller-alert-sign-up.png" alt="Creating a Sign Up Form" style="max-width:100%;"></a></p>
+
+<p><code>UIAlertController</code> goes even further to allow any number of text fields, each with the ability to be configured and customized as necessary. This makes it possible to create a fully-functional signup form in a single modal alert:</p>
+
+<div class="highlight highlight-source-swift"><pre>alertController<span class="pl-k">.</span>addTextFieldWithConfigurationHandler { (textField) <span class="pl-k">in</span>
+    textField<span class="pl-k">.</span>placeholder <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>Email<span class="pl-pds">"</span></span>
+    textField<span class="pl-k">.</span>keyboardType <span class="pl-k">=</span> <span class="pl-k">.</span>EmailAddress
+}
+
+alertController<span class="pl-k">.</span>addTextFieldWithConfigurationHandler { (textField) <span class="pl-k">in</span>
+    textField<span class="pl-k">.</span>placeholder <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>Password<span class="pl-pds">"</span></span>
+    textField<span class="pl-k">.</span>secureTextEntry <span class="pl-k">=</span> <span class="pl-c1">true</span>
+}
+
+alertController<span class="pl-k">.</span>addTextFieldWithConfigurationHandler { (textField) <span class="pl-k">in</span>
+    textField<span class="pl-k">.</span>placeholder <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>Password Confirmation<span class="pl-pds">"</span></span>
+    textField<span class="pl-k">.</span>secureTextEntry <span class="pl-k">=</span> <span class="pl-c1">true</span>
+}</pre></div>
+
+<p>Though, it must be said, <em>caveat implementor</em>. Just because you <em>can</em> implement a signup form in an alert doesn't mean you <em>should</em>. Suck it up and use a view controller, like you're supposed to.</p>
+
+<h2><a id="user-content-caveats" class="anchor" href="#caveats" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Caveats</h2>
+
+<p>Attempting to add a text field to an alert controller with style <code>.ActionSheet</code> will throw the following exception:</p>
+
+<blockquote>
+<p>Terminating app due to uncaught exception <code>NSInternalInconsistencyException</code>, reason: 'Text fields can only be added to an alert controller of style <code>UIAlertControllerStyleAlert</code>'</p>
+</blockquote>
+
+<p>Likewise, attempting to add more than one <code>.Cancel</code> action to either an alert or action sheet will raise:</p>
+
+<blockquote>
+<p>Terminating app due to uncaught exception <code>NSInternalInconsistencyException</code>, reason: '<code>UIAlertController</code> can only have one action with a style of <code>UIAlertActionStyleCancel</code>'</p>
+</blockquote>
+</article></div>

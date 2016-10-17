@@ -1,0 +1,111 @@
+<div class="announce instapaper_body md" data-path="2013-09-09-network-link-conditioner.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>tag</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>Network Link Conditioner</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div>Xcode</div></td>
+
+  <td><div>popular</div></td>
+
+  <td><div>Product design is about empathy. Knowing what a user wants, what they like, what they dislike, what causes them frustration, and learning to understand and embody those motivations in design decisions—this is what it takes to make something insanely great.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>n/a</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>Product design is about empathy. Knowing what a user wants, what they like, what they dislike, what causes them frustration, and learning to understand and embody those motivations in design decisions—this is what it takes to make something insanely great.</p>
+
+<p>And so we invest in reaching beyond our own operational model of the world. We tailor our experience for <a href="http://nshipster.com/nslocalizedstring/">different locales</a>. We consider the usability implications of <a href="http://nshipster.com/uiaccessibility/">screen readers or other assistive technologiess</a>. We <a href="http://nshipster.com/unit-testing/">continuously evaluate</a> our implementation against these expectations.</p>
+
+<p>There is, though, one critical factor that app developers often miss the first time around, and that is <strong>network condition</strong>, or more specifically the latency and bandwidth of an Internet connection. For something so essential to a user's experience with a product, it's unfortunate that most developers take an ad-hoc approach to field testing different kinds of environments, if at all.</p>
+
+<p>This week on NSHipster, we'll be talking about the <a href="https://developer.apple.com/downloads/index.action?q=Hardware%20IO%20Tools">Network Link Conditioner</a>, a utility that allows Mac and iOS devices to accurately and consistently simulate adverse networking environments.</p>
+
+<h2><a id="user-content-installation" class="anchor" href="#installation" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Installation</h2>
+
+<p>Network Link Conditioner can be found in the "Hardware IO Tools for Xcode" package. This can be downloaded from the <a href="https://developer.apple.com/downloads/index.action?q=Hardware%20IO%20Tools">Apple Developer Downloads</a> page.</p>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/network-link-conditioner-download.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/network-link-conditioner-download.png" alt="Download" style="max-width:100%;"></a></p>
+
+<p>Search for "Hardware IO Tools for Xcode", and select the appropriate release of the package.</p>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/network-link-conditioner-dmg.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/network-link-conditioner-dmg.png" alt="Package" style="max-width:100%;"></a></p>
+
+<p>Once the download has finished, open the DMG and double-click "Network Link Condition.prefPane" to install.</p>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/network-link-conditioner-install.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/network-link-conditioner-install.png" alt="System Preferences" style="max-width:100%;"></a></p>
+
+<p>From now on, you can enable the Network Link Conditioner from its preference pane at the bottom of System Preferences.</p>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/network-link-conditioner-system-preference.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/network-link-conditioner-system-preference.png" alt="Network Link Conditioner" style="max-width:100%;"></a></p>
+
+<p>When enabled, the Network Link Conditioner can change the network environment of the iPhone Simulator according to one of the built-in presets:</p>
+
+<ul>
+<li>EDGE</li>
+<li>3G</li>
+<li>DSL</li>
+<li>WiFi</li>
+<li>High Latency DNS</li>
+<li>Very Bad Network</li>
+<li>100% Loss</li>
+</ul>
+
+<p>Each preset can set a limit for uplink or downlink <a href="http://en.wikipedia.org/wiki/Bandwidth_%28computing%29">bandwidth</a>, <a href="http://en.wikipedia.org/wiki/Latency_%28engineering%29%23Communication_latency">latency</a>, and rate of <a href="http://en.wikipedia.org/wiki/Packet_loss">packet loss</a> (when any value is set to 0, that value is unchanged from your computer's network environment).</p>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/network-link-conditioner-preset.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/network-link-conditioner-preset.png" alt="Preset" style="max-width:100%;"></a></p>
+
+<p>You can also create your own preset, if you wish to simulate a particular combination of factors simultaneously.</p>
+
+<p>Try running your app in the simulator with the Network Link Conditioner enabled under various presets and see what happens. How does network latency affect your app startup? What effect does bandwidth have on table view scroll performance? Does your app work at all with 100% packet loss?</p>
+
+<blockquote>
+<p>If your app uses <a href="https://developer.apple.com/library/ios/samplecode/Reachability/Introduction/Intro.html">Reachability</a> to detect network availability, you may experience some unexpected results while using the Network Link Conditioner. As such, any reachability behavior under Airplane mode or WWan / WiFi distinctions is something that should be tested separately from network conditioning.</p>
+</blockquote>
+
+<h2><a id="user-content-enabling-network-link-conditioner-on-ios-devices" class="anchor" href="#enabling-network-link-conditioner-on-ios-devices" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Enabling Network Link Conditioner on iOS Devices</h2>
+
+<p>While the preference pane works well for developing on the simulator, it's also important to test on actual devices. Fortunately, as of iOS 6, the Network Link Conditioner is available on the devices themselves.</p>
+
+<p>To enable it, you need to set up your device for development:</p>
+
+<ol>
+<li>Connect your iPhone or iPad to your Mac</li>
+<li>In Xcode, go to Window &gt; Organizer (⇧⌘2)</li>
+<li>Select your device in the sidebar</li>
+<li>Click "Use for Development"</li>
+</ol>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/network-link-conditioner-ios.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/network-link-conditioner-ios.png" alt="iOS Devices" style="max-width:100%;"></a></p>
+
+<p>Now you'll have access to the Developer section of the Settings app, where you'll find the Network Link Conditioner (just don't forget to turn it off after you're done testing!).</p>
+</article></div>

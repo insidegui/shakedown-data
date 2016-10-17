@@ -1,0 +1,210 @@
+<div class="announce instapaper_body md" data-path="2012-12-03-kvc-collection-operators.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>tags</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>KVC Collection Operators</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div>Cocoa</div></td>
+
+  <td><div>nshipster</div></td>
+
+  <td><div>Rubyists laugh at Objective-C’s bloated syntax. Although we lost a few pounds over the summer with our sleek new object literals, those Red-headed bullies still taunt us with their map one-liners and their fancy Symbol#to_proc. Fortunately, Key-Value Coding has an ace up its sleeves.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+
+  <th>reviewed</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>t.b.c.</div></td>
+
+  <td><div>August 12, 2015</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>Rubyists laugh at Objective-C's bloated syntax.</p>
+
+<p>Although we lost a few pounds over the summer with our <a href="http://nshipster.com/at-compiler-directives/">sleek new object literals</a>, those Red-headed bullies still taunt us with their <code>map</code> one-liners and their fancy <a href="http://pragdave.me/blog/2005/11/04/symboltoproc/"><code>Symbol#to_proc</code></a>.</p>
+
+<p>Really, a lot of how elegant (or clever) a language is comes down to how well it avoids loops. <code>for</code>, <code>while</code>; even <a href="http://nshipster.com/enumerators/">fast enumeration expressions</a> are a drag. No matter how you sugar-coat them, loops will be a block of code that does something that is much simpler to describe in natural language.</p>
+
+<p>"get me the average salary of all of the employees in this array", versus...</p>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-k">double</span> totalSalary = <span class="pl-c1">0.0</span>;
+<span class="pl-k">for</span> (Employee *employee in employees) {
+  totalSalary += [employee.salary <span class="pl-c1">doubleValue</span>];
+}
+<span class="pl-k">double</span> averageSalary = totalSalary / [employees <span class="pl-c1">count</span>];</pre></div>
+
+<p>Meh.</p>
+
+<p>Fortunately, <a href="https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/KeyValueCoding/Articles/KeyValueCoding.html">Key-Value Coding</a> gives us a much more concise--almost Ruby-like--way to do this:</p>
+
+<div class="highlight highlight-source-objc"><pre>[employees <span class="pl-c1">valueForKeyPath:</span><span class="pl-s"><span class="pl-pds">@"</span>@avg.salary<span class="pl-pds">"</span></span>];</pre></div>
+
+<p><a href="https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/KeyValueCoding/Articles/CollectionOperators.html">KVC Collection Operators</a> allows actions to be performed on a collection using key path notation in <code>valueForKeyPath:</code>. Any time you see <code>@</code> in a key path, it denotes a particular aggregate function whose result can be returned or chained, just like any other key path.</p>
+
+<p>Collection Operators fall into one of three different categories, according to the kind of value they return:</p>
+
+<ul>
+<li><strong>Simple Collection Operators</strong> return strings, numbers, or dates, depending on the operator.</li>
+<li><strong>Object Operators</strong> return an array.</li>
+<li><strong>Array and Set Operators</strong> return an array or set, depending on the operator.</li>
+</ul>
+
+<p>The best way to understand how these work is to see them in action. Consider a <code>Product</code> class, and a <code>products</code> array with the following data:</p>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-k">@interface</span> <span class="pl-en">Product</span> : <span class="pl-e">NSObject</span>
+<span class="pl-k">@property</span> <span class="pl-c1">NSString</span> *name;
+<span class="pl-k">@property</span> <span class="pl-k">double</span> price;
+<span class="pl-k">@property</span> <span class="pl-c1">NSDate</span> *launchedOn;
+<span class="pl-k">@end</span></pre></div>
+
+<blockquote>
+<p>Key-Value Coding automatically boxes and un-boxes scalars into <code>NSNumber</code> or <code>NSValue</code> as necessary to make everything work.</p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Price</th>
+      <th>Launch Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>iPhone 5</td>
+      <td>$199</td>
+      <td>September 21, 2012</td>
+    </tr>
+    <tr>
+      <td>iPad Mini</td>
+      <td>$329</td>
+      <td>November 2, 2012</td>
+    </tr>
+    <tr>
+      <td>MacBook Pro</td>
+      <td>$1699</td>
+      <td>June 11, 2012</td>
+    </tr>
+    <tr>
+      <td>iMac</td>
+      <td>$1299</td>
+      <td>November 2, 2012</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a id="user-content-simple-collection-operators" class="anchor" href="#simple-collection-operators" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Simple Collection Operators</h3>
+
+<ul>
+<li><code>@count</code>: Returns the number of objects in the collection as an <code>NSNumber</code>.</li>
+<li><code>@sum</code>: Converts each object in the collection to a <code>double</code>, computes the sum, and returns the sum as an <code>NSNumber</code>.</li>
+<li><code>@avg</code>: Takes the <code>double</code> value of each object in the collection, and returns the average value as an <code>NSNumber</code>.</li>
+<li><code>@max</code>: Determines the maximum value using <code>compare:</code>. Objects must support comparison with one another for this to work.</li>
+<li><code>@min</code>: Same as <code>@max</code>, but returns the minimum value in the collection.</li>
+</ul>
+
+<p><em>Example</em>:</p>
+
+<div class="highlight highlight-source-objc"><pre>[products <span class="pl-c1">valueForKeyPath:</span><span class="pl-s"><span class="pl-pds">@"</span>@count<span class="pl-pds">"</span></span>]; <span class="pl-c">// 4</span>
+[products <span class="pl-c1">valueForKeyPath:</span><span class="pl-s"><span class="pl-pds">@"</span>@sum.price<span class="pl-pds">"</span></span>]; <span class="pl-c">// 3526.00</span>
+[products <span class="pl-c1">valueForKeyPath:</span><span class="pl-s"><span class="pl-pds">@"</span>@avg.price<span class="pl-pds">"</span></span>]; <span class="pl-c">// 881.50</span>
+[products <span class="pl-c1">valueForKeyPath:</span><span class="pl-s"><span class="pl-pds">@"</span>@max.price<span class="pl-pds">"</span></span>]; <span class="pl-c">// 1699.00</span>
+[products <span class="pl-c1">valueForKeyPath:</span><span class="pl-s"><span class="pl-pds">@"</span>@min.launchedOn<span class="pl-pds">"</span></span>]; <span class="pl-c">// June 11, 2012</span></pre></div>
+
+<blockquote>
+<p>Pro Tip: To get the aggregate value of an array or set of <code>NSNumber</code>s, you can simply pass <code>self</code> as the key path after the operator, e.g. <code>[@[@(1), @(2), @(3)] valueForKeyPath:@"@max.self"]</code> (/via <a href="http://twitter.com/davandermobile">@davandermobile</a>, citing <a href="http://objectivesea.tumblr.com/post/34552840247/max-value-nsset-kvc">Objective Sea</a>)</p>
+</blockquote>
+
+<h3><a id="user-content-object-operators" class="anchor" href="#object-operators" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Object Operators</h3>
+
+<p>Let's say we have an <code>inventory</code> array, representing the current stock of our local Apple store (which is running low on iPad Mini, and doesn't have the new iMac, which hasn't shipped yet):</p>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSArray</span> *inventory = @[iPhone5, iPhone5, iPhone5, iPadMini, macBookPro, macBookPro];</pre></div>
+
+<ul>
+<li><code>@unionOfObjects</code> / <code>@distinctUnionOfObjects</code>: Returns an array of the objects in the property specified in the key path to the right of the operator. <code>@distinctUnionOfObjects</code> removes duplicates, whereas <code>@unionOfObjects</code> does not.</li>
+</ul>
+
+<p><em>Example</em>:</p>
+
+<div class="highlight highlight-source-objc"><pre>[inventory <span class="pl-c1">valueForKeyPath:</span><span class="pl-s"><span class="pl-pds">@"</span>@unionOfObjects.name<span class="pl-pds">"</span></span>]; <span class="pl-c">// "iPhone 5", "iPhone 5", "iPhone 5", "iPad Mini", "MacBook Pro", "MacBook Pro"</span>
+[inventory <span class="pl-c1">valueForKeyPath:</span><span class="pl-s"><span class="pl-pds">@"</span>@distinctUnionOfObjects.name<span class="pl-pds">"</span></span>]; <span class="pl-c">// "iPhone 5", "iPad Mini", "MacBook Pro"</span></pre></div>
+
+<h3><a id="user-content-array-and-set-operators" class="anchor" href="#array-and-set-operators" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Array and Set Operators</h3>
+
+<p>Array and Set Operators are similar to Object Operators, but they work on collections of <code>NSArray</code> and <code>NSSet</code>.</p>
+
+<p>This would be useful if we were to, for example, compare the inventory of several stores, say <code>appleStoreInventory</code>, (same as in the previous example) and <code>verizonStoreInventory</code> (which sells iPhone 5 and iPad Mini, and has both in stock).</p>
+
+<ul>
+<li><code>@distinctUnionOfArrays</code> / <code>@unionOfArrays</code>: Returns an array containing the combined values of each array in the collection, as specified by the key path to the right of the operator. As you'd expect, the <code>distinct</code> version removes duplicate values.</li>
+<li><code>@distinctUnionOfSets</code>: Similar to <code>@distinctUnionOfArrays</code>, but it expects an <code>NSSet</code> containing <code>NSSet</code> objects, and returns an <code>NSSet</code>. Because sets can't contain duplicate values anyway, there is only the <code>distinct</code> operator.</li>
+</ul>
+
+<p><em>Example</em>:</p>
+
+<div class="highlight highlight-source-objc"><pre>[@[appleStoreInventory, verizonStoreInventory] <span class="pl-c1">valueForKeyPath:</span><span class="pl-s"><span class="pl-pds">@"</span>@distinctUnionOfArrays.name<span class="pl-pds">"</span></span>]; <span class="pl-c">// "iPhone 5", "iPad Mini", "MacBook Pro"</span></pre></div>
+
+<hr>
+
+<h2><a id="user-content-this-is-probably-a-terrible-idea" class="anchor" href="#this-is-probably-a-terrible-idea" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>This is Probably a Terrible Idea</h2>
+
+<p>Curiously, <a href="https://developer.apple.com/library/ios/documentation/Cocoa/Conceptual/KeyValueCoding/Articles/CollectionOperators.html">Apple's documentation on KVC collection operators</a> goes out of its way to make the following point:</p>
+
+<blockquote>
+<p><strong>Note</strong>: It is not currently possible to define your own collection operators.</p>
+</blockquote>
+
+<p>This makes sense to spell out, since that's what most people are thinking about once they see collection operators for the first time.</p>
+
+<p>However, as it turns out, it <em>is</em> actually possible, with a little help from our friend, <code>objc/runtime</code>.</p>
+
+<p><a href="https://twitter.com/gte">Guy English</a> has a <a href="http://kickingbear.com/blog/archives/9">pretty amazing post</a> wherein he <a href="https://gist.github.com/4196641#file_kb_collection_extensions.m">swizzles <code>valueForKeyPath:</code></a> to parse a custom-defined <a href="http://en.wikipedia.org/wiki/Domain-specific_language">DSL</a>, which extends the existing offerings to interesting effect:</p>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSArray</span> *names = [allEmployees <span class="pl-c1">valueForKeyPath:</span> <span class="pl-s"><span class="pl-pds">@"</span>[collect].{daysOff&lt;10}.name<span class="pl-pds">"</span></span>];</pre></div>
+
+<p>This code would get the names of anyone who has taken fewer than 10 days off (to remind them to take a vacation, no doubt!).</p>
+
+<p>Or, taken to a ridiculous extreme:</p>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSArray</span> *albumCovers = [records <span class="pl-c1">valueForKeyPath:</span><span class="pl-s"><span class="pl-pds">@"</span>[collect].{artist like 'Bon Iver'}.&lt;NSUnarchiveFromDataTransformerName&gt;.albumCoverImageData<span class="pl-pds">"</span></span>];</pre></div>
+
+<p>Eat your heart out, Ruby. This one-liner filters a record collection for artists whose name matches "Bon Iver", and initializes an <code>NSImage</code> from the album cover image data of the matching albums.</p>
+
+<p>Is this a good idea? Probably not. (<code>NSPredicate</code> is rad, and breaking complicated logic up is under-rated)</p>
+
+<p>Is this insanely cool? You bet! This clever example has shown a possible direction for future Objective-C DSLs and meta-programming.</p>
+
+<hr>
+
+<p>KVC Collection Operators are a must-know for anyone who wants to save a few extra lines of code and look cool in the process.</p>
+
+<p>While scripting languages like Ruby boast considerably more flexibility in its one-liner capability, perhaps we should take a moment to celebrate the restraint built into Objective-C and Collection Operators. After all, Ruby is hella slow, amiright? &lt;/troll&gt;</p>
+</article></div>

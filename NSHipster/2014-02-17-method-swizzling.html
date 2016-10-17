@@ -1,0 +1,193 @@
+<div class="announce instapaper_body md" data-path="2014-02-17-method-swizzling.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>Method Swizzling</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div>Objective-C</div></td>
+
+  <td><div>Method swizzling is the process of changing the implementation of an existing selector. It's a technique made possible by the fact that method invocations in Objective-C can be changed at runtime, by changing how selectors are mapped to underlying functions in a class's dispatch table.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+
+  <th>reviewed</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>n/a</div></td>
+
+  <td><div>January 28, 2015</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<blockquote>
+<p>If you could blow up the world with the flick of a switch<br>
+Would you do it?<br>
+If you could make everybody poor just so you could be rich<br>
+Would you do it?<br>
+If you could watch everybody work while you just lay on your back<br>
+Would you do it?<br>
+If you could take all the love without giving any back<br>
+Would you do it?<br>
+And so we cannot know ourselves or what we'd really do...<br>
+With all your power ... What would you do?<br>
+<strong>The Flaming Lips</strong>, <em><a href="http://en.wikipedia.org/wiki/The_Yeah_Yeah_Yeah_Song_(With_All_Your_Power)">"The Yeah Yeah Yeah Song (With All Your Power)"</a></em></p>
+</blockquote>
+
+<p>In last week's article about <a href="http://nshipster.com/associated-objects/">associated objects</a>, we began to explore the dark arts of the Objective-C runtime. This week, we venture further, to discuss what is perhaps the most contentious of runtime hackery techniques: method swizzling.</p>
+
+<hr>
+
+<p>Method swizzling is the process of changing the implementation of an existing selector. It's a technique made possible by the fact that method invocations in Objective-C can be changed at runtime, by changing how selectors are mapped to underlying functions in a class's dispatch table.</p>
+
+<p>For example, let's say we wanted to track how many times each view controller is presented to a user in an iOS app:</p>
+
+<p>Each view controller could add tracking code to its own implementation of <code>viewDidAppear:</code>, but that would make for a ton of duplicated boilerplate code. Subclassing would be another possibility, but it would require subclassing <code>UIViewController</code>, <code>UITableViewController</code>, <code>UINavigationController</code>, and every other view controller class—an approach that would also suffer from code duplication.</p>
+
+<p>Fortunately, there is another way: <strong>method swizzling</strong> from a category. Here's how to do it:</p>
+
+<div class="highlight highlight-source-objc"><pre>#<span class="pl-k">import</span> <span class="pl-s"><span class="pl-pds">&lt;</span>objc/runtime.h<span class="pl-pds">&gt;</span></span>
+
+<span class="pl-k">@implementation</span> <span class="pl-en">UIViewController</span> (Tracking)
+
++ (<span class="pl-k">void</span>)<span class="pl-en">load</span> {
+    <span class="pl-k">static</span> <span class="pl-c1">dispatch_once_t</span> onceToken;
+    <span class="pl-c1">dispatch_once</span>(&amp;onceToken, ^{
+        <span class="pl-c1">Class</span> class = [<span class="pl-v">self</span> <span class="pl-c1">class</span>];
+
+        <span class="pl-c1">SEL</span> originalSelector = <span class="pl-k">@selector</span>(<span class="pl-c1">viewWillAppear:</span>);
+        <span class="pl-c1">SEL</span> swizzledSelector = <span class="pl-k">@selector</span>(<span class="pl-c1">xxx_viewWillAppear:</span>);
+
+        <span class="pl-c1">Method</span> originalMethod = <span class="pl-c1">class_getInstanceMethod</span>(class, originalSelector);
+        <span class="pl-c1">Method</span> swizzledMethod = <span class="pl-c1">class_getInstanceMethod</span>(class, swizzledSelector);
+
+        <span class="pl-c">// When swizzling a class method, use the following:</span>
+        <span class="pl-c">// Class class = object_getClass((id)self);</span>
+        <span class="pl-c">// ...</span>
+        <span class="pl-c">// Method originalMethod = class_getClassMethod(class, originalSelector);</span>
+        <span class="pl-c">// Method swizzledMethod = class_getClassMethod(class, swizzledSelector);</span>
+
+        <span class="pl-c1">BOOL</span> didAddMethod =
+            <span class="pl-c1">class_addMethod</span>(class,
+                originalSelector,
+                <span class="pl-c1">method_getImplementation</span>(swizzledMethod),
+                <span class="pl-c1">method_getTypeEncoding</span>(swizzledMethod));
+
+        <span class="pl-k">if</span> (didAddMethod) {
+            <span class="pl-c1">class_replaceMethod</span>(class,
+                swizzledSelector,
+                <span class="pl-c1">method_getImplementation</span>(originalMethod),
+                <span class="pl-c1">method_getTypeEncoding</span>(originalMethod));
+        } <span class="pl-k">else</span> {
+            <span class="pl-c1">method_exchangeImplementations</span>(originalMethod, swizzledMethod);
+        }
+    });
+}
+
+#<span class="pl-k">pragma mark</span> - Method Swizzling
+
+- (<span class="pl-k">void</span>)<span class="pl-en">xxx_viewWillAppear</span><span class="pl-en">:</span>(<span class="pl-c1">BOOL</span>)<span class="pl-smi">animated</span> {
+    [<span class="pl-v">self</span> <span class="pl-c1">xxx_viewWillAppear:</span>animated];
+    <span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span>viewWillAppear: <span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, self);
+}
+
+<span class="pl-k">@end</span></pre></div>
+
+<blockquote>
+<p>In computer science, <a href="http://en.wikipedia.org/wiki/Pointer_swizzling">pointer swizzling</a> is the conversion of references based on name or position to direct pointer references.  While the origins of Objective-C's usage of the term are not entirely known, it's understandable why it was co-opted, since method swizzling involves changing the reference of a function pointer by its selector.</p>
+</blockquote>
+
+<p>Now, when any instance of <code>UIViewController</code>, or one of its subclasses invokes <code>viewWillAppear:</code>, a log statement will print out.</p>
+
+<p>Injecting behavior into the view controller lifecycle, responder events, view drawing, or the Foundation networking stack are all good examples of how method swizzling can be used to great effect. There are a number of other occasions when swizzling would be an appropriate technique, and they become increasingly apparent the more seasoned an Objective-C developer becomes.</p>
+
+<p>Regardless of <em>why</em> or <em>where</em> one chooses to use swizzling, the <em>how</em> remains absolute:</p>
+
+<h2><a id="user-content-load-vs-initialize" class="anchor" href="#load-vs-initialize" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>+load vs. +initialize</h2>
+
+<p><strong>Swizzling should always be done in <code>+load</code>.</strong></p>
+
+<p>There are two methods that are automatically invoked by the Objective-C runtime for each class. <code>+load</code> is sent when the class is initially loaded, while <code>+initialize</code> is called just before the application calls its first method on that class or an instance of that class. Both are optional, and are executed only if the method is implemented.</p>
+
+<p>Because method swizzling affects global state, it is important to minimize the possibility of race conditions. <code>+load</code> is guaranteed to be loaded during class initialization, which provides a modicum of consistency for changing system-wide behavior. By contrast, <code>+initialize</code> provides no such guarantee of when it will be executed—in fact, it may <em>never</em> be called, if that class is never messaged directly by the app.</p>
+
+<h2><a id="user-content-dispatch_once" class="anchor" href="#dispatch_once" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>dispatch_once</h2>
+
+<p><strong>Swizzling should always be done in a <code>dispatch_once</code>.</strong></p>
+
+<p>Again, because swizzling changes global state, we need to take every precaution available to us in the runtime. Atomicity is one such precaution, as is a guarantee that code will be executed exactly once, even across different threads. Grand Central Dispatch's <code>dispatch_once</code> provides both of these desirable behaviors, and should be considered as much a standard practice for swizzling as they are for <a href="http://nshipster.com/c-storage-classes/">initializing singletons</a>.</p>
+
+<h2><a id="user-content-selectors-methods--implementations" class="anchor" href="#selectors-methods--implementations" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Selectors, Methods, &amp; Implementations</h2>
+
+<p>In Objective-C, <em>selectors</em>, <em>methods</em>, and <em>implementations</em> refer to particular aspects of the runtime, although in normal conversation, these terms are often used interchangeably to generally refer to the process of message sending.</p>
+
+<p>Here is how each is described in Apple's <a href="https://developer.apple.com/library/mac/documentation/Cocoa/Reference/ObjCRuntimeRef/Reference/reference.html#//apple_ref/c/func/method_getImplementation">Objective-C Runtime Reference</a>:</p>
+
+<blockquote>
+<ul>
+<li>Selector (<code>typedef struct objc_selector *SEL</code>): Selectors are used to represent the name of a method at runtime. A method selector is a C string that has been registered (or "mapped") with the Objective-C runtime. Selectors generated by the compiler are automatically mapped by the runtime when the class is loaded .</li>
+<li>Method (<code>typedef struct objc_method *Method</code>): An opaque type that represents a method in a class definition.</li>
+<li>Implementation (<code>typedef id (*IMP)(id, SEL, ...)</code>): This data type is a pointer to the start of the function that implements the method. This function uses standard C calling conventions as implemented for the current CPU architecture. The first argument is a pointer to self (that is, the memory for the particular instance of this class, or, for a class method, a pointer to the metaclass). The second argument is the method selector. The method arguments follow.</li>
+</ul>
+</blockquote>
+
+<p>The best way to understand the relationship between these concepts is as follows: a class (<code>Class</code>) maintains a dispatch table to resolve messages sent at runtime; each entry in the table is a method (<code>Method</code>), which keys a particular name, the selector (<code>SEL</code>), to an implementation (<code>IMP</code>), which is a pointer to an underlying C function.</p>
+
+<p>To swizzle a method is to change a class's dispatch table in order to resolve messages from an existing selector to a different implementation, while aliasing the original method implementation to a new selector.</p>
+
+<h2><a id="user-content-invoking-_cmd" class="anchor" href="#invoking-_cmd" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Invoking <code>_cmd</code></h2>
+
+<p>It may appear that the following code will result in an infinite loop:</p>
+
+<div class="highlight highlight-source-objc"><pre>- (<span class="pl-k">void</span>)xxx_viewWillAppear:(<span class="pl-c1">BOOL</span>)animated {
+    [<span class="pl-v">self</span> <span class="pl-c1">xxx_viewWillAppear:</span>animated];
+    <span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span>viewWillAppear: <span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, <span class="pl-c1">NSStringFromClass</span>([<span class="pl-v">self</span> <span class="pl-c1">class</span>]));
+}</pre></div>
+
+<p>Surprisingly, it won't. In the process of swizzling, <code>xxx_viewWillAppear:</code> has been reassigned to the original implementation of <code>UIViewController -viewWillAppear:</code>. It's good programmer instinct for calling a method on <code>self</code> in its own implementation to raise a red flag, but in this case, it makes sense if we remember what's <em>really</em> going on. However, if we were to call <code>viewWillAppear:</code> in this method, it <em>would</em> cause an infinite loop, since the implementation of this method will be swizzled to the <code>viewWillAppear:</code> selector at runtime.</p>
+
+<blockquote>
+<p>Remember to prefix your swizzled method name, the same way you might any other contentious category method.</p>
+</blockquote>
+
+<h2><a id="user-content-considerations" class="anchor" href="#considerations" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Considerations</h2>
+
+<p>Swizzling is widely considered a voodoo technique, prone to unpredictable behavior and unforeseen consequences. While it is not the safest thing to do, method swizzling is reasonably safe, when the following precautions are taken:</p>
+
+<ul>
+<li><strong>Always invoke the original implementation of a method (unless you have a good reason not to)</strong>: APIs provide a contract for input and output, but the implementation in-between is a black box. Swizzling a method and not calling the original implementation may cause underlying assumptions about private state to break, along with the rest of your application.</li>
+<li><strong>Avoid collisions</strong>: Prefix category methods, and make damn well sure that nothing else in your code base (or any of your dependencies) are monkeying around with the same piece of functionality as you are.</li>
+<li><strong>Understand what's going on</strong>: Simply copy-pasting swizzling code without understanding how it works is not only dangerous, but is a wasted opportunity to learn a lot about the Objective-C runtime. Read through the <a href="https://developer.apple.com/library/mac/documentation/Cocoa/Reference/ObjCRuntimeRef/Reference/reference.html#//apple_ref/c/func/method_getImplementation">Objective-C Runtime Reference</a> and browse <code>&lt;objc/runtime.h&gt;</code> to get a good sense of how and why things happen. <em>Always endeavor to replace magical thinking with understanding.</em></li>
+<li><strong>Proceed with caution</strong>: No matter how confident you are about swizzling Foundation, UIKit, or any other built-in framework, know that everything could break in the next release. Be ready for that, and go the extra mile to ensure that in playing with fire, you don't get <code>NSBurned</code>.</li>
+</ul>
+
+<blockquote>
+<p>Feeling gun shy about invoking the Objective-C runtime directly? <a href="https://twitter.com/rentzsch">Jonathan ‘Wolf’ Rentzsch</a> provides a battle-tested, CocoaPods-ready library called <a href="https://github.com/rentzsch/jrswizzle">JRSwizzle</a> that will take care of everything for you.</p>
+</blockquote>
+
+<hr>
+
+<p>Like <a href="http://nshipster.com/associated-objects/">associated objects</a>, method swizzling is a powerful technique when you need it, but should be used sparingly.</p>
+</article></div>

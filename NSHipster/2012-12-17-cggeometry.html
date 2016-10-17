@@ -1,0 +1,363 @@
+<div class="announce instapaper_body md" data-path="2012-12-17-cggeometry.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>excerpt</th>
+
+  <th>revisions</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>CGGeometry</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div>Cocoa</div></td>
+
+  <td><div>Unless you were a Math Geek or an Ancient Greek, Geometry was probably not your favorite subject in high school. No, chances are that you were that kid in class who dutifully programmed all of the necessary formulae into your TI-8X calculator. Keeping in the tradition of doing the least amount of math possible, here are some semi-obscure CoreGraphics functions to make your job easier.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>2015-02-17</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>Added Swift examples and information about how `Swift + CGRect == awesome`; added section for `CGRectIntersect` and `CGRectUnion`.</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+
+  <th>reviewed</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>2.0</div></td>
+
+  <td><div>September 8, 2015</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>Unless you were a Math Geek or an Ancient Greek, Geometry was probably not your favorite subject in high school. No, chances are that you were that kid in class who dutifully programmed all of the necessary formulæ into your TI-8X calculator.</p>
+
+<p>So for those of you who spent more time learning TI-BASIC than Euclidean geometry, here's the cheat-sheet for how geometry works in <a href="https://developer.apple.com/library/mac/#documentation/graphicsimaging/Conceptual/drawingwithquartz2d/Introduction/Introduction.html#//apple_ref/doc/uid/TP30001066">Quartz 2D</a>, the drawing system used in iOS and OS X:</p>
+
+<ul>
+<li><p>A <code>CGPoint</code> is a struct that represents a point in a two-dimensional coordinate system. For iOS, the origin is at the top-left, so points move right and down as their <code>x</code> and <code>y</code> values, respectively, increase. OS X, by contrast, is oriented with <code>(0, 0)</code> in the bottom left, with <code>y</code> moving up as it increases.</p></li>
+<li><p>A <code>CGSize</code> is a struct that represents the dimensions of <code>width</code> and <code>height</code>.</p></li>
+<li><p>A <code>CGRect</code> is a struct with both a <code>CGPoint</code> (<code>origin</code>) and a <code>CGSize</code> (<code>size</code>), representing a rectangle drawn from its <code>origin</code> point with the <code>width</code> and <code>height</code> of its <code>size</code>.</p></li>
+</ul>
+
+<p>Because <code>CGRect</code> is used to represent the <code>frame</code> of every view drawn on screen, a programmer's success in graphical programming is contingent on their ability to effectively manipulate rectangle geometry.</p>
+
+<p>Fortunately for us, Quartz comes with a slew of useful functions to reduce the amount of floating point math we have to do ourselves. As central as view programming is to Cocoa, and as useful as these functions are, however, they remain relatively unknown to most iOS developers.</p>
+
+<p>This will not stand! Let's shine some light on the most useful functions and save y'all some typing!</p>
+
+<blockquote>
+<p>In Swift, the CoreGraphics framework augments <code>CGRect</code> by adding all this functionality as static properties, instance properties, and both mutating and non-mutating functions where appropriate. For idiomatic Swift code, prefer properties and nonmutating instance methods whenever possible.</p>
+</blockquote>
+
+<hr>
+
+<h2><a id="user-content-transformations" class="anchor" href="#transformations" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Transformations</h2>
+
+<p>First on our list are the geometric transformations. These functions return a <code>CGRect</code>, which is the result of performing a particular set of operations on the passed rectangle.</p>
+
+<h3><a id="user-content-cgrectoffset" class="anchor" href="#cgrectoffset" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>CGRectOffset</code></h3>
+
+<blockquote>
+<p><code>offsetBy</code> / <code>CGRectOffset</code>: Returns a rectangle with an origin that is offset from that of the source rectangle.</p>
+</blockquote>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-c">// methods:</span>
+<span class="pl-k">extension</span> CGRect {
+    <span class="pl-k">func</span> <span class="pl-en">offsetBy</span>(dx: CGFloat, dy: CGFloat) <span class="pl-k">-&gt;</span> CGRect
+    <span class="pl-k">mutating</span> <span class="pl-k">func</span> <span class="pl-en">offsetInPlace</span>(dx: CGFloat, dy: CGFloat)
+}
+<span class="pl-c">// function:</span>
+<span class="pl-k">func</span> <span class="pl-en">CGRectOffset</span>(rect: CGRect, dx: CGFloat, dy: CGFloat) <span class="pl-k">-&gt;</span> CGRect</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">CGRect</span> <span class="pl-en">CGRectOffset</span>(
+  <span class="pl-c1">CGRect</span> rect,
+  <span class="pl-c1">CGFloat</span> dx,
+  <span class="pl-c1">CGFloat</span> dy
+)</pre></div>
+
+<p>Consider using this anytime you're changing the origin of a rectangle. Not only can it save a line of code when changing both the horizontal and vertical position, but more importantly, it represents the translation more semantically than manipulating the origin values individually.</p>
+
+<h3><a id="user-content-cgrectinset" class="anchor" href="#cgrectinset" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>CGRectInset</code></h3>
+
+<blockquote>
+<p><code>rectByInsetting</code> / <code>CGRectInset</code>: Returns a rectangle that is smaller or larger than the source rectangle, with the same center point.</p>
+</blockquote>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-c">// methods:</span>
+<span class="pl-k">extension</span> CGRect {
+    <span class="pl-k">func</span> <span class="pl-en">insetBy</span>(dx: CGFloat, dy: CGFloat) <span class="pl-k">-&gt;</span> CGRect
+    <span class="pl-k">mutating</span> <span class="pl-k">func</span> <span class="pl-en">insetInPlace</span>(dx: CGFloat, dy: CGFloat)
+}
+<span class="pl-c">// function:</span>
+<span class="pl-k">func</span> <span class="pl-en">CGRectInset</span>(rect: CGRect, dx: CGFloat, dy: CGFloat) <span class="pl-k">-&gt;</span> CGRect</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">CGRect</span> <span class="pl-en">CGRectInset</span>(
+  <span class="pl-c1">CGRect</span> rect,
+  <span class="pl-c1">CGFloat</span> dx,
+  <span class="pl-c1">CGFloat</span> dy
+)</pre></div>
+
+<p>Want to make a view-within-a-view look good? Give it a nice 10pt padding with <code>CGRectInset</code>. Keep in mind that the rectangle will be resized around its center by ± <code>dx</code> on its left and right edge (for a total of <code>2 × dx</code>), and ± <code>dy</code> on its top and bottom edge (for a total of <code>2 × dy</code>).</p>
+
+<p>If you're using <code>CGRectInset</code> as a convenience function for resizing a rectangle, it is common to chain this with <code>CGRectOffset</code> by passing the result of <code>CGRectInset</code> as the <code>rect</code> argument in <code>CGRectOffset</code>.</p>
+
+<h3><a id="user-content-cgrectintegral" class="anchor" href="#cgrectintegral" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>CGRectIntegral</code></h3>
+
+<blockquote>
+<p><code>integral</code> / <code>CGRectIntegral</code>: Returns the smallest rectangle that results from converting the source rectangle values to integers.</p>
+</blockquote>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-c">// methods:</span>
+<span class="pl-k">extension</span> CGRect {
+    <span class="pl-k">var</span> integral: CGRect { <span class="pl-k">get</span> }
+    <span class="pl-k">mutating</span> <span class="pl-k">func</span> <span class="pl-en">makeIntegralInPlace</span>()
+}
+<span class="pl-c">// function:</span>
+<span class="pl-k">func</span> <span class="pl-en">CGRectIntegral</span>(rect: CGRect) <span class="pl-k">-&gt;</span> CGRect</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">CGRect</span> <span class="pl-en">CGRectIntegral</span> (
+  <span class="pl-c1">CGRect</span> rect
+)</pre></div>
+
+<p>It's important that <code>CGRect</code> values all are rounded to the nearest whole point. Fractional values cause the frame to be drawn on a <em>pixel boundary</em>. Because pixels are atomic units (cannot be subdivided†) a fractional value will cause the drawing to be averaged over the neighboring pixels, which looks blurry.</p>
+
+<p><code>CGRectIntegral</code> will <code>floor</code> each origin value, and <code>ceil</code> each size value, which will ensure that your drawing code will crisply align on pixel boundaries.</p>
+
+<p>As a rule of thumb, if you are performing any operations that could result in fractional point values (e.g. division, <code>CGRectGetMid[X|Y]</code>, or <code>CGRectDivide</code>), use <code>CGRectIntegral</code> to normalize rectangles to be set as a view frame.</p>
+
+<blockquote>
+<p>† Technically, since the coordinate system operates in terms of points, Retina screens, which have 4 pixels for every point, can draw <code>± 0.5f</code> point values on odd pixels without blurriness.</p>
+</blockquote>
+
+<h2><a id="user-content-value-helper-functions" class="anchor" href="#value-helper-functions" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Value Helper Functions</h2>
+
+<p>These functions provide a shorthand way to calculate interesting dimensional values about a particular <code>CGRect</code>.</p>
+
+<h3><a id="user-content-cgrectgetminmidmaxxy" class="anchor" href="#cgrectgetminmidmaxxy" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>CGRectGet[Min|Mid|Max][X|Y]</code></h3>
+
+<ul>
+<li><code>CGRectGetMinX</code></li>
+<li><code>CGRectGetMinY</code></li>
+<li><code>CGRectGetMidX</code></li>
+<li><code>CGRectGetMidY</code></li>
+<li><code>CGRectGetMaxX</code></li>
+<li><code>CGRectGetMaxY</code></li>
+</ul>
+
+<p>These six functions return the minimum, middle, or maximum <code>x</code> or <code>y</code> value for a rectangle, taking the form:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">func</span> CGRectGet[Min<span class="pl-k">|</span>Mid<span class="pl-k">|</span>Max][X<span class="pl-k">|</span>Y](rect: CGRect) <span class="pl-k">-&gt;</span> CGPoint</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">CGFloat</span> CGRectGet[Min|Mid|Max][X|Y] (
+  <span class="pl-c1">CGRect</span> rect
+)</pre></div>
+
+<p>These functions will replace code like <code>frame.origin.x + frame.size.width</code> with cleaner, more semantically expressive equivalents (especially with the mid and max functions).</p>
+
+<h3><a id="user-content-cgrectgetwidthheight" class="anchor" href="#cgrectgetwidthheight" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>CGRectGet[Width|Height]</code></h3>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-c">// Returns the height of a rectangle.</span>
+<span class="pl-k">func</span> <span class="pl-en">CGRectGetHeight</span>(rect: CGRect) <span class="pl-k">-&gt;</span> CGFloat
+
+<span class="pl-c">// Returns the width of a rectangle.</span>
+<span class="pl-k">func</span> <span class="pl-en">CGRectGetWidth</span>(rect: CGRect) <span class="pl-k">-&gt;</span> CGFloat</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c">// Returns the height of a rectangle.</span>
+<span class="pl-c1">CGFloat</span> <span class="pl-en">CGRectGetHeight</span> (
+   <span class="pl-c1">CGRect</span> rect
+)
+
+<span class="pl-c">// Returns the width of a rectangle.</span>
+CGFloat CGRectGetWidth (
+   <span class="pl-c1">CGRect</span> rect
+)</pre></div>
+
+<p>Much like the previous functions, <code>CGRectGetWidth</code> &amp; <code>CGRectGetHeight</code> are often preferable to returning the corresponding member of a <code>CGRect</code>'s <code>size</code>. While it's not extremely competitive in terms of character savings, remember that semantic clarity trumps brevity every time.</p>
+
+<h3><a id="user-content-swift-additions" class="anchor" href="#swift-additions" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Swift Additions</h3>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">extension</span> CGRect {
+    <span class="pl-k">var</span> minX: CGFloat { <span class="pl-k">get</span> }
+    <span class="pl-k">var</span> minY: CGFloat { <span class="pl-k">get</span> }
+    <span class="pl-k">var</span> midX: CGFloat { <span class="pl-k">get</span> }
+    <span class="pl-k">var</span> midY: CGFloat { <span class="pl-k">get</span> }
+    <span class="pl-k">var</span> maxX: CGFloat { <span class="pl-k">get</span> }
+    <span class="pl-k">var</span> maxY: CGFloat { <span class="pl-k">get</span> }
+    <span class="pl-k">var</span> width: CGFloat { <span class="pl-k">get</span> }
+    <span class="pl-k">var</span> height: CGFloat { <span class="pl-k">get</span> }
+}</pre></div>
+
+<p>The <code>CGRect</code> Swift extensions for dimensional values make a huge difference in code readability, as each of the value helper functions is mapped to individual computed properties.</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-c">// instead of calling the function</span>
+<span class="pl-k">let</span> rightEdge <span class="pl-k">=</span> CGRectMaxX(view<span class="pl-k">.</span>frame)
+
+<span class="pl-c">// simply access the property</span>
+<span class="pl-k">let</span> leftEdge <span class="pl-k">=</span> view<span class="pl-k">.</span>frame<span class="pl-k">.</span>minX</pre></div>
+
+<h2><a id="user-content-identities" class="anchor" href="#identities" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Identities</h2>
+
+<p>There are three special rectangle values, each of which have unique properties that are important to know about:</p>
+
+<h3><a id="user-content-cgrectzero-cgrectnull--cgrectinfinite" class="anchor" href="#cgrectzero-cgrectnull--cgrectinfinite" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>CGRectZero</code>, <code>CGRectNull</code>, &amp; <code>CGRectInfinite</code></h3>
+
+<blockquote>
+<ul>
+<li><code>CGRect.zero</code> / <code>const CGRect CGRectZero</code>: A rectangle constant with location (0,0), and width and height of 0. The zero rectangle is equivalent to CGRectMake(0.0f, 0.0f, 0.0f, 0.0f).</li>
+<li><code>CGRect.null</code> / <code>const CGRect CGRectNull</code>: The null rectangle. This is the rectangle returned when, for example, you intersect two disjoint rectangles. <strong>Note that the null rectangle is not the same as the zero rectangle</strong>.</li>
+<li><code>CGRect.infinite</code> / <code>const CGRect CGRectInfinite</code>: A rectangle that has infinite extent.</li>
+</ul>
+</blockquote>
+
+<p><code>CGRectZero</code> is perhaps the most useful of all of the special rectangle values. When initializing subviews, their frames are often initialized to <code>CGRectZero</code>, deferring their layout to <code>-layoutSubviews</code>.</p>
+
+<p><code>CGRectNull</code> is distinct from <code>CGRectZero</code>, despite any implied correspondence to <code>NULL</code> == <code>0</code>. This value is conceptually similar to <code>NSNotFound</code>, in that it represents the absence of an expected value. Be aware of what functions can return <code>CGRectNull</code>, and be prepared to handle it accordingly, by testing with <code>CGRectIsNull</code>.</p>
+
+<p><code>CGRectInfinite</code> is the most exotic of all, and has some of the most interesting properties. It intersects with all points and rectangles, contains all rectangles, and its union with any rectangle is itself. Use <code>CGRectIsInfinite</code> to check to see if a rectangle is infinite.</p>
+
+<h2><a id="user-content-relationships" class="anchor" href="#relationships" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Relationships</h2>
+
+<p>Moving from one rectangle to two, a pair of rectangles can be either intersected or combined to create a new <code>CGRect</code>:</p>
+
+<h3><a id="user-content-cgrectintersection" class="anchor" href="#cgrectintersection" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>CGRectIntersection</code></h3>
+
+<blockquote>
+<p><code>intersect</code> / <code>CGRectIntersection</code>: Returns the intersection of two rectangles.</p>
+</blockquote>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-c">// methods:</span>
+<span class="pl-k">extension</span> CGRect {
+    <span class="pl-k">func</span> <span class="pl-en">intersect</span>(withRect: CGRect) <span class="pl-k">-&gt;</span> CGRect
+    <span class="pl-k">mutating</span> <span class="pl-k">func</span> <span class="pl-en">intersectInPlace</span>(withRect: CGRect)
+}
+<span class="pl-c">// function:</span>
+<span class="pl-k">func</span> <span class="pl-en">CGRectIntersection</span>(rect1: CGRect, rect2: CGRect) <span class="pl-k">-&gt;</span> CGRect</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">CGRect</span> <span class="pl-en">CGRectIntersection</span> (
+  <span class="pl-c1">CGRect</span> rect1,
+  <span class="pl-c1">CGRect</span> rect2
+)</pre></div>
+
+<p><code>CGRectIntersection</code> is a fast way to find the overlapping region between two views. The intersection of two non-overlapping rectangles is a null rect, but if you need to simply check for intersection or containment, use <code>intersects</code> / <code>CGRectIntersectsRect</code> or <code>contains</code> / <code>CGRectContainsRect</code> instead.</p>
+
+<h3><a id="user-content-cgrectunion" class="anchor" href="#cgrectunion" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>CGRectUnion</code></h3>
+
+<blockquote>
+<p><code>union</code> / <code>CGRectUnion</code>: Returns the smallest rectangle that contains the two source rectangles.</p>
+</blockquote>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-c">// methods:</span>
+<span class="pl-k">extension</span> CGRect {
+    <span class="pl-k">func</span> <span class="pl-en">union</span>(rect: CGRect) <span class="pl-k">-&gt;</span> CGRect
+    <span class="pl-k">mutating</span> <span class="pl-k">func</span> <span class="pl-en">unionInPlace</span>(rect: CGRect)
+}
+<span class="pl-c">// function:</span>
+<span class="pl-k">func</span> <span class="pl-en">CGRectUnion</span>(rect1: CGRect, rect2: CGRect) <span class="pl-k">-&gt;</span> CGRect</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">CGRect</span> <span class="pl-en">CGRectUnion</span> (
+  <span class="pl-c1">CGRect</span> rect1,
+  <span class="pl-c1">CGRect</span> rect2
+)</pre></div>
+
+<p>Need a rectangle that can wrap two separate regions in your view? Remember that you can chain together different methods to produce the rectangle you need. Use <code>CGRectUnion</code> and negative values with <code>CGRectInset</code> to find a padded rectangle around two items:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> combinedRect <span class="pl-k">=</span> imageRect<span class="pl-k">.</span><span class="pl-c1">union</span>(textRect)<span class="pl-k">.</span>insetBy(dx: <span class="pl-c1">-10</span>, dy: <span class="pl-c1">-10</span>)</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">CGRect</span> combinedRect = CGRectInset(CGRectUnion(imageRect, textRect), -<span class="pl-c1">10</span>, -<span class="pl-c1">10</span>);</pre></div>
+
+<h2><a id="user-content-and-finally" class="anchor" href="#and-finally" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>And Finally...</h2>
+
+<p>Behold, the most obscure, misunderstood, and useful of the <code>CGGeometry</code> functions: <code>CGRectDivide</code>.</p>
+
+<h3><a id="user-content-cgrectdivide" class="anchor" href="#cgrectdivide" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>CGRectDivide</code></h3>
+
+<blockquote>
+<p><code>CGRectDivide</code>: Divides a source rectangle into two component rectangles.</p>
+</blockquote>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-c">// method:</span>
+<span class="pl-k">extension</span> CGRect {
+    <span class="pl-k">func</span> <span class="pl-en">divide</span>(atDistance: CGFloat, fromEdge: CGRectEdge) <span class="pl-k">-&gt;</span> (slice: CGRect, remainder: CGRect)
+}
+<span class="pl-c">// function:</span>
+CGRectDivide(rect: CGRect, 
+            slice: <span class="pl-c1">UnsafeMutablePointer</span><span class="pl-k">&lt;</span>CGRect<span class="pl-k">&gt;</span>,
+        remainder: <span class="pl-c1">UnsafeMutablePointer</span><span class="pl-k">&lt;</span>CGRect<span class="pl-k">&gt;</span>,
+           amount: CGFloat,
+             edge: CGRectEdge)</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-k">void</span> <span class="pl-en">CGRectDivide</span>(
+  <span class="pl-c1">CGRect</span> rect,
+  <span class="pl-c1">CGRect</span> *slice,
+  <span class="pl-c1">CGRect</span> *remainder,
+  <span class="pl-c1">CGFloat</span> amount,
+  <span class="pl-c1">CGRectEdge</span> edge
+)</pre></div>
+
+<p><code>CGRectDivide</code> divides a rectangle into two components in the following way:</p>
+
+<ul>
+<li>Take a rectangle and choose an <code>edge</code> (left, right, top, or bottom).</li>
+<li>Measure out an <code>amount</code> from that edge.</li>
+<li>Everything from the <code>edge</code> to the measured <code>amount</code> is stored in the rectangle referenced in the <code>slice</code> argument.</li>
+<li>The rest of the original rectangle is stored in the <code>remainder</code> out argument.</li>
+</ul>
+
+<blockquote>
+<p>Don't fret about the <code>UnsafeMutablePointer&lt;CGRect&gt;</code> in the Swift version; those pointers act just like <code>inout</code> properties in this case. Create your slice and remainder instances up-front, and prefix with an <code>&amp;</code> in the call. Or better yet, use the instance method on an existing <code>CGRect</code>:</p>
+
+<p><code>let (slice, remainder) = frame.divide(120, fromEdge: .MinXEdge)</code></p>
+</blockquote>
+
+<p>That <code>edge</code> argument takes a value from the <code>CGRectEdge</code> enum:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">enum</span> CGRectEdge {
+   <span class="pl-k">case</span> MinXEdge
+   <span class="pl-k">case</span> MinYEdge
+   <span class="pl-k">case</span> MaxXEdge
+   <span class="pl-k">case</span> MaxYEdge
+}</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-k">enum</span> <span class="pl-c1">CGRectEdge</span> {
+   <span class="pl-c1">CGRectMinXEdge</span>,
+   <span class="pl-c1">CGRectMinYEdge</span>,
+   <span class="pl-c1">CGRectMaxXEdge</span>,
+   <span class="pl-c1">CGRectMaxYEdge</span>
+}</pre></div>
+
+<p><code>CGRectDivide</code> is perfect for dividing up available space among several views (call it on subsequent <code>remainder</code> amounts to accommodate more than two views). Give it a try next time you're manually laying-out a <code>UITableViewCell</code>.</p>
+
+<hr>
+
+<p>So what if you didn't pay attention in Geometry class—this is the real world, and in the real world, you have <code>CGGeometry.h</code>.</p>
+
+<p>Know it well, and you'll be on your way to discovering great new user interfaces in your apps. Do good enough of a job with that, and you may run into the greatest arithmetic problem of all: adding up all of the money you'll make with your awesome new app. Mathematical!</p>
+</article></div>

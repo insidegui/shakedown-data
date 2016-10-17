@@ -1,0 +1,124 @@
+<div class="announce instapaper_body md" data-path="2014-04-07-configuration-profiles.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>Configuration Profiles</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div></div></td>
+
+  <td><div>One of the major criticisms of iOS as a platform is how locked down it is. iOS Configuration Profiles offer an interesting mechanism to work around these restrictions.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>n/a</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>One of the major criticisms of iOS as a platform is how locked down it is.</p>
+
+<p>Each app is an island, only able to communicate with other parts of the system under strict terms, and only then with nontrivial effort. There's no way, for example, for an app to open its own settings in Settings.app. There's no way for apps to change their icon at runtime, or to customize the behavior of system-wide functionality, like Notification Center or Siri. Apps can't embed or share views with one another, or communicate locally.</p>
+
+<p>So it may come as a surprise how many of these limitations to iOS can be worked around with a bit of XML.</p>
+
+<p>The feature in question, and topic of this week's article is <a href="https://developer.apple.com/library/ios/featuredarticles/iPhoneConfigurationProfileRef/Introduction/Introduction.html">iOS Configuration Profiles</a>.</p>
+
+<hr>
+
+<p>Unless you've worked in the enterprise or on wide-scale educational software, there's a good chance that you haven't heard much about configuration profiles.</p>
+
+<p><strong>Configuration Profiles are not to be confused with Provisioning Profiles.</strong></p>
+
+<p>A <em>provisioning profile</em> is used to determine that an app is authorized by the developer to run on a particular device. A <em>configuration profile</em> can be used to apply a variety of settings to a device.</p>
+
+<p>Both configuration &amp; provisioning profiles are displayed in similar fashion under <code>Settings.app &gt; General &gt; Profiles</code>, which doesn't help with the potential confusion.</p>
+
+<p>Each configuration file includes a number of payloads, each of which can specify configuration, including:</p>
+
+<ul>
+<li>Whitelisting &amp; Authenticating AirPlay &amp; AirPrint destinations</li>
+<li>Setting up VPN, HTTP Proxies, WiFi &amp; Cellular Network</li>
+<li>Configuring Email (SMTP, Exchange), Calendar (CalDAV), and Contacts (CardDAV, LDAP, AD)</li>
+<li>Restricting access to Apps, Device Features, Web Content, and Media Playback</li>
+<li>Managing Certificates and SSO Credentials</li>
+<li>Installing Web Clips, Apps, and Custom Fonts</li>
+</ul>
+
+<p>There are several ways to deploy configuration profiles:</p>
+
+<ul>
+<li>Attaching to an email</li>
+<li>Linking to one on a webpage</li>
+<li>Using over-the air configuration</li>
+<li>Using Apple Configurator</li>
+</ul>
+
+<blockquote>
+<p>In addition to deploying configuration profiles, the <a href="https://itunes.apple.com/us/app/apple-configurator/id434433123?mt=12">Apple Configurator</a> can generate profiles, as an alternative to hand-writing XML yourself.</p>
+</blockquote>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/ios-configurator-generate.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/ios-configurator-generate.png" alt="iOS Configurator - Generate" style="max-width:100%;"></a></p>
+
+<h2><a id="user-content-use-cases" class="anchor" href="#use-cases" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Use Cases</h2>
+
+<p>It's easy to recognize how invaluable the aforementioned features would be to anyone attempting to deploy iOS devices within a large business or school.</p>
+
+<p>But how can this be used to bring new functionality to conventional apps? Admittedly, the use of configuration profiles is relatively uncharted territory for many developers, but there could be entire categories of app functionality yet to be realized.</p>
+
+<p>Here are a few ideas to chew on:</p>
+
+<h3><a id="user-content-distributing-development-builds" class="anchor" href="#distributing-development-builds" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Distributing Development Builds</h3>
+
+<p>If you're ever used a development distribution service like <a href="http://hockeyapp.net">HockeyApp</a> or <a href="http://testflightapp.com">TestFlight</a>, you've installed a configuration profile—perhaps without knowing it!</p>
+
+<p>Using a configuration profile, these services can automatically get information like device UDID, model name, and even add a new web clip on the home screen to download available apps.</p>
+
+<p>Although Apple Legal gets twitchy at even the slightest intimation of third-party app stores, perhaps there are ways for configuration profiles to enable new forms of collaboration. It's unclear what the effect of <a href="http://www.theverge.com/apps/2014/2/21/5434060/apple-buys-maker-of-the-ios-testing-platform-testflight">Apple's acquisition of Burstly</a> (TestFlight's parent company) will be in the long term, but for now, this could be a great opportunity for some further exploration of this space.</p>
+
+<h3><a id="user-content-installing-custom-fonts" class="anchor" href="#installing-custom-fonts" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Installing Custom Fonts</h3>
+
+<p>A recent addition to configuration profiles is the ability to embed font payloads, allowing for new typefaces to be installed across the system (for example, to be used in Pages or Keynote).</p>
+
+<p>Just as EOF / WOFF / SVG fonts allow typefaces to be distributed over the web, type foundries could similarly offer TTF / OTF files to iOS devices using an app with a configuration profile. Since configuration profiles can be installed from a web page, an app could embed and run an HTTP process to locally serve a webpage with a profile and payload.</p>
+
+<h3><a id="user-content-enhancing-security" class="anchor" href="#enhancing-security" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Enhancing Security</h3>
+
+<p>Security has quickly become a killer feature for apps, as discussed in our article about <a href="http://nshipster.com/multipeer-connectivity/">Multipeer Connectivity</a>.</p>
+
+<p>Perhaps configuration profiles, with the ability to embed certificates and single sign-on credentials, could add another level of security to communication apps.</p>
+
+<h3><a id="user-content-expanding-the-scope-of-in-app-purchases" class="anchor" href="#expanding-the-scope-of-in-app-purchases" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Expanding the Scope of In-App Purchases</h3>
+
+<p>Imagine if IAP could be used to unlock functionality in the real world.</p>
+
+<p>A clever combination of IAP and auto-expiring configuration profiles could be used to allow access to secure WiFi networks, printers, or AirPlay devices. Add in IAP subscriptions and captive WiFi network messages, and it could make for a compelling business model.</p>
+
+<hr>
+
+<p>To its credit, tight restrictions have helped ensure a consistent and secure user experience on iOS from its inception, and Apple should be lauded for engineering the platform in such a way that an entire ecosystem of 3rd party software is able to operate without compromising that experience.</p>
+
+<p>Of course, as developers, we're always going to want more functionality open to us.  iOS Configuration Profiles are a lesser-known feature that open a wide range of possibilities, that we have only begun to understand.</p>
+</article></div>

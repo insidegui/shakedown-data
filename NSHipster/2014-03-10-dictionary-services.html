@@ -1,0 +1,302 @@
+<div class="announce instapaper_body md" data-path="2014-03-10-dictionary-services.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>tags</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>UIReferenceLibraryViewController /<br>DCSDictionaryRef/<br>/usr/share/dict/words</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div>Cocoa</div></td>
+
+  <td><div>cfhipsterref</div></td>
+
+  <td><div>Though widely usurped of their 'go-to reference' status by the Internet, dictionaries and word lists serve an important role behind the scenes of functionality ranging from spell check, grammar check, and auto-correct to auto-summarization and semantic analysis.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>t.b.c.</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p><a href="{{ site.asseturl }}/cfhipsterref-illustration-librarian.png" target="_blank"><img src="{{ site.asseturl }}/cfhipsterref-illustration-librarian.png" width="173" height="300" alt="Librarian, illustrated by Conor Heelan" style="max-width:100%;"></a></p>
+
+<p>This week's article is about dictionaries. Not the <code>NSDictionary</code> / <code>CFDictionaryRef</code> we encounter everyday, but those distant lexicographic vestiges of school days past.</p>
+
+<blockquote>
+<p>But seriously, why are dictionaries called that, anyway? Why can't we just settle on <code>Hash</code>, like those nice Ruby folks? What's that? Semantic overlap with hashing functions and cryptographic digests? Well, dictionary isn't <em>that</em> bad. Anything other than "associative arrays", I reckon.</p>
+</blockquote>
+
+<p>Though widely usurped of their "go-to reference" status by the Internet, dictionaries and word lists serve an important role behind the scenes of functionality ranging from spell check, grammar check, and auto-correct to auto-summarization and semantic analysis. So, for your reference, here's a look at the ways and means by which computers give meaning to the world through words, in Unix, OS X, and iOS.</p>
+
+<hr>
+
+<h2><a id="user-content-unix" class="anchor" href="#unix" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Unix</h2>
+
+<p>Nearly all Unix distributions include a small collection newline-delimited list of words. On OS X, these can be found at <code>/usr/share/dict</code>:</p>
+
+<div class="highlight highlight-source-shell"><pre>$ ls /usr/share/dict
+    README
+    connectives
+    propernames
+    web2
+    web2a
+    words@ -<span class="pl-k">&gt;</span> web2</pre></div>
+
+<p>Symlinked to <code>words</code> is the <code>web2</code> word list, which, though not exhaustive, is still a sizable corpus:</p>
+
+<div class="highlight highlight-source-shell"><pre>$ wc /usr/share/dict/words
+    235886  235886 2493109</pre></div>
+
+<p>Skimming with <code>head</code> shows what fun lies herein. Such excitement is rarely so palpable as it is among words beginning with "a":</p>
+
+<div class="highlight highlight-source-shell"><pre>$ head /usr/share/dict/words
+    A
+    a
+    aa
+    aal
+    aalii
+    aam
+    Aani
+    aardvark
+    aardwolf
+    Aaron</pre></div>
+
+<p>These giant, system-provided text files make it easy to <code>grep</code> crossword puzzle clues, generate mnemonic pass phrases, and seed databases, but from a user perspective, <code>/usr/share/dict</code>'s monolingualism and lack of associated meaning make it less than useful for everyday use.</p>
+
+<p>OS X builds upon this with its own system dictionaries. Never one to disappoint, the operating system's penchant for extending Unix functionality through strategically placed bundles and plist files is in full force with how dictionaries are distributed.</p>
+
+<hr>
+
+<h2><a id="user-content-os-x" class="anchor" href="#os-x" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>OS X</h2>
+
+<p>The OS X analog to <code>/usr/share/dict</code> can be found in <code>/Library/Dictionaries</code>.
+A quick peek into the shared system dictionaries demonstrates one immediate improvement over Unix, by acknowledging the existence of languages other than English:</p>
+
+<div class="highlight highlight-source-shell"><pre>$ ls /Library/Dictionaries/
+
+    Apple Dictionary.dictionary/
+    Diccionario General de la Lengua Española Vox.dictionary/
+    Duden Dictionary Data Set I.dictionary/
+    Dutch.dictionary/
+    Italian.dictionary/
+    Korean - English.dictionary/
+    Korean.dictionary/
+    Multidictionnaire de la langue française.dictionary/
+    New Oxford American Dictionary.dictionary/
+    Oxford American Writer<span class="pl-s"><span class="pl-pds">'</span>s Thesaurus.dictionary/</span>
+<span class="pl-s">    Oxford Dictionary of English.dictionary/</span>
+<span class="pl-s">    Oxford Thesaurus of English.dictionary/</span>
+<span class="pl-s">    Sanseido Super Daijirin.dictionary/</span>
+<span class="pl-s">    Sanseido The WISDOM English-Japanese Japanese-English Dictionary.dictionary/</span>
+<span class="pl-s">    Simplified Chinese - English.dictionary/</span>
+<span class="pl-s">    The Standard Dictionary of Contemporary Chinese.dictionary/</span></pre></div>
+
+<p>OS X ships with dictionaries in Chinese, English, French, Dutch, Italian, Japanese, Korean, as well as an English thesaurus and a special dictionary for Apple-specific terminology.</p>
+
+<p>Diving deeper into the rabbit hole, we peruse the <code>.dictionary</code> bundles to see them for what they really are:</p>
+
+<div class="highlight highlight-source-shell"><pre>$ ls <span class="pl-s"><span class="pl-pds">"</span>/Library/Dictionaries/New Oxford American Dictionary.dictionary/Contents<span class="pl-pds">"</span></span>
+
+    Body.data
+    DefaultStyle.css
+    EntryID.data
+    EntryID.index
+    Images/
+    Info.plist
+    KeyText.data
+    KeyText.index
+    Resources/
+    _CodeSignature/
+    version.plist</pre></div>
+
+<p>A filesystem autopsy reveals some interesting implementation details. In the case of the New Oxford American Dictionary in particular, contents include:</p>
+
+<ul>
+<li>Binary-encoded <code>KeyText.data</code>, <code>KeyText.index</code>, &amp; <code>Content.data</code></li>
+<li>CSS for styling entries</li>
+<li>1207 images, from A-Frame to Zither.</li>
+<li>Preference to switch between <a href="http://en.wikipedia.org/wiki/Pronunciation_respelling_for_English">US English Diacritical Pronunciation</a> and <a href="http://en.wikipedia.org/wiki/International_Phonetic_Alphabet">IPA</a> (International Phonetic Alphabet)</li>
+<li>Manifest &amp; signature for dictionary contents</li>
+</ul>
+
+<p>Normally, proprietary binary encoding would be the end of the road in terms of what one could reasonably do with data, but luckily, Core Services provides APIs to read this information.</p>
+
+<h4><a id="user-content-getting-definition-of-word" class="anchor" href="#getting-definition-of-word" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Getting Definition of Word</h4>
+
+<p>To get the definition of a word on OS X, one can use the <code>DCSCopyTextDefinition</code> function, found in the Core Services framework:</p>
+
+<div class="highlight highlight-source-objc"><pre>#<span class="pl-k">import</span> <span class="pl-s"><span class="pl-pds">&lt;</span>CoreServices/CoreServices.h<span class="pl-pds">&gt;</span></span>
+
+<span class="pl-c1">NSString</span> *word = <span class="pl-s"><span class="pl-pds">@"</span>apple<span class="pl-pds">"</span></span>;
+<span class="pl-c1">NSString</span> *definition = (__bridge_transfer <span class="pl-c1">NSString</span> *)DCSCopyTextDefinition(<span class="pl-c1">NULL</span>, (__bridge <span class="pl-c1">CFStringRef</span>)word, CFRangeMake(<span class="pl-c1">0</span>, [word <span class="pl-c1">length</span>]));
+<span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span><span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, definition);</pre></div>
+
+<p>Wait, where did all of those great dictionaries go?</p>
+
+<p>Well, they all disappeared into that first <code>NULL</code> argument. One might expect to provide a <code>DCSCopyTextDefinition</code> type here, as prescribed by the function definition. However, there are no public functions to construct or copy such a type, making <code>NULL</code> the only available option. The documentation is as clear as it is stern:</p>
+
+<blockquote>
+<p>This parameter is reserved for future use, so pass <code>NULL</code>. Dictionary Services searches in all active dictionaries.</p>
+</blockquote>
+
+<p>"Dictionary Services searches in <strong>all active dictionaries</strong>", you say? Sounds like a loophole!</p>
+
+<h4><a id="user-content-setting-active-dictionaries" class="anchor" href="#setting-active-dictionaries" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Setting Active Dictionaries</h4>
+
+<p>Now, there's nothing programmers love to hate to love more than the practice of exploiting loopholes to side-step Apple platform restrictions. Behold: an entirely error-prone approach to getting, say, thesaurus results instead of the first definition available in the standard dictionary:</p>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSUserDefaults</span> *userDefaults = [<span class="pl-c1">NSUserDefaults</span> <span class="pl-c1">standardUserDefaults</span>];
+<span class="pl-c1">NSMutableDictionary</span> *dictionaryPreferences = [[userDefaults <span class="pl-c1">persistentDomainForName:</span><span class="pl-s"><span class="pl-pds">@"</span>com.apple.DictionaryServices<span class="pl-pds">"</span></span>] <span class="pl-c1">mutableCopy</span>];
+<span class="pl-c1">NSArray</span> *activeDictionaries = [dictionaryPreferences <span class="pl-c1">objectForKey:</span><span class="pl-s"><span class="pl-pds">@"</span>DCSActiveDictionaries<span class="pl-pds">"</span></span>];
+dictionaryPreferences[<span class="pl-s"><span class="pl-pds">@"</span>DCSActiveDictionaries<span class="pl-pds">"</span></span>] = @[<span class="pl-s"><span class="pl-pds">@"</span>/Library/Dictionaries/Oxford American Writer's Thesaurus.dictionary<span class="pl-pds">"</span></span>];
+[userDefaults <span class="pl-c1">setPersistentDomain:</span>dictionaryPreferences <span class="pl-c1">forName:</span><span class="pl-s"><span class="pl-pds">@"</span>com.apple.DictionaryServices<span class="pl-pds">"</span></span>];
+{
+    <span class="pl-c1">NSString</span> *word = <span class="pl-s"><span class="pl-pds">@"</span>apple<span class="pl-pds">"</span></span>;
+    <span class="pl-c1">NSString</span> *definition = (__bridge_transfer <span class="pl-c1">NSString</span> *)<span class="pl-c1">DCSCopyTextDefinition</span>(<span class="pl-c1">NULL</span>, (__bridge <span class="pl-c1">CFStringRef</span>)word, <span class="pl-c1">CFRangeMake</span>(<span class="pl-c1">0</span>, [word <span class="pl-c1">length</span>]));
+    <span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span><span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, definition);
+}
+dictionaryPreferences[<span class="pl-s"><span class="pl-pds">@"</span>DCSActiveDictionaries<span class="pl-pds">"</span></span>] = activeDictionaries;
+[userDefaults <span class="pl-c1">setPersistentDomain:</span>dictionaryPreferences <span class="pl-c1">forName:</span><span class="pl-s"><span class="pl-pds">@"</span>com.apple.DictionaryServices<span class="pl-pds">"</span></span>];</pre></div>
+
+<p>"But this is OS X, a platform whose manifest destiny cannot be contained by meager sandboxing attempts from Cupertino!", you cry. "Isn't there a more civilized approach? Like, say, private APIs?"</p>
+
+<p>Why yes, yes there are.</p>
+
+<h3><a id="user-content-private-apis" class="anchor" href="#private-apis" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Private APIs</h3>
+
+<p>Not publicly exposed, but still available through Core Services are a number of functions that cut closer to the dictionary services functionality that we crave:</p>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-k">extern</span> <span class="pl-c1">CFArrayRef</span> <span class="pl-en">DCSCopyAvailableDictionaries</span>();
+<span class="pl-k">extern</span> <span class="pl-c1">CFStringRef</span> <span class="pl-en">DCSDictionaryGetName</span>(DCSDictionaryRef dictionary);
+<span class="pl-k">extern</span> <span class="pl-c1">CFStringRef</span> <span class="pl-en">DCSDictionaryGetShortName</span>(DCSDictionaryRef dictionary);
+<span class="pl-k">extern</span> DCSDictionaryRef <span class="pl-en">DCSDictionaryCreate</span>(<span class="pl-c1">CFURLRef</span> url);
+<span class="pl-k">extern</span> <span class="pl-c1">CFStringRef</span> <span class="pl-en">DCSDictionaryGetName</span>(DCSDictionaryRef dictionary);
+<span class="pl-k">extern</span> <span class="pl-c1">CFArrayRef</span> <span class="pl-en">DCSCopyRecordsForSearchString</span>(DCSDictionaryRef dictionary, <span class="pl-c1">CFStringRef</span> string, <span class="pl-k">void</span> *, <span class="pl-k">void</span> *);
+
+<span class="pl-k">extern</span> <span class="pl-c1">CFDictionaryRef</span> <span class="pl-en">DCSCopyDefinitionMarkup</span>(DCSDictionaryRef dictionary, <span class="pl-c1">CFStringRef</span> record);
+<span class="pl-k">extern</span> <span class="pl-c1">CFStringRef</span> <span class="pl-en">DCSRecordCopyData</span>(<span class="pl-c1">CFTypeRef</span> record);
+<span class="pl-k">extern</span> <span class="pl-c1">CFStringRef</span> <span class="pl-en">DCSRecordCopyDataURL</span>(<span class="pl-c1">CFTypeRef</span> record);
+<span class="pl-k">extern</span> <span class="pl-c1">CFStringRef</span> <span class="pl-en">DCSRecordGetAnchor</span>(<span class="pl-c1">CFTypeRef</span> record);
+<span class="pl-k">extern</span> <span class="pl-c1">CFStringRef</span> <span class="pl-en">DCSRecordGetAssociatedObj</span>(<span class="pl-c1">CFTypeRef</span> record);
+<span class="pl-k">extern</span> <span class="pl-c1">CFStringRef</span> <span class="pl-en">DCSRecordGetHeadword</span>(<span class="pl-c1">CFTypeRef</span> record);
+<span class="pl-k">extern</span> <span class="pl-c1">CFStringRef</span> <span class="pl-en">DCSRecordGetRawHeadword</span>(<span class="pl-c1">CFTypeRef</span> record);
+<span class="pl-k">extern</span> <span class="pl-c1">CFStringRef</span> <span class="pl-en">DCSRecordGetString</span>(<span class="pl-c1">CFTypeRef</span> record);
+<span class="pl-k">extern</span> <span class="pl-c1">CFStringRef</span> <span class="pl-en">DCSRecordGetTitle</span>(<span class="pl-c1">CFTypeRef</span> record);
+<span class="pl-k">extern</span> DCSDictionaryRef <span class="pl-en">DCSRecordGetSubDictionary</span>(<span class="pl-c1">CFTypeRef</span> record);</pre></div>
+
+<p>Private as they are, these functions aren't about to start documenting themselves, so let's take a look at how they're used:</p>
+
+<h4><a id="user-content-getting-available-dictionaries" class="anchor" href="#getting-available-dictionaries" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Getting Available Dictionaries</h4>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSMapTable</span> *availableDictionariesKeyedByName =
+    [<span class="pl-c1">NSMapTable</span> <span class="pl-c1">mapTableWithKeyOptions:</span>NSPointerFunctionsCopyIn
+                          <span class="pl-c1">valueOptions:</span>NSPointerFunctionsObjectPointerPersonality];
+
+<span class="pl-k">for</span> (<span class="pl-c1">id</span> dictionary <span class="pl-en">in</span> (__bridge_transfer <span class="pl-c1">NSArray</span> *)DCSCopyAvailableDictionaries()) {
+    <span class="pl-c1">NSString</span> *name = (__bridge <span class="pl-c1">NSString</span> *)<span class="pl-c1">DCSDictionaryGetName</span>((__bridge DCSDictionaryRef)dictionary);
+    [availableDictionariesKeyedByName <span class="pl-c1">setObject:</span>dictionary <span class="pl-c1">forKey:</span>name];
+}</pre></div>
+
+<h4><a id="user-content-getting-definition-for-word" class="anchor" href="#getting-definition-for-word" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Getting Definition for Word</h4>
+
+<p>With instances of the elusive <code>DCSDictionaryRef</code> type available at our disposal, we can now see what all of the fuss is about with that first argument in <code>DCSCopyTextDefinition</code>:</p>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSString</span> *word = <span class="pl-s"><span class="pl-pds">@"</span>apple<span class="pl-pds">"</span></span>;
+
+<span class="pl-k">for</span> (<span class="pl-c1">NSString</span> *name in availableDictionariesKeyedByName) {
+    <span class="pl-c1">id</span> dictionary = [availableDictionariesKeyedByName <span class="pl-c1">objectForKey:</span>name];
+
+    <span class="pl-c1">CFRange</span> termRange = <span class="pl-c1">DCSGetTermRangeInString</span>((__bridge DCSDictionaryRef)dictionary, (__bridge <span class="pl-c1">CFStringRef</span>)word, <span class="pl-c1">0</span>);
+    <span class="pl-k">if</span> (termRange.<span class="pl-smi">location</span> == <span class="pl-c1">kCFNotFound</span>) {
+        <span class="pl-k">continue</span>;
+    }
+
+    <span class="pl-c1">NSString</span> *term = [word <span class="pl-c1">substringWithRange:</span><span class="pl-c1">NSMakeRange</span>(termRange.location, termRange.length)];
+
+    <span class="pl-c1">NSArray</span> *records = (__bridge_transfer <span class="pl-c1">NSArray</span> *)<span class="pl-c1">DCSCopyRecordsForSearchString</span>((__bridge DCSDictionaryRef)dictionary, (__bridge <span class="pl-c1">CFStringRef</span>)term, <span class="pl-c1">NULL</span>, <span class="pl-c1">NULL</span>);
+    <span class="pl-k">if</span> (records) {
+        <span class="pl-k">for</span> (<span class="pl-c1">id</span> record in records) {
+            <span class="pl-c1">NSString</span> *headword = (__bridge <span class="pl-c1">NSString</span> *)<span class="pl-c1">DCSRecordGetHeadword</span>((__bridge <span class="pl-c1">CFTypeRef</span>)record);
+            <span class="pl-k">if</span> (headword) {
+                <span class="pl-c1">NSString</span> *definition = (__bridge_transfer <span class="pl-c1">NSString</span>*)<span class="pl-c1">DCSCopyTextDefinition</span>((__bridge DCSDictionaryRef)dictionary, (__bridge <span class="pl-c1">CFStringRef</span>)headword, <span class="pl-c1">CFRangeMake</span>(<span class="pl-c1">0</span>, [headword <span class="pl-c1">length</span>]));
+                <span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span><span class="pl-c1">%@</span>: <span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, name, definition);
+
+                <span class="pl-c1">NSString</span> *HTML = (__bridge_transfer <span class="pl-c1">NSString</span>*)<span class="pl-c1">DCSRecordCopyData</span>((__bridge DCSDictionaryRef)dictionary, (__bridge <span class="pl-c1">CFStringRef</span>)headword, <span class="pl-c1">CFRangeMake</span>(<span class="pl-c1">0</span>, [headword <span class="pl-c1">length</span>]));
+                <span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span><span class="pl-c1">%@</span>: <span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, name, definition);
+            }
+        }
+    }
+}</pre></div>
+
+<p>Most surprising from this experimentation is the ability to access the raw HTML for entries, which  combined with a dictionary's bundled CSS, produces the result seen in Dictionary.app.</p>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/dictionary.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/dictionary.png" alt="Entry for &quot;apple&quot; in Dictionary.app" style="max-width:100%;"></a></p>
+
+<blockquote>
+<p>For any fellow linguistics nerds or markup curious folks out there, here's <a href="https://gist.github.com/mattt/9453538">the HTML of the entry for the word "apple"</a>.</p>
+</blockquote>
+
+<p>In the process of writing this article, I <em>accidentally</em> created <a href="https://github.com/mattt/DictionaryKit">an Objective-C wrapper</a> around this forbidden fruit (so forbidden by our favorite fruit company, so don't try submitting this to the App Store).</p>
+
+<hr>
+
+<h2><a id="user-content-ios" class="anchor" href="#ios" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>iOS</h2>
+
+<p>iOS development is a decidedly more by-the-books affair, so attempting to reverse-engineer the platform would be little more than an academic exercise. Fortunately, a good chunk of functionality is available (as of iOS 5) through the obscure UIKit class <code>UIReferenceLibraryViewController</code>.</p>
+
+<p><code>UIReferenceLibraryViewController</code> is similar to an <code>MFMessageComposeViewController</code>, in that provides a minimally-configurable view controller around system functionality, intended to be presented modally.</p>
+
+<p>Simply initialize with the desired term:</p>
+
+<div class="highlight highlight-source-objc"><pre>UIReferenceLibraryViewController *referenceLibraryViewController =
+    [[UIReferenceLibraryViewController <span class="pl-c1">alloc</span>] <span class="pl-c1">initWithTerm:</span><span class="pl-s"><span class="pl-pds">@"</span>apple<span class="pl-pds">"</span></span>];
+[viewController <span class="pl-c1">presentViewController:</span>referenceLibraryViewController
+                             <span class="pl-c1">animated:</span><span class="pl-c1">YES</span>
+                           <span class="pl-c1">completion:</span><span class="pl-c1">nil</span>];</pre></div>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/uireferencelibraryviewcontroller-1.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/uireferencelibraryviewcontroller-1.png" alt="Presenting a UIReferenceLibraryViewController" style="max-width:100%;"></a></p>
+
+<p>This is the same behavior that one might encounter by tapping the "Define" <code>UIMenuItem</code> on a highlighted word in a <code>UITextView</code>.</p>
+
+<blockquote>
+<p>Tapping on "Manage" brings up a view to download additional dictionaries.</p>
+</blockquote>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/uireferencelibraryviewcontroller-2.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/uireferencelibraryviewcontroller-2.png" alt="Presenting a UIReferenceLibraryViewController" style="max-width:100%;"></a></p>
+
+<p><code>UIReferenceLibraryViewController</code> also provides the class method <code>dictionaryHasDefinitionForTerm:</code>. A developer would do well to call this before presenting a dictionary view controller that will inevitably have nothing to display.</p>
+
+<div class="highlight highlight-source-objc"><pre>[UIReferenceLibraryViewController <span class="pl-c1">dictionaryHasDefinitionForTerm:</span><span class="pl-s"><span class="pl-pds">@"</span>apple<span class="pl-pds">"</span></span>];</pre></div>
+
+<blockquote>
+<p>In both cases, it appears that <code>UIReferenceLibraryViewController</code> will do its best to normalize the search term, so stripping whitespace or changing to lowercase should not be necessary.</p>
+</blockquote>
+
+<hr>
+
+<p>From Unix word lists to their evolved <code>.dictionary</code> bundles on OS X (and presumably iOS), words are as essential to application programming as mathematical constants and the "Sosumi" alert noise. Consider how the aforementioned APIs can be integrated into your own app, or used to create a kind of app you hadn't previously considered. There are a <a href="http://nshipster.com/nslocalizedstring/">wealth</a> <a href="http://nshipster.com/nslinguistictagger/">of</a> <a href="http://nshipster.com/search-kit/">linguistic</a> <a href="http://nshipster.com/uilocalizedindexedcollation/">technologies</a> baked into Apple's platforms, so take advantage of them.</p>
+</article></div>

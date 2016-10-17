@@ -1,0 +1,138 @@
+<div class="announce instapaper_body md" data-path="2013-06-24-uuid-udid-unique-identifier.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>NSUUID /<br>CFUUIDRef /<br>UIDevice -uniqueIdentifier /<br>-identifierForVendor</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div>Cocoa</div></td>
+
+  <td><div>Until recently, it was trivial to uniquely identify devices between application launches, and even across applications: a simple call to UIDevice -uniqueIdentifier, and you were all set.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>1.1</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>Let's say you're making privacy software that also prevents piracy. I mean, it's an obvious idea—<a href="http://www.fakeblock.com">someone's going to do it</a>. You're just trying to be <em>that</em> person.</p>
+
+<p>Until recently, it was trivial to uniquely identify devices between application launches, and even across applications: a simple call to <code>UIDevice -uniqueIdentifier</code>, and you were all set.</p>
+
+<p>However, <code>UIDevice -uniqueIdentifier</code> was deprecated in iOS 5 with the following notes:</p>
+
+<blockquote>
+<p>Use the <code>identifierForVendor</code> property of [<code>UIDevice</code>] or the <code>advertisingIdentifier</code> property of the <code>ASIdentifierManager</code> class instead, as appropriate, or use the <code>UUID</code> method of the <code>NSUUID</code> class to create a <code>UUID</code> and write it to the user defaults database.</p>
+</blockquote>
+
+<p><a href="https://developer.apple.com/news/?id=3212013a">As of May 1st</a>, Apple began enforcing this deprecation on all new app submissions, even for apps targeting earlier versions of iOS. Any use of <code>uniqueIdentifier</code> is grounds for immediate rejection of new binaries.</p>
+
+<p>Just as privacy and piracy have phonetic and conceptual similarities, device identifiers, whether UUID / GUID, UDID, or otherwise can be rather confusing:</p>
+
+<ul>
+<li><strong>UUID <em>(Universally Unique Identifier)</em></strong>: A sequence of 128 bits that can guarantee uniqueness across space and time, defined by <a href="http://www.ietf.org/rfc/rfc4122.txt">RFC 4122</a>.</li>
+<li><strong>GUID <em>(Globally Unique Identifier)</em></strong>: Microsoft's implementation of the UUID specification; often used interchangeably with UUID.</li>
+<li><strong>UDID <em>(Unique Device Identifier)</em></strong>: A sequence of 40 hexadecimal characters that uniquely identify an iOS device (the device's <a href="https://en.wikipedia.org/wiki/Social_Security_number">Social Security Number</a>, if you will). This value can be <a href="http://whatsmyudid.com">retrieved through iTunes</a>, or found using <code>UIDevice -uniqueIdentifier</code>. Derived from hardware details like <a href="http://en.wikipedia.org/wiki/MAC_address">MAC address</a>.</li>
+</ul>
+
+<p>Incidentally, all of the suggested replacements for <code>UIDevice -uniqueIdentifier</code> listed in its deprecation notes return UUID, whether created automatically with <code>UIDevice -identifierForVendor</code> &amp; <code>ASIdentifierManager -advertisingIdentifier</code> or manually with <code>NSUUID</code> (or <code>CFUUIDCreate</code>).</p>
+
+<h2><a id="user-content-vendor-identifier" class="anchor" href="#vendor-identifier" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Vendor Identifier</h2>
+
+<blockquote>
+<p>The value of this property is the same for apps that come from the same vendor running on the same device. A different value is returned for apps on the same device that come from different vendors, and for apps on different devices regardless of vendor.</p>
+
+<p>The value in this property remains the same while the app (or another app from the same vendor) is installed on the iOS device. The value changes when the user deletes all of that vendor’s apps from the device and subsequently reinstalls one or more of them. Therefore, if your app stores the value of this property anywhere, you should gracefully handle situations where the identifier changes.</p>
+</blockquote>
+
+<p>In many ways, this is what should have been used the whole time. App developers now have a way to identify devices uniquely—even across other apps by the same developer—without being entrusted with something as sensitive as the device's UDID.</p>
+
+<p>For most applications, doing a find-and-replace of <code>uniqueIdentifier</code> to <code>identifierForVendor</code> is enough.</p>
+
+<p>However, for advertising networks, which require a consistent identifier across applications from many developers, a different approach is required:</p>
+
+<h2><a id="user-content-advertising-identifier" class="anchor" href="#advertising-identifier" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Advertising Identifier</h2>
+
+<blockquote>
+<p>iOS 6 introduces the Advertising Identifier, a non-permanent, non-personal, device identifier, that advertising networks will use to give you more control over advertisers’ ability to use tracking methods. If you choose to limit ad tracking, advertising networks using the Advertising Identifier may no longer gather information to serve you targeted ads. In the future all advertising networks will be required to use the Advertising Identifier. However, until advertising networks transition to using the Advertising Identifier you may still receive targeted ads from other networks.</p>
+</blockquote>
+
+<p>As the sole component of the <a href="http://developer.apple.com/library/ios/#documentation/DeviceInformation/Reference/AdSupport_Framework/_index.html#//apple_ref/doc/uid/TP40012658">Ad Support framework</a>, <code>ASIdentifierManager</code>'s modus operandi is clear: provide a way for ad networks to track users between different applications in a way that doesn't compromise privacy.</p>
+
+<p>Users can opt out of ad targeting in a Settings screen added in iOS 6.1, found at <strong>Settings &gt; General &gt; About &gt; Advertising</strong>:</p>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/ad-support-limit-ad-tracking.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/ad-support-limit-ad-tracking.png" alt="Limit Ad Tracking" style="max-width:100%;"></a></p>
+
+<h2><a id="user-content-nsuuid--cfuuidref" class="anchor" href="#nsuuid--cfuuidref" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>NSUUID &amp; CFUUIDRef</h2>
+
+<p><code>NSUUID</code> was added to Foundation in iOS 6 as a way to easily create UUIDs. How easy?</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> UUID <span class="pl-k">=</span> NSUUID()<span class="pl-k">.</span>UUIDString</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSString</span> *UUID = [[<span class="pl-c1">NSUUID</span> <span class="pl-c1">UUID</span>] <span class="pl-c1">UUIDString</span>];</pre></div>
+
+<p>If your app targets iOS 5 or earlier, however, you have to settle for Core Foundation functions on <code>CFUUIDRef</code>:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> UUID <span class="pl-k">=</span> CFUUIDCreateString(<span class="pl-c1">nil</span>, CFUUIDCreate(<span class="pl-c1">nil</span>))</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">CFUUIDRef</span> uuid = CFUUIDCreate(<span class="pl-c1">NULL</span>);
+<span class="pl-c1">NSString</span> *UUID = CFUUIDCreateString(<span class="pl-c1">NULL</span>, uuid);</pre></div>
+
+<p>For apps building against a base SDK without the vendor or advertising identifier APIs, a similar effect can be achieved—as recommended in the deprecation notes—by using <a href="http://developer.apple.com/library/ios/#documentation/cocoa/reference/foundation/Classes/NSUserDefaults_Class/Reference/Reference.html"><code>NSUserDefaults</code></a>:</p>
+
+<div class="highlight highlight-source-swift"><pre>    <span class="pl-k">func</span> <span class="pl-en">application</span>(application: UIApplication<span class="pl-k">!</span>, <span class="pl-en">didFinishLaunchingWithOptions</span> <span class="pl-smi">launchOptions</span>: NSDictionary<span class="pl-k">!</span>) <span class="pl-k">-&gt;</span> <span class="pl-c1">Bool</span> {
+
+    <span class="pl-k">let</span> userDefaults <span class="pl-k">=</span> NSUserDefaults<span class="pl-k">.</span>standardUserDefaults()
+
+    <span class="pl-k">if</span> userDefaults<span class="pl-k">.</span><span class="pl-c1">objectForKey</span>(<span class="pl-s"><span class="pl-pds">"</span>ApplicationUniqueIdentifier<span class="pl-pds">"</span></span>) <span class="pl-k">==</span> <span class="pl-c1">nil</span> {
+        <span class="pl-k">let</span> UUID <span class="pl-k">=</span> NSUUID<span class="pl-k">.</span>UUID()<span class="pl-k">.</span>UUIDString
+        userDefaults<span class="pl-k">.</span>setObject(UUID, forKey: <span class="pl-s"><span class="pl-pds">"</span>ApplicationUniqueIdentifier<span class="pl-pds">"</span></span>)
+        userDefaults<span class="pl-k">.</span>synchronize()
+    }
+
+    <span class="pl-k">return</span> <span class="pl-c1">true</span>
+}</pre></div>
+
+<div class="highlight highlight-source-objc"><pre>- (<span class="pl-c1">BOOL</span>)application:(UIApplication *)application
+didFinishLaunchingWithOptions:(<span class="pl-c1">NSDictionary</span> *)launchOptions
+{
+    <span class="pl-c1">NSString</span> *UUID = [[<span class="pl-c1">NSUserDefaults</span> <span class="pl-c1">standardUserDefaults</span>] <span class="pl-c1">objectForKey:</span><span class="pl-c1">kApplicationUUIDKey</span>];
+    <span class="pl-k">if</span> (!UUID) {
+        <span class="pl-c1">CFUUIDRef</span> uuid = <span class="pl-c1">CFUUIDCreate</span>(<span class="pl-c1">NULL</span>);
+        UUID = (__bridge_transfer <span class="pl-c1">NSString</span> *)<span class="pl-c1">CFUUIDCreateString</span>(<span class="pl-c1">NULL</span>, uuid);
+        <span class="pl-c1">CFRelease</span>(uuid);
+
+        [[<span class="pl-c1">NSUserDefaults</span> <span class="pl-c1">standardUserDefaults</span>] <span class="pl-c1">setObject:</span>UUID <span class="pl-c1">forKey:</span><span class="pl-c1">kApplicationUUIDKey</span>];
+        [[<span class="pl-c1">NSUserDefaults</span> <span class="pl-c1">standardUserDefaults</span>] <span class="pl-c1">synchronize</span>];
+    }
+}</pre></div>
+
+<p>This way, a UUID will be generated once when the app is launched for the first time, and then stored in <code>NSUserDefaults</code> to be retrieved on each subsequent app launch. Unlike advertising or vendor identifiers, these identifiers would not be shared across other apps, but for most intents and purposes, this is works just fine.</p>
+
+<hr>
+
+<p>Of course, UUIDs have many other uses: primary identifiers for records in distributed systems, names for temporary files, or even a bulk color generator (chunk the hexadecimal representation into 5 groups of 6!). But on iOS, it's all about tracking, about finding what was lost in a sea of network traffic and possibilities. Knowing where you stand on uniqueness is the first step to understanding all of this.</p>
+</article></div>

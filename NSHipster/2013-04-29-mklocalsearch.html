@@ -1,0 +1,108 @@
+<div class="announce instapaper_body md" data-path="2013-04-29-mklocalsearch.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>MKLocalSearch</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div>Cocoa</div></td>
+
+  <td><div>In all of the hubbub of torch burning and pitchfork raising, you may have completely missed a slew of additions to MapKit in iOS 6.1.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+
+  <th>reviewed</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>2.0</div></td>
+
+  <td><div>November 12, 2015</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>Look, we get it: people are upset about Apple Maps.</p>
+
+<p>What should have been a crowning feature for iOS 6 became the subject of an official apology due to its embarrassing inaccuracies and the removal of public transportation information.</p>
+
+<p>In all of the hubbub of torch burning and pitchfork raising, you may have completely missed a slew of additions to MapKit in iOS 6.1. Namely: <code>MKLocalSearch</code>.</p>
+
+<hr>
+
+<p><code>MKLocalSearch</code> allows developers to find nearby points of interest within a geographic region.</p>
+
+<p>But before you go and rush into using <code>MKLocalSearch</code>, you'll have to know a few things about its friends. You see, <code>MKLocalSearch</code> has its functionality divided across <code>MKLocalSearchRequest</code> and <code>MKLocalSearchResponse</code>:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> request <span class="pl-k">=</span> MKLocalSearchRequest()
+request<span class="pl-k">.</span>naturalLanguageQuery <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>Restaurants<span class="pl-pds">"</span></span>
+request<span class="pl-k">.</span>region <span class="pl-k">=</span> mapView<span class="pl-k">.</span>region
+
+<span class="pl-k">let</span> search <span class="pl-k">=</span> MKLocalSearch(request: request)
+search<span class="pl-k">.</span>startWithCompletionHandler { (response, error) <span class="pl-k">in</span>
+    <span class="pl-k">guard</span> <span class="pl-k">let</span> response <span class="pl-k">=</span> response <span class="pl-k">else</span> {
+        <span class="pl-c1">print</span>(<span class="pl-s"><span class="pl-pds">"</span>Search error: <span class="pl-pse">\(</span><span class="pl-s1">error</span><span class="pl-pse">)</span><span class="pl-pds">"</span></span>)
+        <span class="pl-k">return</span>
+    }
+
+    <span class="pl-k">for</span> item <span class="pl-k">in</span> response<span class="pl-k">.</span>mapItems {
+        <span class="pl-c">// ...</span>
+    }
+}</pre></div>
+
+<div class="highlight highlight-source-objc"><pre>MKLocalSearchRequest *request = [[MKLocalSearchRequest <span class="pl-c1">alloc</span>] <span class="pl-c1">init</span>];
+request.naturalLanguageQuery = <span class="pl-s"><span class="pl-pds">@"</span>Restaurants<span class="pl-pds">"</span></span>;
+request.region = mapView.region;
+MKLocalSearch *search = [[MKLocalSearch <span class="pl-c1">alloc</span>] <span class="pl-c1">initWithRequest:</span>request];
+[search <span class="pl-c1">startWithCompletionHandler:</span>^(MKLocalSearchResponse *response, <span class="pl-c1">NSError</span> *error) {
+    <span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span>Map Items: <span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, response.<span class="pl-smi">mapItems</span>);
+}];</pre></div>
+
+<p><code>MKLocalSearchRequest</code> takes a <code>naturalLanguageQuery</code>, such as "Taxidermists", and an optional bounding geographic <code>region</code> to constrain results. In practice, the <code>region</code> is usually passed from an <code>MKMapView</code>.</p>
+
+<p><code>MKLocalSearchResponse</code> is returned in the eponymous block handler of <code>MKLocalSearch -startWithCompletionHandler:</code>, and returns an array of <code>MKMapItem</code> objects. Each <code>MKMapItem</code> contains information like <code>name</code>, <code>phoneNumber</code>, <code>url</code> and address information via the <code>placemark</code> property.</p>
+
+<p>If you keep a reference to your <code>MKLocalSearch</code> object, you can optionally <code>-cancel</code> the request, such as on <code>-viewWillDisappear:</code> or the like.</p>
+
+<h2><a id="user-content-wheres-the-beef" class="anchor" href="#wheres-the-beef" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Where's The Beef?</h2>
+
+<p><code>MKLocalSearch</code> is a relatively straight-forward API (albeit perhaps worse off for eschewing a simpler single-class interface)... so what's the big deal?</p>
+
+<p><strong>API limits.</strong> Or rather, the lack of them. Let me explain:</p>
+
+<p>Perhaps the most counter-intuitive things about MapKit in iOS 6 is that <em>it's still widely used</em>. Nevermind the "Apple Maps-gate" melodrama, MapKit, even with the introduction of impressive iOS mapping SDKs from <a href="https://developers.google.com/maps/documentation/ios/">Google</a> and <a href="http://mapbox.com/mobile/">MapBox</a>, <a href="http://appleinsider.com/articles/13/03/18/developers-prefer-apples-ios-maps-sdk-over-google-maps">developers are still using MapKit</a>.</p>
+
+<p>Part of this may be aesthetics, but a lot has to do with a certain level of home-field advantage, too. Because of MapKit's close ties to UIKit, it can be customized more easily and more extensively by third-party developers.</p>
+
+<p>This brings us back to API call limits. When developing with another mapping SDK or geospatial webservice, licensing terms are almost necessarily going to be more limited than what Apple makes available for free. Free is a tough price to beat, and it's all-the-more compelling because there is no worry of going over API limits for tile loading or API calls.</p>
+
+<h2><a id="user-content-where-do-we-go-from-here" class="anchor" href="#where-do-we-go-from-here" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Where Do We Go From Here?</h2>
+
+<p>With the introduction of <code>MKLocalSearch</code>, one can be hopeful of more first-party webservices being exposed in a similar fashion. Expanded geospatial search? Or perhaps first-party APIs to iTunes media streaming?</p>
+
+<p>One can dare to dream, after all...</p>
+
+<hr>
+
+<p><code>MKLocalSearch</code> provides a simple way to find local points of interest. Because of its no-hassle webservice integration and tight integration with MapKit, any location-based app would do well to take advantage of it.</p>
+</article></div>

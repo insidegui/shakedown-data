@@ -1,0 +1,181 @@
+<div class="announce instapaper_body md" data-path="2014-05-05-ibaction-iboutlet-iboutletcollection.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>IBAction / IBOutlet / IBOutletCollection</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div>Cocoa</div></td>
+
+  <td><div>In programming, what often begins as a necessary instruction eventually becomes a vestigial cue for humans. For developers just starting with Cocoa &amp; Cocoa Touch, the IBAction, IBOutlet, and IBOutletCollection macros are particularly bewildering examples of this phenomenon</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>t.b.c.</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>In programming, what often begins as a necessary instruction eventually becomes a vestigial cue for humans. In the case of Objective-C, <a href="http://nshipster.com/pragma/"><code>#pragma</code> directives</a>, <a href="http://nshipster.com/type-encodings/">method type encodings</a>, and all but the most essential <a href="http://nshipster.com/c-storage-classes/">storage classes</a> have been rendered essentially meaningless, as the compiler becomes increasingly sophisticated. Discarded and disregarded during the compilation phase, they nonetheless remain useful to the development process as a whole, insofar as what they can tell other developers about the code itself.</p>
+
+<p>For developers just starting with Cocoa &amp; Cocoa Touch, the <code>IBAction</code>, <code>IBOutlet</code>, and <code>IBOutletCollection</code> macros are particularly bewildering examples of this phenomenon. With their raison d'être obscured by decades of change, confusion by anyone without sufficient context is completely understandable.</p>
+
+<p>As we'll learn in this week's article, though having outgrown their technical necessity, they remain a vibrant tradition in the culture of Objective-C development.</p>
+
+<hr>
+
+<p>Unlike other <a href="http://nshipster.com/namespacing/">two-letter prefixes</a>, <code>IB</code> does not refer to a system framework, but rather Interface Builder.</p>
+
+<p><a href="http://en.wikipedia.org/wiki/Interface_Builder">Interface Builder</a> can trace its roots to the halcyon days of Objective-C, when it and Project Builder comprised the NeXTSTEP developer tools (circa 1988). Before it was subsumed into Xcode 4, Interface Builder remained remarkably unchanged from its 1.0 release. An iOS developer today would feel right at home on a NeXTSTEP workstation, control-dragging views into outlets.</p>
+
+<p>Back when they were separate applications, it was a challenge to keep the object graph represented in a <code>.nib</code> document in Interface Builder synchronized with its corresponding <code>.h</code> &amp; <code>.m</code> files in <a href="http://en.wikipedia.org/wiki/Project_Builder">Project Builder</a> (what would eventually become Xcode). <code>IBOutlet</code> and <code>IBAction</code> were used as keywords, to denote what parts of the code should be visible to Interface Builder.</p>
+
+<p><code>IBAction</code> and <code>IBOutlet</code> are, themselves, computationally meaningless, as their macro definitions (in <code>UINibDeclarations.h</code>) demonstrate:</p>
+
+<div class="highlight highlight-source-objc"><pre>#<span class="pl-k">define</span> <span class="pl-en">IBAction</span> <span class="pl-k">void</span>
+#<span class="pl-k">define</span> <span class="pl-en">IBOutlet</span></pre></div>
+
+<blockquote>
+<p>Well actually, there's more than meets the eye. Scrying the <a href="https://llvm.org/svn/llvm-project/cfe/trunk/test/SemaObjC/iboutlet.m">Clang source code</a>, we see that they're actually defined by <a href="http://nshipster.com/__attribute__/"><strong>attribute</strong></a>-backed attributes:</p>
+</blockquote>
+
+<div class="highlight highlight-source-objc"><pre>#<span class="pl-k">define</span> <span class="pl-en">IBOutlet</span> <span class="pl-en">__attribute__</span>((iboutlet))
+#<span class="pl-k">define</span> <span class="pl-en">IBAction</span> <span class="pl-en">__attribute__</span>((ibaction))</pre></div>
+
+<h2><a id="user-content-ibaction" class="anchor" href="#ibaction" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>IBAction</h2>
+
+<p>As early as 2004 (and perhaps earlier), <code>IBAction</code> was no longer necessary for a method to be noticed by Interface Builder. Any method with the signature <code>-(void){name}:(id)sender</code> would be visible in the outlets pane.</p>
+
+<p>Nevertheless, many developers find it useful to still use the <code>IBAction</code> return type in method declarations to denote that a particular method is connected to by an action. Even projects <em>not</em> using Storyboards / XIBs may choose to employ <code>IBAction</code> to call out <a href="https://developer.apple.com/library/ios/documentation/general/conceptual/Devpedia-CocoaApp/TargetAction.html">target / action</a> methods.</p>
+
+<h3><a id="user-content-naming-ibaction-methods" class="anchor" href="#naming-ibaction-methods" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Naming IBAction Methods</h3>
+
+<p>Thanks to strong, and often compiler-enforced conventions, naming is especially important in Objective-C, so the question of how to name IBAction methods is one not taken lightly. Though there is some disagreement, the preferred convention is as follows:</p>
+
+<ul>
+<li><strong>Return type of <code>IBAction</code>.</strong></li>
+<li><strong>Method name of an active verb, describing the specific action performed.</strong> Method names like <code>didTapButton:</code> or <code>didPerformAction:</code> sound more like things a <code>delegate</code> might be sent.</li>
+<li><strong>Required <code>sender</code> parameter of type <code>id</code>.</strong> All target / action methods will pass the <code>sender</code> of the action (usually the responder) to methods that take a parameter. If omitted in the method signature, things will still work.</li>
+<li><strong>Optional event parameter of type <code>UIEvent *</code>, named <code>withEvent:</code></strong> <em>(iOS only)</em>. In UIKit, a second <code>UIEvent *</code> parameter, corresponding to the touch, motion, or remote control event triggering the responder, will be passed to target / action methods accepting this second parameter. The convention is to use <code>withEvent:</code> in the method signature, to match the <code>UIResponder</code> APIs.</li>
+</ul>
+
+<p>For example:</p>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c">// YES</span>
+- (<span class="pl-k">IBAction</span>)refresh:(<span class="pl-c1">id</span>)sender;
+
+- (<span class="pl-k">IBAction</span>)toggleVisibility:(<span class="pl-c1">id</span>)sender
+                   withEvent:(UIEvent *)event;
+
+<span class="pl-c">// NO</span>
+- (<span class="pl-k">IBAction</span>)peformSomeAction;
+
+- (<span class="pl-k">IBAction</span>)didTapButton:(<span class="pl-c1">id</span>)sender;</pre></div>
+
+<h2><a id="user-content-iboutlet" class="anchor" href="#iboutlet" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>IBOutlet</h2>
+
+<p>Unlike <code>IBAction</code>, <code>IBOutlet</code> is still required for hooking up properties in code with objects in a Storyboard or XIB.</p>
+
+<p>An <code>IBOutlet</code> connection is usually established between a view or control and its managing view controller (this is often done in addition to any <code>IBAction</code>s that a view controller might be targeted to perform by a responder). However, an <code>IBOutlet</code> can also be used to expose a top-level property, like another controller or a property that could then be accessed by a referencing view controller.</p>
+
+<h3><a id="user-content-when-to-use-property-or-ivar" class="anchor" href="#when-to-use-property-or-ivar" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>When to use <code>@property</code> or ivar</h3>
+
+<p>As with anything in modern Objective-C, <strong>properties are preferred to direct ivar access</strong>. The same is true of <code>IBOutlet</code>s:</p>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c">// YES</span>
+<span class="pl-k">@interface</span> <span class="pl-en">GallantViewController</span> : <span class="pl-e">UIViewController</span>
+<span class="pl-k">@property</span> (<span class="pl-k">nonatomic</span>, <span class="pl-k">weak</span>) <span class="pl-k">IBOutlet</span> UISwitch *<span class="pl-k">switch</span>;
+<span class="pl-k">@end</span>
+
+<span class="pl-c">// NO</span>
+<span class="pl-k">@interface</span> <span class="pl-en">GoofusViewController</span> : <span class="pl-e">UIViewController</span> {
+    <span class="pl-k">IBOutlet</span> UISwitch *_switch
+}
+<span class="pl-k">@end</span></pre></div>
+
+<p>Since properties are the conventional way to expose and access members of a class, both externally and internally, they are preferred in this case as well, if only for consistency.</p>
+
+<h3><a id="user-content-when-to-use-weak-or-strong" class="anchor" href="#when-to-use-weak-or-strong" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>When to use <code>weak</code> or <code>strong</code></h3>
+
+<p>One unfortunate consequence (if you want to call it that) of ARC is the ambiguity of when a <code>IBOutlet</code> <code>@property</code> should be declared as <code>weak</code> or <code>strong</code>. The ambiguity arises from the fact that most outlets have no discernible behavioral differences between <code>weak</code> or <code>strong</code>—it just works.</p>
+
+<p>…except when it doesn't… and things crash, or the compiler warns about <code>weak</code> or <code>strong</code> use.</p>
+
+<p>So what should one do? <strong>Always declare <code>IBOutlet</code> properties as <code>weak</code>, except when they need to be <code>strong</code></strong>, as explained by Apple in their <a href="https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/LoadingResources/CocoaNibs/CocoaNibs.html">Resource Programming Guide section on Nib Files</a>:</p>
+
+<blockquote>
+<p>Outlets should be changed to <code>strong</code> when the outlet should be considered to own the referenced object:</p>
+
+<ul>
+<li>This is often the case with File’s Owner—top level objects in a nib file are frequently considered to be owned by the <code>File’s Owner</code>.</li>
+<li>You may in some situations need an object from a nib file to exist outside of its original container. For example, you might have an outlet for a view that can be temporarily removed from its initial view hierarchy and must therefore be maintained independently.</li>
+</ul>
+</blockquote>
+
+<p>The reason why most <code>IBOutlet</code> views can get away with <code>weak</code> ownership is that they are already owned within their respective view hierarchy, by their superview. This chain of ownership eventually works its way up to the <code>view</code> owned by the view controller itself. Spurious use of <code>strong</code> ownership on a view outlet has the potential to create a retain cycle.</p>
+
+<h2><a id="user-content-iboutletcollection" class="anchor" href="#iboutletcollection" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>IBOutletCollection</h2>
+
+<p><code>IBOutlet</code>'s obscure step-cousin-in-law-once-removed is <code>IBOutletCollection</code>. Introduced in iOS 4, this pseudo-keyword allows collections of <code>IBOutlet</code>s to be defined in Interface Builder, by dragging connections to its collection members.</p>
+
+<p><code>IBOutletCollection</code> is <code>#define</code>'d in <code>UINibDeclarations.h</code> as:</p>
+
+<div class="highlight highlight-source-objc"><pre>#<span class="pl-k">define</span> <span class="pl-en">IBOutletCollection</span>(<span class="pl-v">ClassName</span>)</pre></div>
+
+<p>…which is defined in a much more satisfying way, again, <a href="http://opensource.apple.com/source/clang/clang-318.0.45/src/tools/clang/test/SemaObjC/iboutletcollection-attr.m">in the Clang source code</a>:</p>
+
+<div class="highlight highlight-source-objc"><pre>#<span class="pl-k">define</span> <span class="pl-en">IBOutletCollection</span>(<span class="pl-v">ClassName</span>) __attribute__((iboutletcollection(ClassName)))</pre></div>
+
+<p>Unlike <code>IBAction</code> or <code>IBOutlet</code>, <code>IBOutletCollection</code> takes a class name as an argument, which is, incidentally, as close to Apple-sanctioned <a href="http://en.wikipedia.org/wiki/Generic_programming">generics</a> as one gets in Objective-C.</p>
+
+<p>As a top-level object, an <code>IBOutletCollection</code> <code>@property</code> should be declared <code>strong</code>, with an <code>NSArray *</code> type:</p>
+
+<div class="highlight highlight-source-objc"><pre>@property (nonatomic, strong) IBOutletCollection(UIButton) <span class="pl-c1">NSArray</span> *buttons;</pre></div>
+
+<p>There are two rather curious things to note about an <code>IBOutletCollection</code> array:</p>
+
+<ul>
+<li><strong>Its order is not necessarily guaranteed</strong>. The order of an outlet collection appears to be roughly the order in which their connections are established in Interface Builder. However, there are numerous reports of that order changing across versions of Xcode, or as a natural consequence of version control. Nonetheless, having code rely on a fixed order is strongly discouraged.</li>
+<li><strong>No matter what type is declared for the property, an <code>IBOutletCollection</code> is always an <code>NSArray</code></strong>. In fact, any type can be declared: <code>NSSet *</code>, <code>id &lt;NSFastEnumeration&gt;</code>—heck, even <code>UIColor *</code> (depending on your error flags)! No matter what you put, an <code>IBOutletCollection</code> will always be stored as an <code>NSArray</code>, so you might as well have that type match up in your declaration to avoid compiler warnings.</li>
+</ul>
+
+<p>With the advent of Objective-C <a href="http://nshipster.com/at-compiler-directives/">object literals</a>, <code>IBOutletCollection</code> has fallen slightly out of favor—at least for the common use case of convenience accessors, as in:</p>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-k">for</span> (UILabel *label in labels) {
+    label.<span class="pl-smi">font</span> = [UIFont <span class="pl-c1">systemFontOfSize:</span><span class="pl-c1">14</span>];
+}</pre></div>
+
+<p>Since declaring a collection of outlets is now as easy as comma-delimiting them within <code>@[]</code>, it may make just as much sense to do that as create a distinct collection.</p>
+
+<p>Where <code>IBOutletCollection</code> really shines is how it allows you to define a unique collection of outlets under a shared identifier. Another advantage over a code-defined <code>NSArray</code> literal is that a collection can contain outlets that themselves are not connected to <code>File's Owner</code>.</p>
+
+<p>The next time you're managing a significant or variable number of outlets in an iOS view, take a look at <code>IBOutletCollection</code>.</p>
+
+<hr>
+
+<p><code>IBAction</code>, <code>IBOutlet</code>, and <code>IBOutletCollection</code> play important roles in development, on both the compiler level and human level. As Objective-C continues to rapidly evolve as a platform, it is likely that they may someday be as completely vestigial as the wings of flightless birds or eyes of cavefish.</p>
+
+<p>For now, though, it's important to understand what they are, and how to use them, if you plan on creating apps in any capacity.</p>
+</article></div>

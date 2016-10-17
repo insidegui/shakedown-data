@@ -1,0 +1,257 @@
+<div class="announce instapaper_body md" data-path="2015-02-09-swift-1.2.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>category</th>
+
+  <th>author</th>
+
+  <th>tags</th>
+
+  <th>excerpt</th>
+
+  <th>hiddenlang</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>Swift 1.2</div></td>
+
+  <td><div>Swift</div></td>
+
+  <td><div>Nate Cook</div></td>
+
+  <td><div>swift</div></td>
+
+  <td><div>Swift, true to its name, is moving fast. With the beta release of Swift 1.2, the Swift team has responded to so many of the community's requests in one fell swoop, we're overflowing with new and exciting features. This week, take a look at two major aspects of the release that will significantly improve the experience of working in Swift: first, big changes in `if let` optional binding, and second, new access to nullability annotations in Objective-C.</div></td>
+
+  <td><div></div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>1.2</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>Swift, true to its name, is moving fast. This week marks the beta release of Swift 1.2, a <em>major</em> update to the language. The Swift team has responded to so many of the community's requests in one fell swoop, we're overflowing with new and exciting features. Every line-item in this announcement is a big advancement: incremental builds, improved error messages and stability in Xcode, static class properties, support for C unions and bitfields, bridging of Swift <code>enum</code>s to Objective-C, safer type casting, improvements to single-line closures, and more.</p>
+
+<p>In what follows, let's look at two major aspects of the release that will significantly improve the experience of working in Swift: first, big changes in <code>if let</code> optional binding (<em>"finally"</em>), and second, new access to nullability annotations in Objective-C.</p>
+
+<h2><a id="user-content-improved-optional-binding" class="anchor" href="#improved-optional-binding" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Improved Optional Binding</h2>
+
+<p>Swift 1.2 allows multiple simultaneous optional bindings, providing an escape from the trap of needing deeply nested <code>if let</code> statements to unwrap multiple values. Multiple optional bindings are separated by commas and can be paired with a <code>where</code> clause that acts like the expression in a traditional <code>if</code> statement. As such, the byzantine <a href="http://www.scottlogic.com/blog/2014/12/08/swift-optional-pyramids-of-doom.html">pyramid of doom</a> has been renovated into a mid-century modern ranch:</p>
+
+<p><strong>Old:</strong></p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> a <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>10<span class="pl-pds">"</span></span><span class="pl-k">.</span>toInt()
+<span class="pl-k">let</span> b <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>5<span class="pl-pds">"</span></span><span class="pl-k">.</span>toInt()
+<span class="pl-k">let</span> c <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>3<span class="pl-pds">"</span></span><span class="pl-k">.</span>toInt()
+
+<span class="pl-k">if</span> <span class="pl-k">let</span> a <span class="pl-k">=</span> a {
+    <span class="pl-k">if</span> <span class="pl-k">let</span> b <span class="pl-k">=</span> b {
+        <span class="pl-k">if</span> <span class="pl-k">let</span> c <span class="pl-k">=</span> c {
+            <span class="pl-k">if</span> c <span class="pl-k">!=</span> <span class="pl-c1">0</span> {
+                println(<span class="pl-s"><span class="pl-pds">"</span>(a + b) / c = <span class="pl-pse">\(</span><span class="pl-s1">(a + b) <span class="pl-k">/</span> c</span><span class="pl-pse">)</span><span class="pl-pds">"</span></span>)
+            }
+        }
+    }
+}</pre></div>
+
+<p><strong>New:</strong></p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">if</span> <span class="pl-k">let</span> a <span class="pl-k">=</span> a, b <span class="pl-k">=</span> b, c <span class="pl-k">=</span> c <span class="pl-k">where</span> c <span class="pl-k">!=</span> <span class="pl-c1">0</span> {
+    println(<span class="pl-s"><span class="pl-pds">"</span>(a + b) / c = <span class="pl-pse">\(</span><span class="pl-s1">(a + b) <span class="pl-k">/</span> c</span><span class="pl-pse">)</span><span class="pl-pds">"</span></span>)     <span class="pl-c">// (a + b) / c = 5</span>
+}</pre></div>
+
+<blockquote>
+<p>The order of execution in these two examples is identical. Using the new syntax, each binding is evaluated in turn, stopping if any of the attempted bindings is <code>nil</code>. Only after all the optional bindings are successful is the <code>where</code> clause checked.</p>
+
+<p>An <code>if</code> statement can actually have more than one <code>let</code> binding separated by commas. Since each <code>let</code> binding can bind multiple optionals <em>and</em> include a <code>where</code> clause, some truly sophisticated logic is possible with this construct. (Thanks to <a href="https://twitter.com/stephencelis">Stephen Celis</a> for helping clarify this point.)</p>
+</blockquote>
+
+<p>What's more, later binding expressions can reference earlier bindings. This means you can delve into <code>Dictionary</code> instances or cast an <code>AnyObject?</code> value to a specific type, then use it in another expression, all in a single <code>if let</code> statement.</p>
+
+<p>To revisit the canonical example, this is what parsing a <a href="http://jsonplaceholder.typicode.com/users">big block of JSON</a> can look like in Swift 1.2. The example uses one <code>if let</code> block to handle the optionals that come with using <code>NSBundle</code>, <code>NSURL</code> and <code>NSData</code>, then another to map several <code>AnyObject?</code> instances  from the interpreted JSON to specific types:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">var</span> users: [User] <span class="pl-k">=</span> []
+
+<span class="pl-c">// load and parse the JSON into an array</span>
+<span class="pl-k">if</span> <span class="pl-k">let</span>
+    path     <span class="pl-k">=</span> NSBundle<span class="pl-k">.</span>mainBundle()<span class="pl-k">.</span>pathForResource(<span class="pl-s"><span class="pl-pds">"</span>users<span class="pl-pds">"</span></span>, ofType: <span class="pl-s"><span class="pl-pds">"</span>json<span class="pl-pds">"</span></span>),
+    url      <span class="pl-k">=</span> NSURL(fileURLWithPath: path),
+    data     <span class="pl-k">=</span> NSData(contentsOfURL: url),
+    userList <span class="pl-k">=</span> NSJSONSerialization<span class="pl-k">.</span>JSONObjectWithData(data, options: <span class="pl-c1">nil</span>, error: <span class="pl-c1">nil</span>) <span class="pl-k">as?</span> [[<span class="pl-c1">String</span>: <span class="pl-c1">AnyObject</span>]] 
+{
+    <span class="pl-c">// extract individual users</span>
+    <span class="pl-k">for</span> userDict <span class="pl-k">in</span> userList {
+        <span class="pl-k">if</span> <span class="pl-k">let</span>
+            id      <span class="pl-k">=</span> userDict[<span class="pl-s"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span>] <span class="pl-k">as?</span> <span class="pl-c1">Int</span>,
+            name    <span class="pl-k">=</span> userDict[<span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>] <span class="pl-k">as?</span> <span class="pl-c1">String</span>,
+            email   <span class="pl-k">=</span> userDict[<span class="pl-s"><span class="pl-pds">"</span>email<span class="pl-pds">"</span></span>] <span class="pl-k">as?</span> <span class="pl-c1">String</span>,
+            address <span class="pl-k">=</span> userDict[<span class="pl-s"><span class="pl-pds">"</span>address<span class="pl-pds">"</span></span>] <span class="pl-k">as?</span> [<span class="pl-c1">String</span>: <span class="pl-c1">AnyObject</span>]
+        {
+            users<span class="pl-k">.</span>append(User(id: id, name: name, <span class="pl-k">...</span>))
+        }
+    }
+}</pre></div>
+
+<div class="highlight highlight-source-json"><pre>[
+  {
+    <span class="pl-s"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span>: <span class="pl-c1">1</span>,
+    <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Leanne Graham<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Bret<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>email<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Sincere@april.biz<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>address<span class="pl-pds">"</span></span>: {
+      <span class="pl-s"><span class="pl-pds">"</span>street<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Kulas Light<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>suite<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Apt. 556<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>city<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Gwenborough<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>zipcode<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>92998-3874<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>geo<span class="pl-pds">"</span></span>: {
+        <span class="pl-s"><span class="pl-pds">"</span>lat<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>-37.3159<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>lng<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>81.1496<span class="pl-pds">"</span></span>
+      }
+    },
+    <span class="pl-s"><span class="pl-pds">"</span>phone<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>1-770-736-8031 x56442<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>website<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>hildegard.org<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>company<span class="pl-pds">"</span></span>: {
+      <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Romaguera-Crona<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>catchPhrase<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Multi-layered client-server neural-net<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>bs<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>harness real-time e-markets<span class="pl-pds">"</span></span>
+    }
+  },
+  {
+    <span class="pl-s"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span>: <span class="pl-c1">2</span>,
+    <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Ervin Howell<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Antonette<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>email<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Shanna@melissa.tv<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>address<span class="pl-pds">"</span></span>: {
+      <span class="pl-s"><span class="pl-pds">"</span>street<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Victor Plains<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>suite<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Suite 879<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>city<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Wisokyburgh<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>zipcode<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>90566-7771<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>geo<span class="pl-pds">"</span></span>: {
+        <span class="pl-s"><span class="pl-pds">"</span>lat<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>-43.9509<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>lng<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>-34.4618<span class="pl-pds">"</span></span>
+      }
+    },
+    <span class="pl-s"><span class="pl-pds">"</span>phone<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>010-692-6593 x09125<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>website<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>anastasia.net<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>company<span class="pl-pds">"</span></span>: {
+      <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Deckow-Crist<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>catchPhrase<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Proactive didactic contingency<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>bs<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>synergize scalable supply-chains<span class="pl-pds">"</span></span>
+    }
+  },
+  <span class="pl-ii">...</span>
+]</pre></div>
+
+<p>I see many commas in our future.</p>
+
+<h2><a id="user-content-nullability-annotations" class="anchor" href="#nullability-annotations" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Nullability Annotations</h2>
+
+<p>When Swift was first released, every call to a Cocoa API method took and returned implicitly unwrapped optionals (i.e., <code>AnyObject!</code>). Because they crash a program on access, implicitly unwrapped return values are inherently unsafe if there isn't clear documentation of whether or not a method will return a null value. All those exclamation marks were a sign of bad form. Sure, Swift bridged to the Cocoa APIs, but it always looked grumpy about it.</p>
+
+<p>As the beta releases rolled on through the summer and fall, internal audits gradually removed the offending punctuation, replacing implicitly unwrapped optionals with either true optionals or non-optional, never-gonna-be-<code>nil</code> values. This vastly improved the experience of working with Cocoa, but there was no mechanism to mark up third-party code in the same way, leaving part of the problem in place.</p>
+
+<p>But no longer—Swift 1.2 ships alongside a new version of Clang. New property attributes and pointer annotations allow you to indicate whether a pointer, be it an Objective-C property, method parameter, or return value, can or won't ever be <code>nil</code>.</p>
+
+<blockquote>
+<ul>
+<li><code>nonnull</code>: Indicates that the pointer should/will never be <code>nil</code>. Pointers annotated with <code>nonnull</code> are imported into Swift as their non-optional base value (i.e., <code>NSData</code>).</li>
+<li><code>nullable</code>: Indicates that the pointer can be <code>nil</code> in general practice. Imported into Swift as an optional value (<code>NSURL?</code>).</li>
+<li><code>null_unspecified</code>: Continues the current functionality of importing into Swift as an implicitly unwrapped optional, ideally to be used during this annotation process only.</li>
+<li><code>null_resettable</code>: Indicates that while a property will always have a value, it can be reset by assigning <code>nil</code>. Properties with a non-<code>nil</code> default value can be annotated this way, like <code>tintColor</code>. Imported into Swift as a (relatively safe) implicitly unwrapped optional. Document accordingly!</li>
+</ul>
+</blockquote>
+
+<p>The first three annotations can also be used with C pointers and block pointers, using the doubly-underscored <code>__nonnull</code>, <code>__nullable</code>, and <code>__null_unspecified</code>. The last annotation, <code>null_resettable</code>, is only valid as an Objective-C property attribute.</p>
+
+<h3><a id="user-content-nullability-in-action" class="anchor" href="#nullability-in-action" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Nullability in Action</h3>
+
+<p>As an example to show the benefit of these annotations, let's take a look at a data controller used to handle a list of locations, each with a possible attached photo:</p>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-k">@interface</span> <span class="pl-en">LocationDataController</span> : <span class="pl-e">NSObject</span>
+
+<span class="pl-k">@property</span> (<span class="pl-k">nonatomic</span>, <span class="pl-k">readonly</span>) <span class="pl-c1">NSArray</span> *locations;
+<span class="pl-k">@property</span> (<span class="pl-k">nonatomic</span>, <span class="pl-k">readonly</span>) Location *latestLocation;
+
+- (<span class="pl-k">void</span>)<span class="pl-en">addPhoto</span><span class="pl-en">:</span>(Photo *)<span class="pl-smi">photo</span> <span class="pl-en">forLocation</span><span class="pl-en">:</span>(Location *)<span class="pl-smi">location</span>;
+- (Photo *)<span class="pl-en">photoForLocation</span><span class="pl-en">:</span>(Location *)<span class="pl-smi">location</span>;
+<span class="pl-k">@end</span></pre></div>
+
+<p>Without any nullability annotations, each pointer in my <code>LocationDataController</code> class is imported to Swift as an implicitly unwrapped optional:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">class</span> LocationDataController <span class="pl-k">:</span> NSObject {
+    <span class="pl-k">var</span> locations: [<span class="pl-c1">AnyObject</span>]<span class="pl-k">!</span> { <span class="pl-k">get</span> }
+    <span class="pl-k">var</span> latestLocation: Location<span class="pl-k">!</span> { <span class="pl-k">get</span> }
+
+    <span class="pl-k">func</span> <span class="pl-en">addPhoto</span>(photo: Photo<span class="pl-k">!</span>, <span class="pl-en">forLocation</span> <span class="pl-smi">location</span>: Location<span class="pl-k">!</span>)
+    <span class="pl-k">func</span> <span class="pl-en">photoForLocation</span>(location: Location<span class="pl-k">!</span>) <span class="pl-k">-&gt;</span> Photo!
+}</pre></div>
+
+<p>Enough! With! The shouting! Here's how I can now annotate the Objective-C interface:</p>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-k">@interface</span> <span class="pl-en">LocationDataController</span> : <span class="pl-e">NSObject</span>
+
+<span class="pl-k">@property</span> (<span class="pl-k">nonnull</span>, <span class="pl-k">nonatomic</span>, <span class="pl-k">readonly</span>) <span class="pl-c1">NSArray</span> *locations;
+<span class="pl-k">@property</span> (<span class="pl-k">nullable</span>, <span class="pl-k">nonatomic</span>, <span class="pl-k">readonly</span>) Location *latestLocation;
+
+- (<span class="pl-k">void</span>)<span class="pl-en">addPhoto</span><span class="pl-en">:</span>(nonnull Photo *)<span class="pl-smi">photo</span> <span class="pl-en">forLocation</span><span class="pl-en">:</span>(nonnull Location *)<span class="pl-smi">location</span>;
+- (nullable Photo *)<span class="pl-en">photoForLocation</span><span class="pl-en">:</span>(nonnull Location *)<span class="pl-smi">location</span>;
+<span class="pl-k">@end</span></pre></div>
+
+<p>First, the properties—my <code>locations</code> list is <code>nonnull</code>, since at worst it will be an empty array, but <code>latestLocation</code> <em>can</em> be <code>nil</code> if there are no locations in the list yet. Likewise, the parameters to my two methods should always have a value, yet because not all locations have a photo, that second method returns a <code>nullable</code> photo. Back in Swift, the results are much better—that is, clearer about how to safely use the data controller and no more grumpy <code>!</code>s:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">class</span> LocationDataController <span class="pl-k">:</span> NSObject {
+    <span class="pl-k">var</span> locations: [<span class="pl-c1">AnyObject</span>] { <span class="pl-k">get</span> }
+    <span class="pl-k">var</span> latestLocation: Location? { <span class="pl-k">get</span> }
+
+    <span class="pl-k">func</span> <span class="pl-en">addPhoto</span>(photo: Photo, <span class="pl-en">forLocation</span> <span class="pl-smi">location</span>: Location)
+    <span class="pl-k">func</span> <span class="pl-en">photoForLocation</span>(location: Location) <span class="pl-k">-&gt;</span> Photo?
+}</pre></div>
+
+<h3><a id="user-content-ns_assume_nonnull_beginend" class="anchor" href="#ns_assume_nonnull_beginend" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>NS_ASSUME_NONNULL_BEGIN/END</h3>
+
+<p>Annotating <em>any</em> pointer in an Objective-C header file causes the compiler to expect annotations for the entire file, bringing on a cascade of warnings. Given that most annotations will be <code>nonnull</code>, a new macro can help streamline the process of annotating existing classes. Simply mark the beginning and end of a section of your header with <code>NS_ASSUME_NONNULL_BEGIN</code> and <code>..._END</code>, then mark the exceptions.</p>
+
+<p>Another revision of our data controller interface from above results in a more readable version with the exact same Swift profile:</p>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-k">@interface</span> <span class="pl-en">LocationDataController</span> : <span class="pl-e">NSObject</span>
+NS_ASSUME_NONNULL_BEGIN
+
+<span class="pl-k">@property</span> (<span class="pl-k">nonatomic</span>, <span class="pl-k">readonly</span>) <span class="pl-c1">NSArray</span> *locations;
+<span class="pl-k">@property</span> (<span class="pl-k">nullable</span>, <span class="pl-k">nonatomic</span>, <span class="pl-k">readonly</span>) Location *latestLocation;
+
+- (<span class="pl-k">void</span>)<span class="pl-en">addPhoto</span><span class="pl-en">:</span>(Photo *)<span class="pl-smi">photo</span> <span class="pl-en">forLocation</span><span class="pl-en">:</span>(Location *)<span class="pl-smi">location</span>;
+- (nullable Photo *)<span class="pl-en">photoForLocation</span><span class="pl-en">:</span>(Location *)<span class="pl-smi">location</span>;
+
+NS_ASSUME_NONNULL_END
+<span class="pl-k">@end</span></pre></div>
+
+<h3><a id="user-content-not-just-for-swift" class="anchor" href="#not-just-for-swift" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Not Just for Swift</h3>
+
+<p>The new Objective-C nullability annotations have huge benefits for code on the Swift side of the fence, but there's a substantial gain here even without writing a line of Swift. Pointers marked as <code>nonnull</code> will now give a hint during autocomplete and yield a warning if sent <code>nil</code> instead of a proper pointer:</p>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c">// Can I remove a photo by sending nil?</span>
+[dataController <span class="pl-c1">addPhoto:</span><span class="pl-c1">nil</span> <span class="pl-c1">forLocation:</span>currentLocation];
+<span class="pl-c">// Nope -- Warning: Null passed to a callee that requires a non-null argument</span></pre></div>
+
+<hr>
+
+<p>Excitingly, all that is just half the story. In addition to the changes in Swift syntax and compiler savoir faire, the standard library has also seen a <a href="http://swiftdoc.org/news/2015/02/swift1.2/">major revision</a>, including a proper <code>Set</code> class (so long, <a href="https://github.com/natecook1000/SwiftSets/blob/master/Set.swift">dear friend</a>). <em>Okaaay,</em> so none of our code works anymore, and Stack Overflow has 21,000 out-of-date Swift questions? It's still fun to be along for the ride.</p>
+
+
+</article></div>

@@ -1,0 +1,416 @@
+<div class="announce instapaper_body md" data-path="2014-06-09-ios8.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>iOS 8</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div></div></td>
+
+  <td><div>Ask anyone, and they'll tell you: WWDC 2014 was the one of the most exciting in recent memory. This week, we'll take a look beneath the headline features, and share some of the more obscure APIs that everyone should know about.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+
+  <th>reviewed</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>2.0</div></td>
+
+  <td><div>Sep 12, 2015</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>Ask anyone, and they'll tell you: WWDC 2014 was one of the most exciting in recent memory. It was, first and foremost, a developer event, with nary a hardware announcement to upstage the latest software &amp; developer tools.</p>
+
+<p>And boy howdy, was there a lot to be excited about.</p>
+
+<p>The announcements from iOS 8 &amp; OS X Yosemite alone would have made 2014 a bellwether year for the Apple platform, with Extensions, Continuity, SpriteKit enhancements, SceneKit for iOS, Metal, Game HealthKit, HomeKit, Local Authentication, and a brand new Photos framework. Not to mention the dramatic improvements to Xcode &amp; Interface Builder, a revamped iTunes Connect, TestFlight, Crash Reports, and CloudKit. And oh yeah—Swift.</p>
+
+<p>The kicker? Apple has graciously relaxed its NDA for new technologies, meaning that we don't have to wait to talk about all of the shiny new toys we have to play with.</p>
+
+<p>This week, we'll take a look beneath the headline features, and share some of the more obscure APIs that everyone should know about.</p>
+
+<blockquote>
+<p>From here on out, NSHipster will primarily write code samples in Swift, with the occasional Objective-C throwback where appropriate. By the end of the summer, we hope to have all of the existing code samples ported to Swift, with the option to toggle between languages.</p>
+</blockquote>
+
+<hr>
+
+<h2><a id="user-content-nsprocessinfo--isoperatingsystematleastversion" class="anchor" href="#nsprocessinfo--isoperatingsystematleastversion" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>NSProcessInfo -isOperatingSystemAtLeastVersion</h2>
+
+<p>Forget <code>[[UIDevice currentDevice] systemVersion]</code> and <code>NSFoundationVersionNumber</code>, there's a new way to determine the current operating system in code: <code>NSProcessInfo -isOperatingSystemAtLeastVersion</code></p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">import</span> <span class="pl-c1">Foundation</span>
+
+<span class="pl-k">let</span> yosemite <span class="pl-k">=</span> NSOperatingSystemVersion(majorVersion: <span class="pl-c1">10</span>, minorVersion: <span class="pl-c1">10</span>, patchVersion: <span class="pl-c1">0</span>)
+NSProcessInfo()<span class="pl-k">.</span>isOperatingSystemAtLeastVersion(yosemite) <span class="pl-c">// false</span></pre></div>
+
+<p>Keep in mind, however, that a test for capability, such as with <code>SomeClass.class</code> or <code>respondsToSelector:</code>, is preferable to checking the OS version. Compiler macros in C or Swift can be used to conditionally compile source based on the build configuration of the target.</p>
+
+<h2><a id="user-content-new-nsformatter-subclasses" class="anchor" href="#new-nsformatter-subclasses" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>New NSFormatter Subclasses</h2>
+
+<p>One of the features most sorely lacking in Foundation was the ability to work with units for quantities like mass or length. In iOS 8 and OS X Yosemite, three new classes were introduced that fills the gap: <code>NSEnergyFormatter</code>, <code>NSMassFormatter</code>, &amp; <code>NSLengthFormatter</code>.</p>
+
+<blockquote>
+<p>This effectively doubles the number of <a href="http://nshipster.com/nsformatter/"><code>NSFormatter</code></a> subclasses in Foundation, which was previously limited to <code>NSNumberFormatter</code>, <code>NSDateFormatter</code>, &amp; <code>NSByteCountFormatter</code>.</p>
+</blockquote>
+
+<p>Although these new formatter classes are part of Foundation, they were added primarily for use in HealthKit.</p>
+
+<h3><a id="user-content-nsenergyformatter" class="anchor" href="#nsenergyformatter" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>NSEnergyFormatter</h3>
+
+<p><code>NSEnergyFormatter</code> formats energy in Joules, the raw unit of work for exercises, and Calories, which is used when working with nutrition information.</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> energyFormatter <span class="pl-k">=</span> NSEnergyFormatter()
+energyFormatter<span class="pl-k">.</span>forFoodEnergyUse <span class="pl-k">=</span> <span class="pl-c1">true</span>
+
+<span class="pl-k">let</span> joules <span class="pl-k">=</span> <span class="pl-c1">10_000</span><span class="pl-k">.</span><span class="pl-c1">0</span>
+<span class="pl-c1">print</span>(energyFormatter<span class="pl-k">.</span>stringFromJoules(joules)) <span class="pl-c">// "2.39 Cal"</span></pre></div>
+
+<h3><a id="user-content-nsmassformatter" class="anchor" href="#nsmassformatter" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>NSMassFormatter</h3>
+
+<p>Although the fundamental unit of physical existence, mass is pretty much relegated to tracking the weight of users in HealthKit. Yes, mass and weight are different, but this is programming, not science class, so stop being pedantic.</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> massFormatter <span class="pl-k">=</span> NSMassFormatter()
+<span class="pl-k">let</span> kilograms <span class="pl-k">=</span> <span class="pl-c1">60</span><span class="pl-k">.</span><span class="pl-c1">0</span>
+<span class="pl-c1">print</span>(massFormatter<span class="pl-k">.</span>stringFromKilograms(kilograms)) <span class="pl-c">// "132 lb"</span></pre></div>
+
+<h3><a id="user-content-nslengthformatter" class="anchor" href="#nslengthformatter" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>NSLengthFormatter</h3>
+
+<p>Rounding out the new <code>NSFormatter</code> subclasses is <code>NSLengthFormatter</code>. Think of it as a more useful version of <code>MKDistanceFormatter</code>, with more unit options and formatting options.</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> lengthFormatter <span class="pl-k">=</span> NSLengthFormatter()
+<span class="pl-k">let</span> meters <span class="pl-k">=</span> <span class="pl-c1">5_000</span><span class="pl-k">.</span><span class="pl-c1">0</span>
+<span class="pl-c1">print</span>(lengthFormatter<span class="pl-k">.</span>stringFromMeters(meters)) <span class="pl-c">// "3.107 mi"</span></pre></div>
+
+<h2><a id="user-content-cmpedometer" class="anchor" href="#cmpedometer" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>CMPedometer</h2>
+
+<p>Continuing on iOS 8's health kick, <code>CMStepCounter</code> is revamped in the latest release. <code>CMPedometer</code> is a strict improvement over its predecessor, with the ability to query from discrete points in time, track both steps and distance, and even calculate how many flights of stairs were climbed.</p>
+
+<p>It's amazing what that M7 chip is capable of.</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">import</span> <span class="pl-c1">CoreMotion</span>
+
+<span class="pl-k">let</span> lengthFormatter <span class="pl-k">=</span> NSLengthFormatter()
+<span class="pl-k">let</span> pedometer <span class="pl-k">=</span> CMPedometer()
+pedometer<span class="pl-k">.</span>startPedometerUpdatesFromDate(NSDate()) { data, error <span class="pl-k">in</span>
+    <span class="pl-k">if</span> <span class="pl-k">let</span> data <span class="pl-k">=</span> data {
+        <span class="pl-c1">print</span>(<span class="pl-s"><span class="pl-pds">"</span>Steps Taken: <span class="pl-pse">\(</span><span class="pl-s1">data<span class="pl-k">.</span>numberOfSteps</span><span class="pl-pse">)</span><span class="pl-pds">"</span></span>)
+
+        <span class="pl-k">if</span> <span class="pl-k">let</span> <span class="pl-c1">distance</span> <span class="pl-k">=</span> data<span class="pl-k">.</span><span class="pl-c1">distance</span>?<span class="pl-k">.</span>doubleValue {
+            <span class="pl-c1">print</span>(<span class="pl-s"><span class="pl-pds">"</span>Distance: <span class="pl-pse">\(</span><span class="pl-s1">lengthFormatter<span class="pl-k">.</span>stringFromMeters(distance)</span><span class="pl-pse">)</span><span class="pl-pds">"</span></span>)
+
+            <span class="pl-k">let</span> time <span class="pl-k">=</span> data<span class="pl-k">.</span>endDate<span class="pl-k">.</span>timeIntervalSinceDate(data<span class="pl-k">.</span>startDate)
+            <span class="pl-k">let</span> speed <span class="pl-k">=</span> <span class="pl-c1">distance</span> <span class="pl-k">/</span> time
+            <span class="pl-c1">print</span>(<span class="pl-s"><span class="pl-pds">"</span>Speed: <span class="pl-pse">\(</span><span class="pl-s1">lengthFormatter<span class="pl-k">.</span>stringFromMeters(speed)</span><span class="pl-pse">)</span> / s<span class="pl-pds">"</span></span>)
+        }
+    }
+}</pre></div>
+
+<h2><a id="user-content-cmaltimeter" class="anchor" href="#cmaltimeter" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>CMAltimeter</h2>
+
+<p>On supported devices, a <code>CMPedometer</code>'s stats on <code>floorsAscended</code> / <code>floorsDescended</code> can be augmented with <code>CMAltimeter</code> to get a more granular look at vertical distance traveled:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">import</span> <span class="pl-c1">CoreMotion</span>
+
+<span class="pl-k">let</span> altimeter <span class="pl-k">=</span> CMAltimeter()
+<span class="pl-k">if</span> CMAltimeter<span class="pl-k">.</span>isRelativeAltitudeAvailable() {
+    altimeter<span class="pl-k">.</span>startRelativeAltitudeUpdatesToQueue(NSOperationQueue<span class="pl-k">.</span>mainQueue()) { data, error <span class="pl-k">in</span>
+        <span class="pl-k">if</span> <span class="pl-k">let</span> data <span class="pl-k">=</span> data {
+            <span class="pl-c1">print</span>(<span class="pl-s"><span class="pl-pds">"</span>Relative Altitude: <span class="pl-pse">\(</span><span class="pl-s1">data<span class="pl-k">.</span>relativeAltitude</span><span class="pl-pse">)</span><span class="pl-pds">"</span></span>)
+        }
+    }
+}</pre></div>
+
+<h2><a id="user-content-clfloor" class="anchor" href="#clfloor" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>CLFloor</h2>
+
+<p><code>CLFloor</code> is a new API in iOS 8 that ties the new features in CoreMotion with Apple's ambitious plan to map the interiors of the largest buildings in the world. Look for this information to play a significant role in future hyperlocal mapping applications.</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">import</span> <span class="pl-c1">CoreLocation</span>
+
+<span class="pl-k">class</span> LocationManagerDelegate: NSObject, CLLocationManagerDelegate {
+    <span class="pl-k">func</span> <span class="pl-en">locationManager</span>(manager: CLLocationManager, <span class="pl-en">didUpdateLocations</span> <span class="pl-smi">locations</span>: [CLLocation]) {
+        <span class="pl-k">if</span> <span class="pl-k">let</span> floor <span class="pl-k">=</span> locations<span class="pl-k">.</span><span class="pl-c1">first</span>?<span class="pl-k">.</span>floor {
+            <span class="pl-c1">print</span>(<span class="pl-s"><span class="pl-pds">"</span>Current Floor: <span class="pl-pse">\(</span><span class="pl-s1">floor<span class="pl-k">.</span>level</span><span class="pl-pse">)</span><span class="pl-pds">"</span></span>)
+        }
+    }
+}
+
+<span class="pl-k">let</span> manager <span class="pl-k">=</span> CLLocationManager()
+manager<span class="pl-k">.</span>delegate <span class="pl-k">=</span> LocationManagerDelegate()
+manager<span class="pl-k">.</span>startUpdatingLocation()</pre></div>
+
+<h2><a id="user-content-hkstatistics" class="anchor" href="#hkstatistics" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>HKStatistics</h2>
+
+<p>As a framework, HealthKit covers a lot of ground, with dozens of new classes and constants. A good place to start, in terms of understanding what's possible is <code>HKStatistics</code>.</p>
+
+<p>HealthKit manages your biometrics from all of your devices in a single unified API. Statistics on things like heart rate, caloric intake, and aerobic output can be tracked and aggregated in powerful ways.</p>
+
+<p>The following example shows how statistics summed over the duration of the day can be grouped and interpreted individually:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">import</span> <span class="pl-c1">HealthKit</span>
+
+<span class="pl-k">let</span> collection: HKStatisticsCollection? <span class="pl-k">=</span> <span class="pl-k">...</span>
+<span class="pl-k">let</span> statistics: HKStatistics? <span class="pl-k">=</span> collection?<span class="pl-k">.</span>statisticsForDate(NSDate())
+<span class="pl-k">let</span> sources: [HKSource] <span class="pl-k">=</span> statistics?<span class="pl-k">.</span>sources <span class="pl-k">??</span> []
+
+<span class="pl-k">for</span> source <span class="pl-k">in</span> sources {
+    <span class="pl-k">if</span> <span class="pl-k">let</span> quantity <span class="pl-k">=</span> statistics?<span class="pl-k">.</span>sumQuantityForSource(source) {
+        <span class="pl-k">if</span> quantity<span class="pl-k">.</span>isCompatibleWithUnit(HKUnit<span class="pl-k">.</span>gramUnitWithMetricPrefix(<span class="pl-k">.</span>Kilo)) {
+            <span class="pl-k">let</span> massFormatter <span class="pl-k">=</span> NSMassFormatter()
+            <span class="pl-k">let</span> kilograms <span class="pl-k">=</span> quantity<span class="pl-k">.</span>doubleValueForUnit(HKUnit<span class="pl-k">.</span>gramUnitWithMetricPrefix(<span class="pl-k">.</span>Kilo))
+            <span class="pl-c1">print</span>(massFormatter<span class="pl-k">.</span>stringFromKilograms(kilograms))
+        }
+
+        <span class="pl-k">if</span> quantity<span class="pl-k">.</span>isCompatibleWithUnit(HKUnit<span class="pl-k">.</span>meterUnit()) {
+            <span class="pl-k">let</span> lengthFormatter <span class="pl-k">=</span> NSLengthFormatter()
+            <span class="pl-k">let</span> meters <span class="pl-k">=</span> quantity<span class="pl-k">.</span>doubleValueForUnit(HKUnit<span class="pl-k">.</span>meterUnit())
+            <span class="pl-c1">print</span>(lengthFormatter<span class="pl-k">.</span>stringFromMeters(meters))
+        }
+
+        <span class="pl-k">if</span> quantity<span class="pl-k">.</span>isCompatibleWithUnit(HKUnit<span class="pl-k">.</span>jouleUnit()) {
+            <span class="pl-k">let</span> energyFormatter <span class="pl-k">=</span> NSEnergyFormatter()
+            <span class="pl-k">let</span> joules <span class="pl-k">=</span> quantity<span class="pl-k">.</span>doubleValueForUnit(HKUnit<span class="pl-k">.</span>jouleUnit())
+            <span class="pl-c1">print</span>(energyFormatter<span class="pl-k">.</span>stringFromJoules(joules))
+        }
+    }
+}</pre></div>
+
+<p>NSHipster will be covering a lot more about HealthKit in future editions, so stay tuned!</p>
+
+<h2><a id="user-content-nsstream-getstreamstohostwithname" class="anchor" href="#nsstream-getstreamstohostwithname" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>NSStream +getStreamsToHostWithName</h2>
+
+<p>In many ways, WWDC 2014 was the year that Apple <em>fixed their shit</em>. Small things, like adding the missing <code>NSStream</code> initializer for creating a bound stream pair (without resorting to awkwardly-bridged <code>CFStreamCreatePairWithSocketToHost</code> call). Behold: <code>+[NSStream getStreamsToHostWithName:port:inputStream:outputStream:]</code></p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">var</span> inputStream: NSInputStream?
+<span class="pl-k">var</span> outputStream: NSOutputStream?
+
+NSStream<span class="pl-k">.</span>getStreamsToHostWithName(<span class="pl-s"><span class="pl-pds">"</span>nshipster.com<span class="pl-pds">"</span></span>,
+                            port: <span class="pl-c1">5432</span>,
+                     inputStream: <span class="pl-k">&amp;</span>inputStream,
+                    outputStream: <span class="pl-k">&amp;</span>outputStream)</pre></div>
+
+<h2><a id="user-content-nsstring--localizedcaseinsensitivecontainsstring" class="anchor" href="#nsstring--localizedcaseinsensitivecontainsstring" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>NSString -localizedCaseInsensitiveContainsString</h2>
+
+<p>Also filed under: "small but solid fixes", is this convenience method for <code>String</code>/<code>NSString</code>:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> string <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>Café<span class="pl-pds">"</span></span>
+<span class="pl-k">let</span> substring <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>É<span class="pl-pds">"</span></span>
+
+string<span class="pl-k">.</span>localizedCaseInsensitiveContainsString(substring) <span class="pl-c">// true</span></pre></div>
+
+<h2><a id="user-content-ctrubyannotationref" class="anchor" href="#ctrubyannotationref" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>CTRubyAnnotationRef</h2>
+
+<p>If you're a linguistics and typography nerd, this new addition to the CoreText framework may have you standing up on your chair and cheering. "What's with Jim? Is it me, or has he been acting kind of weird since his trip to San Francisco?", they'll say, looking at you atop your desk as you tear your clothes off your body in a frenzy of pure ecstasy. "Yeah, remind me not to stay in the Tenderloin for next year's conference."</p>
+
+<p>...oh right. Ruby. No, not <a href="https://www.ruby-lang.org/en/">Ruby</a>. <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/ruby">Ruby</a>. It's used to display the pronunciation of characters in certain Asian scripts.</p>
+
+<div class="highlight highlight-source-objc"><pre>@import CoreText;
+
+<span class="pl-c1">NSString</span> *kanji = <span class="pl-s"><span class="pl-pds">@"</span>猫<span class="pl-pds">"</span></span>;
+<span class="pl-c1">NSString</span> *hiragana = <span class="pl-s"><span class="pl-pds">@"</span>ねこ<span class="pl-pds">"</span></span>;
+
+<span class="pl-c1">CFStringRef</span> furigana[<span class="pl-c1">kCTRubyPositionCount</span>] =
+    {(__bridge <span class="pl-c1">CFStringRef</span>)hiragana, <span class="pl-c1">NULL</span>, <span class="pl-c1">NULL</span>, <span class="pl-c1">NULL</span>};
+
+CTRubyAnnotationRef ruby =
+    <span class="pl-en">CTRubyAnnotationCreate</span>(<span class="pl-c1">kCTRubyAlignmentAuto</span>, <span class="pl-c1">kCTRubyOverhangAuto</span>, <span class="pl-c1">0.5</span>, furigana);</pre></div>
+
+<p>Admittedly, the documentation isn't entirely clear on how exactly to incorporate this into the rest of your <code>CoreText</code> drawing calls, but the result would look something like this:</p>
+
+<ruby>猫<rt>ねこ</rt></ruby>
+
+<h2><a id="user-content-new-calendar-identifiers" class="anchor" href="#new-calendar-identifiers" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>New Calendar Identifiers</h2>
+
+<p>What's even nerdier than Ruby annotations? The new calendar identifiers added to iOS 8 &amp; OS X Yosemite. This update brings Foundation up to the latest version of the <a href="http://cldr.unicode.org/core-spec">CLDR</a>:</p>
+
+<p>(Sadly, the <a href="https://speakerdeck.com/mattt/software-design-and-eclecticism">French Republican Calendar</a> is still but a twinkle in the eyes of NSHipsters everywhere)</p>
+
+<ul>
+<li><code>NSCalendarIdentifierCoptic</code>: a.k.a Alexandrian calendar, is used by the Coptic Orthodox Church.</li>
+<li><code>NSCalendarIdentifierEthiopicAmeteMihret</code>: Ethiopic calendar, Amete Mihret (epoch approx. 8 C.E.)</li>
+<li><code>NSCalendarIdentifierEthiopicAmeteAlem</code>: Ethiopic calendar, Amete Alem (epoch approx. 5493 B.C.E.)</li>
+<li><code>NSCalendarIdentifierIslamicTabular</code>: A simple tabular Islamic calendar using the astronomical/Thursday epoch of CE 622 July 15.</li>
+<li><code>NSCalendarIdentifierIslamicUmmAlQura</code>: The Islamic Umm al-Qura calendar used in Saudi Arabia. This is based on astronomical calculation, instead of tabular behavior.</li>
+</ul>
+
+<h2><a id="user-content-nsurlcredentialstorage" class="anchor" href="#nsurlcredentialstorage" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>NSURLCredentialStorage</h2>
+
+<p>The Foundation URL Loading System has remained relatively unchanged since last year's <code>NSURLSession</code> blowout. However, <code>NSURLCredentialStorage</code> has been given some TLC, with new functions that get and set credentials for tasks in asynchronous, non-blocking fashion.</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">import</span> <span class="pl-c1">Foundation</span>
+
+<span class="pl-k">let</span> session <span class="pl-k">=</span> NSURLSession()
+<span class="pl-k">let</span> task <span class="pl-k">=</span> session<span class="pl-k">.</span>dataTaskWithURL(NSURL(string: <span class="pl-s"><span class="pl-pds">"</span>http://nshipster.com<span class="pl-pds">"</span></span>)<span class="pl-k">!</span>) { data, response, error <span class="pl-k">in</span>
+    <span class="pl-c">// ...</span>
+}
+
+<span class="pl-k">let</span> protectionSpace <span class="pl-k">=</span> NSURLProtectionSpace()
+<span class="pl-k">let</span> credentialStorage <span class="pl-k">=</span> NSURLCredentialStorage()
+credentialStorage<span class="pl-k">.</span>getCredentialsForProtectionSpace(protectionSpace, task: task) { credentials <span class="pl-k">in</span>
+    <span class="pl-c">// ...</span>
+}</pre></div>
+
+<h2><a id="user-content-kuttypetodoitem" class="anchor" href="#kuttypetodoitem" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>kUTTypeToDoItem</h2>
+
+<p>Looking through the latest API diffs, one might notice the large number of new <a href="http://en.wikipedia.org/wiki/Uniform_Type_Identifier">UTIs</a> constants. One that caught my eye was <code>kUTTypeToDoItem</code>:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">import</span> <span class="pl-c1">MobileCoreServices</span>
+
+kUTTypeToDoItem <span class="pl-c">// "public.to-do-item"</span></pre></div>
+
+<p>As a public type, iOS &amp; OS X now provide a unified way to share tasks between applications. If you happen to work on a task management tool (and, let's be honest, the chances are extremely good, considering how damn many of them there are in the App Store), proper integration with this system type should be put at the top of your list.</p>
+
+<h2><a id="user-content-kcgimagemetadatashouldexcludegps" class="anchor" href="#kcgimagemetadatashouldexcludegps" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>kCGImageMetadataShouldExcludeGPS</h2>
+
+<p>Most users are completely unaware that most pictures taken with phones these days include GPS metadata. Countless individuals have had their privacy breached because of this small detail.</p>
+
+<p>New to the Image I/O framework is a convenient new option for <code>CGImageDestination</code>: <code>kCGImageMetadataShouldExcludeGPS</code>, which does what you'd expect.</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">import</span> <span class="pl-c1">UIKit</span>
+<span class="pl-k">import</span> <span class="pl-c1">ImageIO</span>
+<span class="pl-k">import</span> <span class="pl-c1">MobileCoreServices</span>
+
+<span class="pl-k">let</span> image <span class="pl-k">=</span> <span class="pl-k">...</span>
+<span class="pl-k">let</span> fileURL <span class="pl-k">=</span> NSURL(fileURLWithPath: <span class="pl-s"><span class="pl-pds">"</span>/path/to/output.jpg<span class="pl-pds">"</span></span>)
+<span class="pl-k">let</span> options: NSDictionary <span class="pl-k">=</span> [kCGImageDestinationLossyCompressionQuality <span class="pl-k">as</span> NSString: <span class="pl-c1">0</span><span class="pl-k">.</span><span class="pl-c1">75</span>,
+                            kCGImageMetadataShouldExcludeGPS <span class="pl-k">as</span> NSString: <span class="pl-c1">true</span>]
+
+<span class="pl-k">if</span> <span class="pl-k">let</span> imageDestination <span class="pl-k">=</span> CGImageDestinationCreateWithURL(fileURL, kUTTypeJPEG, <span class="pl-c1">1</span>, <span class="pl-c1">nil</span>),
+    <span class="pl-k">let</span> cgImage <span class="pl-k">=</span> image<span class="pl-k">.</span>CGImage
+{
+    CGImageDestinationAddImage(imageDestination, cgImage, options)
+    CGImageDestinationFinalize(imageDestination)
+}</pre></div>
+
+<div class="highlight highlight-source-objc"><pre>@import UIKit;
+@import ImageIO;
+@import MobileCoreServices;
+
+UIImage *image = ...;
+<span class="pl-c1">NSURL</span> *fileURL = [<span class="pl-c1">NSURL</span> <span class="pl-c1">fileURLWithPath:</span><span class="pl-s"><span class="pl-pds">@"</span>/path/to/output.jpg<span class="pl-pds">"</span></span>];
+<span class="pl-c1">NSString</span> *UTI = <span class="pl-c1">kUTTypeJPEG</span>;
+<span class="pl-c1">NSDictionary</span> *options = @{
+                          (__bridge <span class="pl-c1">id</span>)<span class="pl-c1">kCGImageDestinationLossyCompressionQuality</span>: @(<span class="pl-c1">0.75</span>),
+                          (__bridge <span class="pl-c1">id</span>)<span class="pl-c1">kCGImageMetadataShouldExcludeGPS</span>: @(<span class="pl-c1">YES</span>),
+                          };
+
+CGImageDestinationRef imageDestinationRef =
+<span class="pl-en">CGImageDestinationCreateWithURL</span>((__bridge <span class="pl-c1">CFURLRef</span>)fileURL,
+                                (__bridge <span class="pl-c1">CFStringRef</span>)UTI,
+                                1,
+                                NULL);
+
+<span class="pl-en">CGImageDestinationAddImage</span>(imageDestinationRef, [image <span class="pl-c1">CGImage</span>], (__bridge <span class="pl-c1">CFDictionaryRef</span>)options);
+<span class="pl-en">CGImageDestinationFinalize</span>(imageDestinationRef);
+<span class="pl-en">CFRelease</span>(imageDestinationRef);</pre></div>
+
+<h2><a id="user-content-wtf_platform_ios" class="anchor" href="#wtf_platform_ios" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>WTF_PLATFORM_IOS</h2>
+
+<p><code>#define WTF_PLATFORM_IOS</code> has been removed from JavaScriptCore. It will be missed.</p>
+
+<h2><a id="user-content-wkwebview" class="anchor" href="#wkwebview" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>WKWebView</h2>
+
+<p><code>UIWebView</code> is dead. Long live <code>WKWebView</code>.</p>
+
+<p><code>WKWebView</code> offers Safari-level performance to your own app, and further improves on <code>UIWebView</code> with preferences and configurations:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">import</span> <span class="pl-c1">WebKit</span>
+
+<span class="pl-k">let</span> preferences <span class="pl-k">=</span> WKPreferences()
+preferences<span class="pl-k">.</span>javaScriptCanOpenWindowsAutomatically <span class="pl-k">=</span> <span class="pl-c1">false</span>
+
+<span class="pl-k">let</span> configuration <span class="pl-k">=</span> WKWebViewConfiguration()
+configuration<span class="pl-k">.</span>preferences <span class="pl-k">=</span> preferences
+
+<span class="pl-k">let</span> webView <span class="pl-k">=</span> WKWebView(frame: <span class="pl-k">self</span><span class="pl-k">.</span>view<span class="pl-k">.</span>bounds, configuration: configuration)
+<span class="pl-k">let</span> request <span class="pl-k">=</span> NSURLRequest(URL: NSURL(string: <span class="pl-s"><span class="pl-pds">"</span>http://nshipster.com<span class="pl-pds">"</span></span>)<span class="pl-k">!</span>)
+webView<span class="pl-k">.</span>loadRequest(request)</pre></div>
+
+<h2><a id="user-content-nsqualityofservice" class="anchor" href="#nsqualityofservice" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>NSQualityOfService</h2>
+
+<p>Threads have been systematically de-emphasized from the conceptual foundation of Apple frameworks. This has been a good thing for developers.</p>
+
+<p>Following this trend is a change to <code>NSOperation</code> in the latest APIs. A new <code>qualityOfService</code> property replaces the <code>threadPriority</code>. These new semantics allow an app to defer non-critical work to ensure a consistently great user experience.</p>
+
+<p>The <code>NSQualityOfService</code> enum defines the following values:</p>
+
+<ul>
+<li><code>UserInteractive</code>: UserInteractive QoS is used when performing work that is related to graphically intensive work such as scrolling or animating.</li>
+<li><code>UserInitiated</code>: UserInitiated QoS is used for performing work that has been explicitly requested by the user, but does not require millisecond accuracy like animations. For example, if a user requests an email app to check for mail right now.</li>
+<li><code>Utility</code>: Utility QoS is used for performing work that has been requested by the user to happen automatically. For example, an email app may be configured to automatically check for mail every 5 minutes. It is not a problem if the email check is deferred by a few minutes if the system is extremely limited in resources.</li>
+<li><code>Background</code>: Background QoS is used for performing work that the user may not even be aware is happening on their behalf. For example, an email app may use this to perform indexing for a search.</li>
+</ul>
+
+<p>Quality of Service is used throughout Foundation in iOS 8 &amp; OS X Yosemite, so be on the lookout for opportunities to capitalize on this new feature.</p>
+
+<h2><a id="user-content-localauthentication" class="anchor" href="#localauthentication" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>LocalAuthentication</h2>
+
+<p>Finally, one of the most anticipated features of iOS 8: LocalAuthentication. Ever since TouchID was introduced with the iPhone 5s, developers have been salivating at the prospect of using that in their own app.</p>
+
+<p>Imagine: with CloudKit and LocalAuthentication, nearly all of the friction to creating a user account is gone. Just scan your fingerprint, and you're in.</p>
+
+<p>LocalAuthentication works in terms of an <code>LAContext</code> class, which evaluates a specified policy, and gives a thumbs up or thumbs down on user authentication. At no point is any biometric information made available to the application—everything is kept safe on the hardware itself.</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> context <span class="pl-k">=</span> LAContext()
+<span class="pl-k">var</span> error: NSError?
+
+<span class="pl-k">if</span> context<span class="pl-k">.</span>canEvaluatePolicy(<span class="pl-k">.</span>DeviceOwnerAuthenticationWithBiometrics, error: <span class="pl-k">&amp;</span>error) {
+    context<span class="pl-k">.</span>evaluatePolicy(<span class="pl-k">.</span>DeviceOwnerAuthenticationWithBiometrics, localizedReason: <span class="pl-s"><span class="pl-pds">"</span>...<span class="pl-pds">"</span></span>) { success, error <span class="pl-k">in</span>
+        <span class="pl-k">if</span> success {
+            <span class="pl-c">// ...</span>
+        } <span class="pl-k">else</span> {
+            <span class="pl-c1">print</span>(<span class="pl-s"><span class="pl-pds">"</span>Error: <span class="pl-pse">\(</span><span class="pl-s1">error</span><span class="pl-pse">)</span><span class="pl-pds">"</span></span>)
+        }
+    }
+} <span class="pl-k">else</span> {
+    <span class="pl-c1">print</span>(<span class="pl-s"><span class="pl-pds">"</span>Error: <span class="pl-pse">\(</span><span class="pl-s1">error</span><span class="pl-pse">)</span><span class="pl-pds">"</span></span>)
+}</pre></div>
+
+<div class="highlight highlight-source-objc"><pre>LAContext *context = [[LAContext <span class="pl-c1">alloc</span>] <span class="pl-c1">init</span>];
+<span class="pl-c1">NSError</span> *error = <span class="pl-c1">nil</span>;
+
+<span class="pl-k">if</span> ([context <span class="pl-c1">canEvaluatePolicy:</span>LAPolicyDeviceOwnerAuthenticationWithBiometrics
+                         <span class="pl-c1">error:</span>&amp;error])
+{
+    [context <span class="pl-c1">evaluatePolicy:</span>LAPolicyDeviceOwnerAuthenticationWithBiometrics
+            <span class="pl-c1">localizedReason:</span>NSLocalizedString(<span class="pl-s"><span class="pl-pds">@"</span>...<span class="pl-pds">"</span></span>, <span class="pl-c1">nil</span>)
+                      <span class="pl-c1">reply:</span>^(<span class="pl-c1">BOOL</span> success, <span class="pl-c1">NSError</span> *error) {
+        <span class="pl-k">if</span> (success) {
+            <span class="pl-c">// ...</span>
+        } <span class="pl-k">else</span> {
+            <span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span><span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, error);
+        }
+    }];
+} <span class="pl-k">else</span> {
+    <span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span><span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, error);
+}</pre></div>
+
+<hr>
+
+<p>Although it seems like all that anyone can talk about these days is Swift, it'd be a shame if we ignored all of the neat things iOS 8 &amp; OS X Yosemite allow us to actually <em>do</em> with this new language.</p>
+
+<p>If you're feeling adventurous, <a href="https://developer.apple.com/library/prerelease/ios/releasenotes/General/iOS80APIDiffs/index.html#//apple_ref/doc/uid/TP40014455">dive into the iOS 7.1 to 8.0 API diffs</a> to really appreciate the magnitude of new technologies to discover. <em>Granted, of the 4000+ new APIs, at least half of those are slight changes to Accelerate functions, or methods becoming properties, but still...</em> Have at it!</p>
+</article></div>

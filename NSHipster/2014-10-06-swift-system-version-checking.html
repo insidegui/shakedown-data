@@ -1,0 +1,178 @@
+<div class="announce instapaper_body md" data-path="2014-10-06-swift-system-version-checking.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>tags</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>Swift System Version Checking</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div>Swift</div></td>
+
+  <td><div>swift</div></td>
+
+  <td><div>C uses preprocessor directives capable of unspeakable evil. Swift has a safe subset of preprocessor directives. So how do we check system version for API compatibility?</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>1.0</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>While it's not accurate to say that Swift is "Objective-C without the C", it's for lack of resemblance to Objective-C, not the absence of C. Swift is <em>vehemently</em> <strong><em>not</em></strong> C.</p>
+
+<p>Swift certainly draws inspiration from Haskell, Rust, Python, D, and other modern languages, but one can perhaps best understand the language as a rejection of everything that's broken in C:</p>
+
+<ul>
+<li>C is <strong>unsafe</strong> by default. Swift is <strong>safe</strong> by default <em>(hence the <code>unsafe</code> naming of pointer manipulation functions)</em>.</li>
+<li>C has <strong>undefined behavior</strong>. Swift has <strong>well-defined behavior</strong> <em>(or at least theoretically; the compiler tools still have some catching up to do)</em>.</li>
+<li>C uses <strong>preprocessor directives capable of unspeakable evil</strong>. Swift has a <strong>safe subset of preprocessor directives</strong>.</li>
+</ul>
+
+<blockquote>
+<p>One could go as far to say that Swift's type system was specifically designed out of <em>spite</em> for C++.</p>
+</blockquote>
+
+<p>In Objective-C, checking for the availability of an API was accomplished through a combination of C preprocessor directives, conditionals on <code>class</code>, <code>respondsToSelector:</code>, and <code>instancesRespondToSelector:</code>:</p>
+
+<div class="highlight highlight-source-objc"><pre>#<span class="pl-k">if</span> defined(__IPHONE_OS_VERSION_MAX_ALLOWED) &amp;&amp; __IPHONE_OS_VERSION_MAX_ALLOWED &gt;= 70000
+<span class="pl-k">if</span> ([<span class="pl-c1">NSURLSession</span> <span class="pl-c1">class</span>] &amp;&amp;
+    [<span class="pl-c1">NSURLSessionConfiguration</span> <span class="pl-c1">respondsToSelector:</span><span class="pl-k">@selector</span>(<span class="pl-c1">backgroundSessionConfigurationWithIdentifier:</span>)]) {
+    <span class="pl-c">// ...</span>
+}
+#<span class="pl-k">endif</span></pre></div>
+
+<p>However, as noted previously, Swift's compiler directives are <a href="https://developer.apple.com/library/ios/documentation/Swift/Conceptual/BuildingCocoaApps/InteractingWithCAPIs.html#//apple_ref/doc/uid/TP40014216-CH8-XID_20">extremely constrained</a>, allowing only for compiler flags and conditional compilation against specific operating systems and architectures:</p>
+
+<div class="highlight highlight-source-swift"><pre>#<span class="pl-k">if</span> DEBUG
+     println(<span class="pl-s"><span class="pl-pds">"</span>OTHER_SWIFT_FLAGS = -D DEBUG<span class="pl-pds">"</span></span>)
+#endif</pre></div>
+
+<table><thead>
+<tr>
+<th>Function</th>
+<th>Valid Arguments</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><code>os()</code></td>
+<td><code>OSX</code>, <code>iOS</code></td>
+</tr>
+<tr>
+<td><code>arch()</code></td>
+<td><code>x86_64</code>, <code>arm</code>, <code>arm64</code>, <code>i386</code></td>
+</tr>
+</tbody></table>
+
+<div class="highlight highlight-source-swift"><pre>#<span class="pl-k">if</span> os(iOS)
+    <span class="pl-k">var</span> image: UIImage?
+#elseif os(OSX)
+    <span class="pl-k">var</span> image: NSImage?
+#endif</pre></div>
+
+<p>Unfortunately, <code>os()</code> does not offer any insight into the specific version of OS X or iOS, which means that checks must be made at runtime. And with Swift's less-forgiving <a href="http://nshipster.com/nil/">treatment of <code>nil</code></a>, checking for constants Objective-C-style results in a crash.</p>
+
+<p>So how do you check the system version in Swift to determine API availability? Read on to find out.</p>
+
+<hr>
+
+<h2><a id="user-content-nsprocessinfo" class="anchor" href="#nsprocessinfo" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>NSProcessInfo</h2>
+
+<p>Anticipating the need for a Swift-friendly API for determining API version at runtime, iOS 8 introduces the <code>operatingSystemVersion</code> property and <code>isOperatingSystemAtLeastVersion</code> method on <code>NSProcessInfo</code>. Both APIs use a new <code>NSOperatingSystemVersion</code> value type, which contains the <code>majorVersion</code>, <code>minorVersion</code>, and <code>patchVersion</code>.</p>
+
+<blockquote>
+<p>Apple software releases follow <a href="http://semver.org">semantic versioning</a> conventions.</p>
+</blockquote>
+
+<h3><a id="user-content-isoperatingsystematleastversion" class="anchor" href="#isoperatingsystematleastversion" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>isOperatingSystemAtLeastVersion</h3>
+
+<p>For a simple check, like "is this app running on iOS 9?", <code>isOperatingSystemAtLeastVersion</code> is the most straightforward approach.</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">if</span> NSProcessInfo()<span class="pl-k">.</span>isOperatingSystemAtLeastVersion(NSOperatingSystemVersion(majorVersion: <span class="pl-c1">9</span>, minorVersion: <span class="pl-c1">0</span>, patchVersion: <span class="pl-c1">0</span>)) {
+    println(<span class="pl-s"><span class="pl-pds">"</span>iOS &gt;= 9.0.0<span class="pl-pds">"</span></span>)
+}</pre></div>
+
+<h3><a id="user-content-operatingsystemversion" class="anchor" href="#operatingsystemversion" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>operatingSystemVersion</h3>
+
+<p>For more involved version comparison, the <code>operatingSystemVersion</code> can be inspected directly. Combine this with Swift pattern matching and <code>switch</code> statements for syntactic concision:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> os <span class="pl-k">=</span> NSProcessInfo()<span class="pl-k">.</span>operatingSystemVersion
+<span class="pl-k">switch</span> (os<span class="pl-k">.</span>majorVersion, os<span class="pl-k">.</span>minorVersion, os<span class="pl-k">.</span>patchVersion) {
+<span class="pl-k">case</span> (<span class="pl-c1">8</span>, <span class="pl-c1">0</span>, _):
+    println(<span class="pl-s"><span class="pl-pds">"</span>iOS &gt;= 8.0.0, &lt; 8.1.0<span class="pl-pds">"</span></span>)
+<span class="pl-k">case</span> (<span class="pl-c1">8</span>, _, _):
+    println(<span class="pl-s"><span class="pl-pds">"</span>iOS &gt;= 8.1.0, &lt; 9.0<span class="pl-pds">"</span></span>)
+<span class="pl-k">case</span> (<span class="pl-c1">9</span>, _, _):
+    println(<span class="pl-s"><span class="pl-pds">"</span>iOS &gt;= 9.0.0<span class="pl-pds">"</span></span>)
+<span class="pl-k">default</span>:
+    <span class="pl-c">// this code will have already crashed on iOS 7, so &gt;= iOS 10.0</span>
+    println(<span class="pl-s"><span class="pl-pds">"</span>iOS &gt;= 10.0.0<span class="pl-pds">"</span></span>)
+}</pre></div>
+
+<h2><a id="user-content-uidevice-systemversion" class="anchor" href="#uidevice-systemversion" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>UIDevice systemVersion</h2>
+
+<p>Ironically, the new <code>NSProcessInfo</code> APIs aren't especially useful at the time of writing, since they're unavailable for iOS 7.</p>
+
+<p>As an alternative, one can use the <code>systemVersion</code> property <code>UIDevice</code>:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">switch</span> UIDevice<span class="pl-k">.</span>currentDevice()<span class="pl-k">.</span>systemVersion<span class="pl-k">.</span>compare(<span class="pl-s"><span class="pl-pds">"</span>8.0.0<span class="pl-pds">"</span></span>, options: NSStringCompareOptions<span class="pl-k">.</span>NumericSearch) {
+<span class="pl-k">case</span> <span class="pl-k">.</span>OrderedSame, <span class="pl-k">.</span>OrderedDescending:
+    println(<span class="pl-s"><span class="pl-pds">"</span>iOS &gt;= 8.0<span class="pl-pds">"</span></span>)
+<span class="pl-k">case</span> <span class="pl-k">.</span>OrderedAscending:
+    println(<span class="pl-s"><span class="pl-pds">"</span>iOS &lt; 8.0<span class="pl-pds">"</span></span>)
+}</pre></div>
+
+<blockquote>
+<p>Use <code>NSStringCompareOptions.NumericSearch</code> when comparing version number strings to ensure that, for example, <code>"2.5" &lt; "2.10"</code>.</p>
+</blockquote>
+
+<p>String comparison and <code>NSComparisonResult</code> aren't as sexy as a dedicated value type like <code>NSOperatingSystemVersion</code>, but it gets the job done all the same.</p>
+
+<h2><a id="user-content-nsappkitversionnumber" class="anchor" href="#nsappkitversionnumber" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>NSAppKitVersionNumber</h2>
+
+<p>Another approach to determining API availability is to check framework version numbers. Unfortunately, Foundation's <code>NSFoundationVersionNumber</code> and Core Foundation's <code>kCFCoreFoundationVersionNumber</code> have historically been out of date, missing constants for past OS releases.</p>
+
+<p>This is a dead-end for iOS, but OS X can pretty reliably check against the version of AppKit, with <code>NSAppKitVersionNumber</code>:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">if</span> rint(NSAppKitVersionNumber) <span class="pl-k">&gt;</span> NSAppKitVersionNumber10_9 {
+    println(<span class="pl-s"><span class="pl-pds">"</span>OS X &gt;= 10.10<span class="pl-pds">"</span></span>)
+}</pre></div>
+
+<blockquote>
+<p>Apple uses <code>rint</code> in sample code to round off version numbers for <code>NSAppKitVersionNumber</code> comparison.</p>
+</blockquote>
+
+<hr>
+
+<p>To summarize, here's what you need to know about checking the system version in Swift:</p>
+
+<ul>
+<li>Use <code>#if os(iOS)</code> preprocessor directives to distinguish between iOS (UIKit) and OS X (AppKit) targets.</li>
+<li>For minimum deployment targets of iOS 8.0 or above, use <code>NSProcessInfo</code> <code>operatingSystemVersion</code> or <code>isOperatingSystemAtLeastVersion</code>.</li>
+<li>For minimum deployment targets of iOS 7.1 or below, use <code>compare</code> with <code>NSStringCompareOptions.NumericSearch</code> on <code>UIDevice</code> <code>systemVersion</code>.</li>
+<li>For OS X deployment targets, compare <code>NSAppKitVersionNumber</code> against available AppKit constants.</li>
+</ul>
+</article></div>

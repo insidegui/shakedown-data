@@ -1,0 +1,634 @@
+<div class="announce instapaper_body md" data-path="2016-01-04-new-years-2016.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>Reader Submissions -<br> New Year's 2016</div></td>
+
+  <td><div>Nate Cook</div></td>
+
+  <td><div>Reader Submissions</div></td>
+
+  <td><div>With 2015 behind us and the new year begun, it's time again for an NSHipster tradition: reader submissions! As in year's past, this installment is chock full of tips and tricks that can help ease your days working with Xcode, Swift, and Objective-C.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>2.1</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>With 2015 behind us and the new year begun, it's time again for an NSHipster tradition: reader submissions! As <a href="/new-years-2013">in</a> <a href="/new-years-2014">year's</a> <a href="/new-years-2015">past</a>, this installment is chock full of tips and tricks that can help ease your days working with Xcode, Swift, and Objective-C.</p>
+
+<p>Many thanks to
+<a href="https://github.com/0xced">Cédric Luthi</a>,
+<a href="https://github.com/jcavar">Josip Ćavar</a>,
+<a href="https://github.com/jurajhilje">Juraj Hilje</a>,
+<a href="https://github.com/kyleve">Kyle Van Essen</a>,
+<a href="https://github.com/beeth0ven">Luo Jie</a>,
+<a href="https://github.com/mhuusko5">Mathew Huusko V</a>,
+<a href="https://github.com/jakunico">Nicolás Jakubowski</a>,
+<a href="https://github.com/NSProgrammer">Nolan O'Brien</a>,
+<a href="https://github.com/orta">Orta Therox</a>,
+<a href="https://github.com/rayfix">Ray Fix</a>,
+<a href="https://github.com/stephencelis">Stephen Celis</a>,
+<a href="https://github.com/tfrank64">Taylor Franklin</a>,
+<a href="https://github.com/thebugcode">Ursu Dan</a>,
+<a href="https://github.com/mflint">Matthew Flint</a>,
+<a href="https://github.com/biggercoffee">@biggercoffee</a>, and 
+<a href="https://github.com/vlat456">@vlat456</a> for <a href="https://gist.github.com/natecook1000/151d8de423eb77fc87bf">their contributions</a>!</p>
+
+<hr>
+
+<h2><a id="user-content-swifts-defer-in-objective-c" class="anchor" href="#swifts-defer-in-objective-c" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Swift's <code>defer</code> in Objective-C</h2>
+
+<p>From <a href="https://github.com/NSProgrammer">Nolan O'Brien</a>:</p>
+
+<blockquote>
+<p>With the excellent addition of <code>defer</code> to Swift we Objective-C holdouts can't help but feel envious of the improvements happening so rapidly to the Swift language. Until Apple officially adds <code>@defer</code> devs can actually implement defer support simply enough with a macro in Objective-C. Below I’ve outlined how one can go about doing a <code>defer</code> today in Objective-C. Personally, having Apple add <code>@defer</code> seem like an easy win for Objective-C, but <a href="http://openradar.appspot.com/radar?id=6105823419826176">we'll see what happens</a>. :)</p>
+</blockquote>
+
+<p>Nolan's macro uses the GCC <code>(cleanup())</code> attribute to execute a block when scope exits:</p>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c">// some helper declarations</span>
+#<span class="pl-k">define</span> <span class="pl-en">_nob_macro_concat</span>(<span class="pl-v">a, b</span>) a##b
+#<span class="pl-k">define</span> <span class="pl-en">nob_macro_concat</span>(<span class="pl-v">a, b</span>) _nob_macro_concat(a, b)
+<span class="pl-k">typedef</span> <span class="pl-en">void</span>(^<span class="pl-c1">nob_defer_block_t</span>)();
+NS_INLINE <span class="pl-k">void</span> <span class="pl-en">nob_deferFunc</span>(__strong <span class="pl-c1">nob_defer_block_t</span> *blockRef)
+{
+    <span class="pl-c1">nob_defer_block_t</span> actualBlock = *blockRef;
+    <span class="pl-c1">actualBlock</span>();
+}
+
+<span class="pl-c">// the core macro</span>
+#<span class="pl-k">define</span> <span class="pl-en">nob_defer</span>(<span class="pl-v">deferBlock</span>) \
+__strong <span class="pl-c1">nob_defer_block_t</span> <span class="pl-en">nob_macro_concat</span>(__nob_stack_defer_block_, __LINE__) __attribute__((cleanup(nob_deferFunc), unused)) = deferBlock</pre></div>
+
+<p>Blocks used with <code>nob_defer</code> are executed in reverse order, just like <a href="/guard-and-defer/">Swift <code>defer</code> statements</a>:</p>
+
+<div class="highlight highlight-source-objc"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>nob_defer.h<span class="pl-pds">&gt;</span></span>
+
+- (<span class="pl-k">void</span>)dealWithFile
+{
+    <span class="pl-c1">FILE</span> *file = <span class="pl-c1">fopen</span>(…);
+    <span class="pl-c1">nob_defer</span>(^{
+        <span class="pl-k">if</span> (file) {
+            <span class="pl-c1">fclose</span>(file);
+        }
+    });
+
+    <span class="pl-c">// continue code where any scope exit will </span>
+    <span class="pl-c">// lead to the defer being executed</span>
+}
+
+- (<span class="pl-k">void</span>)dealWithError
+{
+    __block <span class="pl-c1">NSError</span> *scopeError = <span class="pl-c1">nil</span>;
+    <span class="pl-c1">nob_defer</span>(^{
+        <span class="pl-k">if</span> (scopeError) {
+            [<span class="pl-v">self</span> <span class="pl-c1">performCustomErrorHandling:</span> scopeError];
+        }
+    });
+
+    <span class="pl-c">// assign any errors to "scopeError" to handle the error</span>
+    <span class="pl-c">// on exit, no matter how you exit</span>
+}
+
+#<span class="pl-k">define</span> <span class="pl-en">NOBDeferRelease</span>(<span class="pl-v">cfTypeRef</span>) nob_defer(^{ <span class="pl-k">if</span> (cfTypeRef) { <span class="pl-c1">CFRelease</span>(cfTypeRef); } })
+
+- (<span class="pl-k">void</span>)cleanUpCFTypeRef
+{
+    <span class="pl-c1">CFStringRef</span> stringRef = ... some code to create a <span class="pl-c1">CFStringRef</span> ...;
+    <span class="pl-c1">NOBDeferRelease</span>(stringRef);
+
+    <span class="pl-c">// continue working without having to worry</span>
+    <span class="pl-c">// about the CFTypeRef needing to be released</span>
+}</pre></div>
+
+<blockquote>
+<p>I've been using my custom defer macro in production code since June and it is really the Bee's Knees!</p>
+</blockquote>
+
+<hr>
+
+<h2><a id="user-content-swift-protocol-extensions" class="anchor" href="#swift-protocol-extensions" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Swift Protocol Extensions</h2>
+
+<p>From <a href="https://github.com/jurajhilje">Juraj Hilje</a>:</p>
+
+<blockquote>
+<p>Keep inheritance trees shallow and use protocol composition:</p>
+</blockquote>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">protocol</span> Hello {
+    <span class="pl-k">func</span> <span class="pl-en">sayHello</span>() <span class="pl-k">-&gt;</span> <span class="pl-c1">String</span>
+}
+
+<span class="pl-k">extension</span> Hello {
+    <span class="pl-k">func</span> <span class="pl-en">sayHello</span>() <span class="pl-k">-&gt;</span> <span class="pl-c1">String</span> {
+        <span class="pl-k">return</span> <span class="pl-s"><span class="pl-pds">"</span>Hello, stranger<span class="pl-pds">"</span></span>
+    }
+}
+
+<span class="pl-k">class</span> MyClass: Hello {
+}
+
+<span class="pl-k">let</span> c <span class="pl-k">=</span> MyClass()
+c<span class="pl-k">.</span>sayHello() <span class="pl-c">// "Hello, stranger"</span></pre></div>
+
+<hr>
+
+<h2><a id="user-content-public-read-only-variables" class="anchor" href="#public-read-only-variables" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Public Read-only Variables</h2>
+
+<p>From <a href="https://github.com/stephencelis">Stephen Celis</a>:</p>
+
+<blockquote>
+<p>Classes commonly have public, read-only properties but need the ability privately modify them. I've come across the following pattern a few times:</p>
+</blockquote>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> Person {
+    <span class="pl-k">public</span> <span class="pl-k">var</span> name: <span class="pl-c1">String</span> {
+        <span class="pl-k">return</span> _name
+    }
+    <span class="pl-k">private</span> <span class="pl-k">var</span> _name: <span class="pl-c1">String</span>
+    <span class="pl-c">// ...</span>
+}</pre></div>
+
+<blockquote>
+<p>Luckily, there's a better, oft-overlooked way that avoids the extra variable:</p>
+</blockquote>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> Person {
+    <span class="pl-k">public</span> <span class="pl-k">private</span>(<span class="pl-k">set</span>) <span class="pl-k">var</span> name: <span class="pl-c1">String</span>
+    <span class="pl-c">// ...</span>
+}</pre></div>
+
+<hr>
+
+<h2><a id="user-content-swift-where-everywhere" class="anchor" href="#swift-where-everywhere" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Swift <code>where</code> Everywhere</h2>
+
+<p>From <a href="https://github.com/tfrank64">Taylor Franklin</a>:</p>
+
+<blockquote>
+<p>The addition of the <code>where</code> clause has made my code simple and compact while remaining readable. In addition, it has a broad application in Swift, so that it can be applied in nearly any kind of control-flow statement, such as <code>for</code> loop, <code>while</code> loop, <code>if</code>, <code>guard</code>, <code>switch</code>, and even in extension declarations. One simple way I like to use it is in my <code>prepareForSegue</code> method:</p>
+</blockquote>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">if</span> <span class="pl-k">let</span> segueID <span class="pl-k">=</span> segue<span class="pl-k">.</span>identifier <span class="pl-k">where</span> segueID <span class="pl-k">==</span> <span class="pl-s"><span class="pl-pds">"</span>mySegue<span class="pl-pds">"</span></span> {
+    <span class="pl-k">...</span>
+}</pre></div>
+
+<blockquote>
+<p>The combo of unwrapping and performing a condition check is most commonly where I use the <code>where</code> clause. The <code>where</code> clause is not going to change your life, but it should be an easy and useful addition to your Swift skills.</p>
+</blockquote>
+
+<hr>
+
+<h2><a id="user-content-improved-optional-binding" class="anchor" href="#improved-optional-binding" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Improved Optional Binding</h2>
+
+<p>From <a href="https://github.com/thebugcode">Ursu Dan</a>:</p>
+
+<blockquote>
+<p>The improved optional binding in Swift is amazing and I use it virtually everywhere now and avoid the pyramid of doom:</p>
+</blockquote>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">if</span> <span class="pl-k">let</span> 
+    url          <span class="pl-k">=</span> NSBundle<span class="pl-k">.</span>mainBundle()<span class="pl-k">.</span>URLForResource(<span class="pl-s"><span class="pl-pds">"</span>users<span class="pl-pds">"</span></span>, withExtension: <span class="pl-s"><span class="pl-pds">"</span>json<span class="pl-pds">"</span></span>),
+    data         <span class="pl-k">=</span> NSData(contentsOfURL: url),
+    deserialized <span class="pl-k">=</span> <span class="pl-k">try</span>? NSJSONSerialization<span class="pl-k">.</span>JSONObjectWithData(data, options: []),
+    userList     <span class="pl-k">=</span> deserialized <span class="pl-k">as?</span> [ [<span class="pl-c1">String</span>: <span class="pl-c1">AnyObject</span>] ]
+{
+
+    <span class="pl-k">for</span> userDict <span class="pl-k">in</span> userList {
+        <span class="pl-k">if</span> <span class="pl-k">let</span>
+            id          <span class="pl-k">=</span> userDict[<span class="pl-s"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span>] <span class="pl-k">as?</span> <span class="pl-c1">Int</span>,
+            name        <span class="pl-k">=</span> userDict[<span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>] <span class="pl-k">as?</span> <span class="pl-c1">String</span>,
+            username    <span class="pl-k">=</span> userDict[<span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>] <span class="pl-k">as?</span> <span class="pl-c1">String</span>,
+            email       <span class="pl-k">=</span> userDict[<span class="pl-s"><span class="pl-pds">"</span>email<span class="pl-pds">"</span></span>] <span class="pl-k">as?</span> <span class="pl-c1">String</span>,
+            phone       <span class="pl-k">=</span> userDict[<span class="pl-s"><span class="pl-pds">"</span>phone<span class="pl-pds">"</span></span>] <span class="pl-k">as?</span> <span class="pl-c1">String</span>,
+            address     <span class="pl-k">=</span> userDict[<span class="pl-s"><span class="pl-pds">"</span>address<span class="pl-pds">"</span></span>] <span class="pl-k">as?</span> [<span class="pl-c1">String</span>: <span class="pl-c1">AnyObject</span>]
+        {
+            users<span class="pl-k">.</span>append(User(id: id, name: name, <span class="pl-k">...</span>))
+        }
+    }
+}</pre></div>
+
+<hr>
+
+<h2><a id="user-content-unbuffered-xcodebuild-output" class="anchor" href="#unbuffered-xcodebuild-output" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Unbuffered <code>xcodebuild</code> Output</h2>
+
+<p>From <a href="https://github.com/0xced">Cédric Luthi</a>:</p>
+
+<blockquote>
+<p>Using <code>xcpretty</code> because the output of <code>xcodebuild test</code> is unreadable? Unfortunately, the output of the test results becomes buffered when piped. Solution: set the <code>NSUnbufferedIO</code> environment variable for a smooth experience. <g-emoji alias="sunglasses" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f60e.png" ios-version="6.0">😎</g-emoji></p>
+</blockquote>
+
+<div class="highlight highlight-source-shell"><pre>env NSUnbufferedIO=YES xcodebuild [flags] <span class="pl-k">|</span> xcpretty</pre></div>
+
+<hr>
+
+<h2><a id="user-content-multiline-labels-in-a-table-view" class="anchor" href="#multiline-labels-in-a-table-view" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Multiline Labels in a Table View</h2>
+
+<p>From <a href="https://github.com/rayfix">Ray Fix</a>:</p>
+
+<blockquote>
+<p>Using autolayout to toggle a label in a table view from one line to many:</p>
+</blockquote>
+
+<div class="highlight highlight-source-swift"><pre>tableView<span class="pl-k">.</span>beginUpdates()
+label<span class="pl-k">.</span>numberOfLines <span class="pl-k">=</span> label<span class="pl-k">.</span>numberOfLines <span class="pl-k">==</span> <span class="pl-c1">0</span> <span class="pl-k">?</span> <span class="pl-c1">1</span> <span class="pl-k">:</span> <span class="pl-c1">0</span>
+tableView<span class="pl-k">.</span>endUpdates()</pre></div>
+
+<p>You can see Ray's technique in action in <a href="https://github.com/rayfix/MultilineDemo">an example project</a>:</p>
+
+<p><a href="https://raw.githubusercontent.com/rayfix/MultilineDemo/master/demo.gif" target="_blank"><img src="https://raw.githubusercontent.com/rayfix/MultilineDemo/master/demo.gif" alt="Multiline demo" style="max-width:100%;"></a></p>
+
+<hr>
+
+<h2><a id="user-content-amirunningasanextension" class="anchor" href="#amirunningasanextension" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>AmIRunningAsAnExtension</code></h2>
+
+<p>Another from <a href="https://github.com/NSProgrammer">Nolan O'Brien</a>:</p>
+
+<blockquote>
+<p>With extensions in iOS, it is critical that frameworks that can be linked to both extensions and apps be cognizant of their uses so they don't call any APIs that might not be available to an extension (like UIApplication). Here's a function to help determine if you are running in an extension at runtime:</p>
+
+<p>(<a href="https://developer.apple.com/library/ios/documentation/General/Reference/InfoPlistKeyReference/Articles/SystemExtensionKeys.html">Per Apple</a>, an extension will have a top level "NSExtension" dictionary in the info.plist.)</p>
+</blockquote>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> NOBAmIRunningAsAnExtension: <span class="pl-c1">Bool</span> <span class="pl-k">=</span> {
+    <span class="pl-k">let</span> extensionDictionary: <span class="pl-c1">AnyObject</span>? <span class="pl-k">=</span> NSBundle<span class="pl-k">.</span>mainBundle()<span class="pl-k">.</span>infoDictionary?[<span class="pl-s"><span class="pl-pds">"</span>NSExtension<span class="pl-pds">"</span></span>]
+    <span class="pl-k">return</span> extensionDictionary?<span class="pl-k">.</span>isKindOfClass(NSDictionary<span class="pl-k">.</span><span class="pl-k">self</span>) <span class="pl-k">??</span> <span class="pl-c1">false</span>
+}()</pre></div>
+
+<div class="highlight highlight-source-objc"><pre>FOUNDATION_EXTERN <span class="pl-c1">BOOL</span> <span class="pl-en">AmIRunningAsAnExtension</span>() __attribute__((<span class="pl-k">const</span>));
+
+<span class="pl-c1">BOOL</span> <span class="pl-en">NOBAmIRunningAsAnExtension</span>()
+{
+
+    <span class="pl-k">static</span> <span class="pl-c1">BOOL</span> <span class="pl-smi">sIsExtension</span>;
+    <span class="pl-k">static</span> <span class="pl-c1">dispatch_once_t</span> <span class="pl-smi">sOnceToken</span>;
+    <span class="pl-c1">dispatch_once</span>(&amp; <span class="pl-smi">sOnceToken</span>, ^{
+        <span class="pl-c1">NSDictionary</span> *extensionDictionary = [[<span class="pl-c1">NSBundle</span> <span class="pl-c1">mainBundle</span>] <span class="pl-c1">infoDictionary</span>][<span class="pl-s"><span class="pl-pds">@"</span>NSExtension<span class="pl-pds">"</span></span>];
+        <span class="pl-smi">sIsExtension</span> = [extensionDictionary <span class="pl-c1">isKindOfClass:</span>[<span class="pl-c1">NSDictionary</span> <span class="pl-c1">class</span>]];
+    });
+    <span class="pl-k">return</span> <span class="pl-smi">sIsExtension</span>;
+}</pre></div>
+
+<blockquote>
+<p>That frees you to do things like this:</p>
+</blockquote>
+
+<div class="highlight highlight-source-objc"><pre>- (<span class="pl-k">void</span>)startBackgroundTask
+{
+#<span class="pl-k">if</span> TARGET_OS_IPHONE
+    <span class="pl-k">if</span> (!<span class="pl-c1">NOBAmIRunningAsAnExtension</span>()) {
+        <span class="pl-c1">Class</span> UIApplicationClass = <span class="pl-c1">NSClassFromString</span>(<span class="pl-s"><span class="pl-pds">@"</span>UIApplication<span class="pl-pds">"</span></span>);
+        <span class="pl-c1">id</span> sharedApplication = [UIApplicationClass <span class="pl-c1">sharedApplication</span>];
+        self.<span class="pl-smi">backgroundTaskIdentifier</span> = [sharedApplication <span class="pl-c1">beginBackgroundTaskWithExpirationHandler:</span>^{
+            <span class="pl-k">if</span> (self.<span class="pl-smi">backgroundTaskIdentifier</span> != UIBackgroundTaskInvalid) {
+                [sharedApplication <span class="pl-c1">endBackgroundTask:</span><span class="pl-v">self</span>.backgroundTaskIdentifier];
+                self.<span class="pl-smi">backgroundTaskIdentifier</span> = UIBackgroundTaskInvalid;
+            }
+        }];
+    }
+#<span class="pl-k">endif</span>
+}
+
+- (<span class="pl-k">void</span>)endBackgroundTask
+{
+#<span class="pl-k">if</span> TARGET_OS_IPHONE
+    <span class="pl-k">if</span> (self.<span class="pl-smi">backgroundTaskIdentifier</span> != UIBackgroundTaskInvalid) {
+        <span class="pl-en">NSAssert</span>(!NOBAmIRunningAsAnExtension());
+        <span class="pl-c1">Class</span> UIApplicationClass = <span class="pl-c1">NSClassFromString</span>(<span class="pl-s"><span class="pl-pds">@"</span>UIApplication<span class="pl-pds">"</span></span>);
+        <span class="pl-c1">id</span> sharedApplication = [UIApplicationClass <span class="pl-c1">sharedApplication</span>];
+        [sharedApplication <span class="pl-c1">endBackgroundTask:</span><span class="pl-v">self</span>.backgroundTaskIdentifier];
+        self.<span class="pl-smi">backgroundTaskIdentifier</span> = UIBackgroundTaskInvalid;
+    }
+#<span class="pl-k">endif</span>
+}</pre></div>
+
+<hr>
+
+<h2><a id="user-content-beyond-breakpoints" class="anchor" href="#beyond-breakpoints" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Beyond Breakpoints</h2>
+
+<p>From <a href="https://github.com/mflint">Matthew Flint</a>:</p>
+
+<blockquote>
+<p>This has been my year of truly appreciating Xcode breakpoints, beyond the standard "break at this line" type.
+It breaks my heart to see other developers not using them to their potential.</p>
+</blockquote>
+
+<p>Right click on a breakpoint and choose <strong>Edit Breakpoint...</strong> for access to advanced features:</p>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/2016-breakpoint.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/2016-breakpoint.png" alt="Breakpoint Options Popup" style="max-width:100%;"></a></p>
+
+<blockquote>
+<p>Particularly the ones with actions (such as logging to the console) that continue automatically without pausing any threads, because you can add/edit them without recompiling. I'll never accidentally commit NSLogs again. :)</p>
+</blockquote>
+
+<hr>
+
+<h2><a id="user-content-fix-console-po-frame-printing" class="anchor" href="#fix-console-po-frame-printing" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Fix Console <code>po frame</code> Printing</h2>
+
+<p><a href="https://github.com/biggercoffee">GitHub user @biggercoffee</a> reminds us that <code>po frame</code> printing fails in the LLDB console by default:</p>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/2016-po-frame-fail.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/2016-po-frame-fail.png" alt="Broken po frame" style="max-width:100%;"></a></p>
+
+<p>Fix it mid-debugging session with <code>expr @import UIKit</code>, or fix it once and for all by adding a couple lines to your ".lldbinit". From the command line:</p>
+
+<div class="highlight highlight-source-shell"><pre>touch <span class="pl-k">~</span>/.lldbinit
+<span class="pl-c1">echo</span> display @import UIKit <span class="pl-k">&gt;&gt;</span> <span class="pl-k">~</span>/.lldbinit
+<span class="pl-c1">echo</span> target stop-hook add -o <span class="pl-cce">\"</span>target stop-hook disable<span class="pl-cce">\"</span> <span class="pl-k">&gt;&gt;</span> <span class="pl-k">~</span>/.lldbinit</pre></div>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/2016-po-frame-win.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/2016-po-frame-win.png" alt="Fixed po frame" style="max-width:100%;"></a></p>
+
+<hr>
+
+<h2><a id="user-content-avoiding--ddebug-in-swift" class="anchor" href="#avoiding--ddebug-in-swift" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Avoiding <code>-DDEBUG</code> in Swift</h2>
+
+<p>From <a href="https://github.com/vlat456">GitHub user @vlat456</a>:</p>
+
+<blockquote>
+<p>For those, who like me, are trying to avoid the mess with <code>-DDEBUG</code> in Swift, but have to know which version of executable is running, Debug or Release.</p>
+</blockquote>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c">// PreProcessorMacros.m:</span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>PreProcessorMacros.h<span class="pl-pds">"</span></span>
+#<span class="pl-k">ifdef</span> DEBUG
+<span class="pl-c1">BOOL</span> <span class="pl-k">const</span> DEBUG_BUILD = <span class="pl-c1">YES</span>;
+#<span class="pl-k">else</span>
+<span class="pl-c1">BOOL</span> <span class="pl-k">const</span> DEBUG_BUILD = <span class="pl-c1">NO</span>;
+#<span class="pl-k">endif</span>
+
+<span class="pl-c">// PreProcessorMacros.h:</span>
+#<span class="pl-k">ifndef</span> PreProcessorMacros_h
+#<span class="pl-k">define</span> <span class="pl-en">PreProcessorMacros_h</span>
+#<span class="pl-k">include</span>
+
+<span class="pl-k">extern</span> <span class="pl-c1">BOOL</span> <span class="pl-k">const</span> DEBUG_BUILD;
+
+#<span class="pl-k">endif</span> <span class="pl-c">/* PreProcessorMacros_h */</span>
+
+<span class="pl-c">// in Bridged header:</span>
+#<span class="pl-k">import</span> <span class="pl-s"><span class="pl-pds">"</span>PreProcessorMacros.h<span class="pl-pds">"</span></span></pre></div>
+
+<p>And then from Swift:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">if</span> DEBUG_BUILD {
+<span class="pl-c1">debugPrint</span>(<span class="pl-s"><span class="pl-pds">"</span>It's Debug build<span class="pl-pds">"</span></span>)
+} <span class="pl-k">else</span> {
+<span class="pl-c1">debugPrint</span>(<span class="pl-s"><span class="pl-pds">"</span>It's Release build<span class="pl-pds">"</span></span>)
+}</pre></div>
+
+<hr>
+
+<h2><a id="user-content-checking-for-null-blocks" class="anchor" href="#checking-for-null-blocks" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Checking For Null Blocks</h2>
+
+<p>From <a href="https://github.com/jakunico">Nicolás Jakubowski</a>:</p>
+
+<blockquote>
+<p>This macro for checking block nullability before executing them:</p>
+</blockquote>
+
+<div class="highlight highlight-source-objc"><pre>#<span class="pl-k">define</span> <span class="pl-en">BLOCK_EXEC</span>(block, ...) <span class="pl-k">if</span> (block) { <span class="pl-c1">block</span>(__VA_ARGS__); };</pre></div>
+
+<p>Old and busted:</p>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-k">if</span> (completionBlock)
+{
+    <span class="pl-c1">completionBlock</span>(arg1, arg2);
+}</pre></div>
+
+<p>New and shiny:</p>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-en">BLOCK_EXEC</span>(completionBlock, arg1, arg2);</pre></div>
+
+<hr>
+
+<h2><a id="user-content-swiftier-gcd" class="anchor" href="#swiftier-gcd" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Swiftier GCD</h2>
+
+<p>From <a href="https://github.com/beeth0ven">Luo Jie</a>:</p>
+
+<blockquote>
+<p>You can use enums and protocol extensions to provide a GCD convenience API:</p>
+</blockquote>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">protocol</span> ExcutableQueue {
+    <span class="pl-k">var</span> queue: dispatch_queue_t { <span class="pl-k">get</span> }
+}
+
+<span class="pl-k">extension</span> ExcutableQueue {
+    <span class="pl-k">func</span> <span class="pl-en">execute</span>(closure: () <span class="pl-k">-&gt;</span> <span class="pl-c1">Void</span>) {
+        dispatch_async(queue, closure)
+    }
+}
+
+<span class="pl-k">enum</span> Queue: ExcutableQueue {
+    <span class="pl-k">case</span> Main
+    <span class="pl-k">case</span> UserInteractive
+    <span class="pl-k">case</span> UserInitiated
+    <span class="pl-k">case</span> Utility
+    <span class="pl-k">case</span> Background
+
+    <span class="pl-k">var</span> queue: dispatch_queue_t {
+        <span class="pl-k">switch</span> <span class="pl-k">self</span> {
+        <span class="pl-k">case</span> <span class="pl-k">.</span>Main:
+            <span class="pl-k">return</span> dispatch_get_main_queue()
+        <span class="pl-k">case</span> <span class="pl-k">.</span>UserInteractive:
+            <span class="pl-k">return</span> dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, <span class="pl-c1">0</span>)
+        <span class="pl-k">case</span> <span class="pl-k">.</span>UserInitiated:
+            <span class="pl-k">return</span> dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, <span class="pl-c1">0</span>)
+        <span class="pl-k">case</span> <span class="pl-k">.</span>Utility:
+            <span class="pl-k">return</span> dispatch_get_global_queue(QOS_CLASS_UTILITY, <span class="pl-c1">0</span>)
+        <span class="pl-k">case</span> <span class="pl-k">.</span>Background:
+            <span class="pl-k">return</span> dispatch_get_global_queue(QOS_CLASS_BACKGROUND, <span class="pl-c1">0</span>)
+        }
+    }
+}
+
+<span class="pl-k">enum</span> SerialQueue: <span class="pl-c1">String</span>, ExcutableQueue {
+    <span class="pl-k">case</span> DownLoadImage <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>myApp.SerialQueue.DownLoadImage<span class="pl-pds">"</span></span>
+    <span class="pl-k">case</span> UpLoadFile <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>myApp.SerialQueue.UpLoadFile<span class="pl-pds">"</span></span>
+
+    <span class="pl-k">var</span> queue: dispatch_queue_t {
+        <span class="pl-k">return</span> dispatch_queue_create(rawValue, DISPATCH_QUEUE_SERIAL)
+    }
+}</pre></div>
+
+<blockquote>
+<p>Downloading something then could be written like this:</p>
+</blockquote>
+
+<div class="highlight highlight-source-swift"><pre>Queue<span class="pl-k">.</span>UserInitiated<span class="pl-k">.</span>execute {
+    <span class="pl-k">let</span> url <span class="pl-k">=</span> NSURL(string: <span class="pl-s"><span class="pl-pds">"</span>http://image.jpg<span class="pl-pds">"</span></span>)<span class="pl-k">!</span>
+    <span class="pl-k">let</span> data <span class="pl-k">=</span> NSData(contentsOfURL: url)<span class="pl-k">!</span>
+    <span class="pl-k">let</span> image <span class="pl-k">=</span> UIImage(data: data)
+
+    Queue<span class="pl-k">.</span>Main<span class="pl-k">.</span>execute {
+        imageView<span class="pl-k">.</span>image <span class="pl-k">=</span> image
+    }
+}</pre></div>
+
+<hr>
+
+<h2><a id="user-content-_objectivecbridgeable" class="anchor" href="#_objectivecbridgeable" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>_ObjectiveCBridgeable</code></h2>
+
+<p>From <a href="https://github.com/mhuusko5">Mathew Huusko V</a>:</p>
+
+<blockquote>
+<p>Using Swift's _ObjectiveCBridgeable (implicit castability between types) to create a generic protocol for Obj-C compatible objects that wrap pure Swift structs (keeping Swift framework API clean, but Obj-C compatible for as long as desired).</p>
+</blockquote>
+
+<p>This first part defines an extension with default implementations for the bridging bookkeeping methods:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">public</span> <span class="pl-k">protocol</span> BackedObjectType: <span class="pl-c1">AnyObject</span> {
+    <span class="pl-k">typealias</span> Backing
+
+    <span class="pl-k">var</span> backingObject: Backing { <span class="pl-k">get</span> }
+
+    <span class="pl-k">init</span>(_ backingObject: Backing)
+}
+
+<span class="pl-k">public</span> <span class="pl-k">protocol</span> ObjectBackable: _ObjectiveCBridgeable {
+    <span class="pl-k">typealias</span> Backed: BackedObjectType
+}
+
+<span class="pl-k">public</span> <span class="pl-k">extension</span> ObjectBackable <span class="pl-k">where</span> Backed<span class="pl-k">.</span>Backing <span class="pl-k">==</span> <span class="pl-k">Self</span> {
+    <span class="pl-k">static</span> <span class="pl-k">func</span> <span class="pl-en">_isBridgedToObjectiveC</span>() <span class="pl-k">-&gt;</span> <span class="pl-c1">Bool</span> {
+        <span class="pl-k">return</span> <span class="pl-c1">true</span>
+    }
+
+    <span class="pl-k">static</span> <span class="pl-k">func</span> <span class="pl-en">_getObjectiveCType</span>() <span class="pl-k">-&gt;</span> <span class="pl-c1">Any</span>.Type {
+        <span class="pl-k">return</span> Backed<span class="pl-k">.</span><span class="pl-k">self</span>
+    }
+
+    <span class="pl-k">func</span> <span class="pl-en">_bridgeToObjectiveC</span>() <span class="pl-k">-&gt;</span> Backed {
+        <span class="pl-k">return</span> Backed(<span class="pl-k">self</span>)
+    }
+
+    <span class="pl-k">static</span> <span class="pl-k">func</span> <span class="pl-en">_forceBridgeFromObjectiveC</span>(source: Backed, <span class="pl-en">inout</span> <span class="pl-smi">result</span>: <span class="pl-k">Self</span>?) {
+        result <span class="pl-k">=</span> source<span class="pl-k">.</span>backingObject
+    }
+
+    <span class="pl-k">static</span> <span class="pl-k">func</span> <span class="pl-en">_conditionallyBridgeFromObjectiveC</span>(source: Backed, <span class="pl-en">inout</span> <span class="pl-smi">result</span>: <span class="pl-k">Self</span>?) <span class="pl-k">-&gt;</span> <span class="pl-c1">Bool</span> {
+        _forceBridgeFromObjectiveC(source, result: <span class="pl-k">&amp;</span>result)
+        <span class="pl-k">return</span> <span class="pl-c1">true</span>
+    }
+
+    <span class="pl-k">func</span> <span class="pl-en">toBridgedObject</span>() <span class="pl-k">-&gt;</span> Backed {
+        <span class="pl-k">return</span> _bridgeToObjectiveC() 
+    }
+}</pre></div>
+
+<p>Here the Swift struct <code>SomeModel</code> and Objective-C class <code>M5SomeModel</code> are declared and bridged. Bridging between them is accomplished with an <code>as</code> cast:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">public</span> <span class="pl-k">struct</span> SomeModel {
+    <span class="pl-k">public</span> <span class="pl-k">let</span> ID: <span class="pl-c1">Int</span>
+    <span class="pl-k">public</span> <span class="pl-k">let</span> name: <span class="pl-c1">String</span>
+    <span class="pl-k">public</span> <span class="pl-k">let</span> category: <span class="pl-c1">String</span>
+}
+
+<span class="pl-k">extension</span> SomeModel: ObjectBackable {
+    <span class="pl-k">public</span> <span class="pl-k">typealias</span> Backed <span class="pl-k">=</span> M5SomeModel
+}
+
+<span class="pl-k">@objc</span> <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-k">class</span> M5SomeModel: NSObject, BackedObjectType {
+    <span class="pl-k">public</span> <span class="pl-k">let</span> backingObject: SomeModel
+    <span class="pl-k">public</span> <span class="pl-k">init</span>(_ backingObject: SomeModel) {
+        <span class="pl-k">self</span><span class="pl-k">.</span>backingObject <span class="pl-k">=</span> backingObject 
+    }
+
+    <span class="pl-k">public</span> <span class="pl-k">var</span> ID: <span class="pl-c1">Int</span> { <span class="pl-k">return</span> backingObject<span class="pl-k">.</span>ID }
+    <span class="pl-k">public</span> <span class="pl-k">var</span> name: <span class="pl-c1">String</span> { <span class="pl-k">return</span> backingObject<span class="pl-k">.</span>name }
+    <span class="pl-k">public</span> <span class="pl-k">var</span> category: <span class="pl-c1">String</span> { <span class="pl-k">return</span> backingObject<span class="pl-k">.</span>category }
+}
+
+<span class="pl-c">// Usage:</span>
+<span class="pl-k">let</span> model <span class="pl-k">=</span> SomeModel(ID: <span class="pl-c1">2</span>, name: <span class="pl-s"><span class="pl-pds">"</span>awesome<span class="pl-pds">"</span></span>, category: <span class="pl-s"><span class="pl-pds">"</span>music<span class="pl-pds">"</span></span>)
+<span class="pl-k">let</span> objcCompatibleModel <span class="pl-k">=</span> model <span class="pl-k">as</span> M5SomeModel
+<span class="pl-k">let</span> originalModel <span class="pl-k">=</span> objcCompatibleModel <span class="pl-k">as</span> SomeModel</pre></div>
+
+<hr>
+
+<h2><a id="user-content-phantom-types" class="anchor" href="#phantom-types" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Phantom Types</h2>
+
+<p><a href="https://github.com/jcavar">Josip Ćavar</a> writes in about getting additional type safety with phantom types. In the example below, <code>Kilometer</code> and <code>Meter</code> are used to constrain what kinds of <code>DistanceT</code> instances can be added together:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">struct</span> Kilometer {}
+<span class="pl-k">struct</span> Meter {}
+
+<span class="pl-k">struct</span> DistanceT<span class="pl-k">&lt;</span>T<span class="pl-k">&gt;</span> {
+    <span class="pl-k">private</span> <span class="pl-k">let</span> value: <span class="pl-c1">Int</span>
+
+    <span class="pl-k">init</span>(value: <span class="pl-c1">Int</span>) {
+        <span class="pl-k">self</span><span class="pl-k">.</span><span class="pl-c1">value</span> <span class="pl-k">=</span> value
+    }
+}
+
+<span class="pl-k">func</span> <span class="pl-en">+</span>&lt;T&gt;(<span class="pl-k">left</span>: DistanceT<span class="pl-k">&lt;</span>T<span class="pl-k">&gt;</span>, <span class="pl-k">right</span>: DistanceT<span class="pl-k">&lt;</span>T<span class="pl-k">&gt;</span>) <span class="pl-k">-&gt;</span> DistanceT&lt;T&gt; {
+    <span class="pl-k">return</span> DistanceT(value: <span class="pl-k">left</span><span class="pl-k">.</span><span class="pl-c1">value</span> <span class="pl-k">+</span> <span class="pl-k">right</span><span class="pl-k">.</span><span class="pl-c1">value</span>)
+}
+
+<span class="pl-k">extension</span> <span class="pl-c1">Int</span> {
+    <span class="pl-k">var</span> km: DistanceT<span class="pl-k">&lt;</span>Kilometer<span class="pl-k">&gt;</span> {
+        <span class="pl-k">return</span> DistanceT<span class="pl-k">&lt;</span>Kilometer<span class="pl-k">&gt;</span>(value: <span class="pl-k">self</span>)
+    }
+    <span class="pl-k">var</span> m: DistanceT<span class="pl-k">&lt;</span>Meter<span class="pl-k">&gt;</span> {
+        <span class="pl-k">return</span> DistanceT<span class="pl-k">&lt;</span>Meter<span class="pl-k">&gt;</span>(value: <span class="pl-k">self</span>)
+    }
+}
+
+<span class="pl-k">let</span> distanceKilometers <span class="pl-k">=</span> <span class="pl-c1">5</span><span class="pl-k">.</span>km
+<span class="pl-k">let</span> distanceMeters <span class="pl-k">=</span> <span class="pl-c1">15</span><span class="pl-k">.</span>m
+<span class="pl-k">let</span> newDistance <span class="pl-k">=</span> distanceKilometers <span class="pl-k">+</span> distanceKilometers <span class="pl-c">// Ok</span>
+<span class="pl-k">let</span> newDistance <span class="pl-k">=</span> distanceKilometers <span class="pl-k">+</span> distanceMeters <span class="pl-c">// Compiler error</span></pre></div>
+
+<hr>
+
+<h2><a id="user-content-easier-configuration" class="anchor" href="#easier-configuration" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Easier Configuration</h2>
+
+<p>From <a href="https://github.com/kyleve">Kyle Van Essen</a> by way 
+of <a href="https://github.com/orta">Orta Therox</a> comes a function that streamlines
+multi-step initialization and configuration processes.</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">@warn_unused_result</span>
+<span class="pl-k">public</span> <span class="pl-k">func</span> <span class="pl-en">Init</span>&lt;<span class="pl-k">Type</span>&gt;(value <span class="pl-k">:</span> <span class="pl-k">Type</span>, <span class="pl-k">@noescape</span> block: (object: <span class="pl-k">Type</span>) <span class="pl-k">-&gt;</span> <span class="pl-c1">Void</span>) -&gt; Type
+{
+    block(object: value)
+    <span class="pl-k">return</span> value
+}
+
+<span class="pl-k">func</span> <span class="pl-en">example</span>()
+{
+    <span class="pl-k">let</span> label <span class="pl-k">=</span> Init(UILabel()) {
+        $<span class="pl-c1">0</span><span class="pl-k">.</span>font <span class="pl-k">=</span> UIFont<span class="pl-k">.</span>boldSystemFontOfSize(<span class="pl-c1">13</span><span class="pl-k">.</span><span class="pl-c1">0</span>)
+
+        $<span class="pl-c1">0</span><span class="pl-k">.</span>text <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>Hello, World<span class="pl-pds">"</span></span>
+        $<span class="pl-c1">0</span><span class="pl-k">.</span>textAlignment <span class="pl-k">=</span> <span class="pl-k">.</span>Center
+    }
+}</pre></div>
+
+<hr>
+
+<p>Well, that rounds out <em>this</em> year's list—thanks again to all who contributed!</p>
+
+<p>Happy New Year! May your code continue to compile and inspire.</p>
+</article></div>

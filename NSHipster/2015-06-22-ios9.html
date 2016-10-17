@@ -1,0 +1,228 @@
+<div class="announce instapaper_body md" data-path="2015-06-22-ios9.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>iOS 9</div></td>
+
+  <td><div>Nate Cook</div></td>
+
+  <td><div></div></td>
+
+  <td><div>WWDC 2015 may not have packed quite as many fireworks as its predecessor, but neither was it short on the new and shiny. For this week's issue, we'll take a look at some of the changes that iOS 9 brings to the APIs we already know and love.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>2.0</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>WWDC 2015 may not have packed quite as many fireworks as its predecessor, but neither was it short on the new and shiny. The introduction of watchOS 2, including a revamped WatchKit, access to the Apple Watch hardware, and support for complications. Major changes to the Swift language and the announcement of open source plans. Brand new frameworks, such as Contacts, ContactsUI, and CoreSpotlight, and new UIKit types like <code>UIStackView</code> and <code>SFSafariViewController</code>.</p>
+
+<p>We'll surely delve into these major new components in the weeks and months to come. For now, however, let's take a look at some of the smaller changes that iOS 9 brings to the APIs we already know and love.</p>
+
+<hr>
+
+<h2><a id="user-content-string-transformations" class="anchor" href="#string-transformations" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>String Transformations</h2>
+
+<p>Up first is the news that string transformations, formerly housed in Core Foundation, have made their way to <code>NSString</code> and the Swift <code>String</code> type. This is a huge advance in discoverability and ease-of-use for this powerful Cocoa feature, because there is no longer any need to deal with the hassle of bridging to and from <code>CFStringRef</code>. Here's how some of our favorite transformations can be done along with the new <code>NSStringTransform*</code> constants that enable them:</p>
+
+<h3><a id="user-content-transliteration" class="anchor" href="#transliteration" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Transliteration</h3>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-s"><span class="pl-pds">"</span>privet<span class="pl-pds">"</span></span><span class="pl-k">.</span>stringByApplyingTransform(NSStringTransformLatinToCyrillic, reverse: <span class="pl-c1">false</span>)
+<span class="pl-c">// "привет"</span>
+<span class="pl-s"><span class="pl-pds">"</span>안녕하세요<span class="pl-pds">"</span></span><span class="pl-k">.</span>stringByApplyingTransform(NSStringTransformLatinToHangul, reverse: <span class="pl-c1">true</span>)
+<span class="pl-c">// "annyeonghaseyo"</span>
+<span class="pl-s"><span class="pl-pds">"</span>annyeonghaseyo<span class="pl-pds">"</span></span><span class="pl-k">.</span>stringByApplyingTransform(NSStringTransformLatinToHangul, reverse: <span class="pl-c1">false</span>)
+<span class="pl-c">// "안녕하세요"</span></pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span><span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, [<span class="pl-s"><span class="pl-pds">@"</span>privet<span class="pl-pds">"</span></span> <span class="pl-c1">stringByApplyingTransform:</span><span class="pl-c1">NSStringTransformLatinToCyrillic</span> <span class="pl-c1">reverse:</span><span class="pl-c1">NO</span>]);
+<span class="pl-c">// "привет"</span>
+<span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span><span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, [<span class="pl-s"><span class="pl-pds">@"</span>annyeonghaseyo<span class="pl-pds">"</span></span> <span class="pl-c1">stringByApplyingTransform:</span><span class="pl-c1">NSStringTransformLatinToHangul</span> <span class="pl-c1">reverse:</span><span class="pl-c1">NO</span>]);
+<span class="pl-c">// "안녕하세요"</span>
+<span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span><span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, [<span class="pl-s"><span class="pl-pds">@"</span>안녕하세요<span class="pl-pds">"</span></span> <span class="pl-c1">stringByApplyingTransform:</span><span class="pl-c1">NSStringTransformLatinToHangul</span> <span class="pl-c1">reverse:</span><span class="pl-c1">YES</span>]);
+<span class="pl-c">// "annyeonghaseyo"</span></pre></div>
+
+<h3><a id="user-content-unicode-names" class="anchor" href="#unicode-names" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Unicode Names</h3>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-s"><span class="pl-pds">"</span>🐷<span class="pl-pds">"</span></span><span class="pl-k">.</span>stringByApplyingTransform(NSStringTransformToUnicodeName, reverse: <span class="pl-c1">false</span>)
+<span class="pl-c">// "{PIG FACE}"</span></pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span><span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, [<span class="pl-s"><span class="pl-pds">@"</span>🐷<span class="pl-pds">"</span></span> <span class="pl-c1">stringByApplyingTransform:</span><span class="pl-c1">NSStringTransformToUnicodeName</span> <span class="pl-c1">reverse:</span><span class="pl-c1">NO</span>]);
+<span class="pl-c">// "{PIG FACE}"</span></pre></div>
+
+<h3><a id="user-content-normalizing-user-input" class="anchor" href="#normalizing-user-input" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Normalizing User Input</h3>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-s"><span class="pl-pds">"</span>Hello! こんにちは! สวัสดี! مرحبا! 您好!<span class="pl-pds">"</span></span>
+        <span class="pl-k">.</span>stringByApplyingTransform(NSStringTransformToLatin, reverse: <span class="pl-c1">false</span>)?
+        <span class="pl-k">.</span>stringByApplyingTransform(NSStringTransformStripDiacritics, reverse: <span class="pl-c1">false</span>)?
+        <span class="pl-k">.</span>localizedLowercaseString
+        <span class="pl-k">.</span>componentsSeparatedByCharactersInSet(NSCharacterSet<span class="pl-k">.</span>whitespaceCharacterSet())
+<span class="pl-c">// ["hello!", "kon'nichiha!", "swasdi!", "mrhba!", "nin", "hao!"]</span></pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSString</span> *input = <span class="pl-s"><span class="pl-pds">@"</span>Hello! こんにちは! สวัสดี! مرحبا! 您好!<span class="pl-pds">"</span></span>;
+<span class="pl-c1">NSString</span> *processing = [input <span class="pl-c1">stringByApplyingTransform:</span><span class="pl-c1">NSStringTransformToLatin</span> <span class="pl-c1">reverse:</span><span class="pl-c1">NO</span>];
+processing = [processing <span class="pl-c1">stringByApplyingTransform:</span><span class="pl-c1">NSStringTransformStripDiacritics</span> <span class="pl-c1">reverse:</span><span class="pl-c1">NO</span>];
+
+<span class="pl-c1">NSArray</span>&lt;<span class="pl-c1">NSString</span> *&gt; *output = [processing.localizedLowercaseString
+                               <span class="pl-c1">componentsSeparatedByCharactersInSet:</span>[<span class="pl-c1">NSCharacterSet</span> <span class="pl-c1">whitespaceCharacterSet</span>]];
+<span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span><span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, output);
+<span class="pl-c">// ["hello!", "kon'nichiha!", "swasdi!", "mrhba!", "nin", "hao!"]</span></pre></div>
+
+<p>For more on string transformations, be sure to check out Mattt's <a href="http://nshipster.com/cfstringtransform/">terrific article on <code>CFStringTransform</code></a>.</p>
+
+<h2><a id="user-content-cllocationmanagerrequestlocation" class="anchor" href="#cllocationmanagerrequestlocation" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>CLLocationManager.requestLocation</h2>
+
+<p>Core Location includes a nice new API for apps that simply need to fetch the user's location without continuous location updates. <code>requestLocation()</code> uses the same delegate methods as continuous updates, turning itself off after delivering the location with the desired accuracy:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">class</span> ViewController <span class="pl-k">:</span> UIViewController, CLLocationManagerDelegate {
+    <span class="pl-k">let</span> locationManager <span class="pl-k">=</span> CLLocationManager()
+    <span class="pl-c">// ...</span>
+
+    <span class="pl-k">override</span> <span class="pl-k">func</span> <span class="pl-en">viewDidLoad</span>() {
+        <span class="pl-k">super</span><span class="pl-k">.</span>viewDidLoad()
+
+        locationManager<span class="pl-k">.</span>delegate <span class="pl-k">=</span> <span class="pl-k">self</span>
+        locationManager<span class="pl-k">.</span>desiredAccuracy <span class="pl-k">=</span> kCLLocationAccuracyHundredMeters
+        locationManager<span class="pl-k">.</span>requestLocation()
+    }
+
+   <span class="pl-c">// MARK: - CLLocationManagerDelegate</span>
+
+    <span class="pl-k">func</span> <span class="pl-en">locationManager</span>(manager: CLLocationManager, <span class="pl-en">didUpdateLocations</span> <span class="pl-smi">locations</span>: [CLLocation]) {
+        <span class="pl-k">if</span> <span class="pl-k">let</span> location <span class="pl-k">=</span> locations<span class="pl-k">.</span><span class="pl-c1">first</span> {
+            <span class="pl-c1">print</span>(<span class="pl-s"><span class="pl-pds">"</span>Current location: <span class="pl-pse">\(</span><span class="pl-s1">location</span><span class="pl-pse">)</span><span class="pl-pds">"</span></span>)
+        } <span class="pl-k">else</span> {
+            <span class="pl-c">// ...</span>
+        }
+    }
+
+    <span class="pl-k">func</span> <span class="pl-en">locationManager</span>(manager: CLLocationManager, <span class="pl-en">didFailWithError</span> <span class="pl-smi">error</span>: NSError) {
+        <span class="pl-c1">print</span>(<span class="pl-s"><span class="pl-pds">"</span>Error finding location: <span class="pl-pse">\(</span><span class="pl-s1">error<span class="pl-k">.</span>localizedDescription</span><span class="pl-pse">)</span><span class="pl-pds">"</span></span>)
+    }
+}</pre></div>
+
+<h2><a id="user-content-swiftification" class="anchor" href="#swiftification" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Swiftification</h2>
+
+<p>The Cocoa APIs in iOS 9 (and OS X 10.11) include thousands of minor changes designed to make Swift interoperability safer and cleaner. These changes start with the familiar nullability annotations, converting implicitly unwrapped parameters and return values to either true Optionals or simple, non-optional data types. But they also go much further.</p>
+
+<p>For example, instead of marking <code>NSArray</code> return values as nullable, many APIs have been modified to return an empty array—semantically these have the same value (i.e., nothing), but a non-optional array is far simpler to work with. Moreover, many Cocoa APIs are gradually taking advantage of the new Objective-C generic syntax to provide typed arrays. The <code>CLLocationManagerDelegate</code> method <code>locationManager(_:didUpdateLocations:)</code> shown above is one such example: where the <code>locations</code> parameter used to be imported as an  <code>AnyObject</code> array, it is now an array of <code>CLLocation</code>, eliminating the need for any casting in the method body.</p>
+
+<p>Finally, some APIs that were completely inaccessible from Swift have been revised, such as methods for retrieving <code>UIAppearance</code> proxies that limit appearance to a particular containment hierarchy—UIKit's version of CSS-lite. The old <code>appearanceWhenContainedIn:</code> method is implemented with C variadic parameters, which Swift doesn't import; the new <code>appearanceWhenContainedInInstancesOfClasses(_:)</code> method simply takes an array of type objects:</p>
+
+<div class="highlight highlight-source-swift"><pre>UIBarButtonItem<span class="pl-k">.</span>appearanceWhenContainedInInstancesOfClasses([UINavigationController<span class="pl-k">.</span><span class="pl-k">self</span>])<span class="pl-k">.</span>tintColor <span class="pl-k">=</span> UIColor<span class="pl-k">.</span>redColor()</pre></div>
+
+<div class="highlight highlight-source-objc"><pre>[UIBarButtonItem <span class="pl-c1">appearanceWhenContainedInInstancesOfClasses:</span>@[[UINavigationController <span class="pl-c1">class</span>]]].tintColor = [UIColor <span class="pl-c1">redColor</span>];</pre></div>
+
+<blockquote>
+<p>Ironically enough, this method crashes at runtime when used from Swift. Betas gonna beta.</p>
+</blockquote>
+
+<h2><a id="user-content-nsformatter-additions" class="anchor" href="#nsformatter-additions" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>NSFormatter Additions</h2>
+
+<p>The new Contacts framework includes <code>NSFormatter</code> subclasses for localized formatting of contacts and addresses alongside a new Foundation <code>NSPersonNameComponentsFormatter</code> class. We'll cover those more in the weeks to come, but here let's highlight a few additions to two old favorites: <code>NSNumberFormatter</code> and <code>NSDateFormatter</code>.</p>
+
+<h3><a id="user-content-nsnumberformatter" class="anchor" href="#nsnumberformatter" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>NSNumberFormatter</h3>
+
+<p>First, <code>NSNumberFormatter</code> sees four additional styles in iOS 9, starting with <code>.OrdinalStyle</code>, used for converting numbers to their ordinal equivalent:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> formatter <span class="pl-k">=</span> NSNumberFormatter()
+formatter<span class="pl-k">.</span>numberStyle <span class="pl-k">=</span> <span class="pl-k">.</span>OrdinalStyle
+
+<span class="pl-k">let</span> numbers <span class="pl-k">=</span> [<span class="pl-c1">1</span>, <span class="pl-c1">2</span>, <span class="pl-c1">3</span>, <span class="pl-c1">4</span>, <span class="pl-c1">5</span>]
+numbers<span class="pl-k">.</span><span class="pl-c1">map</span> { formatter<span class="pl-k">.</span>stringFromNumber($<span class="pl-c1">0</span>)<span class="pl-k">!</span> }
+<span class="pl-c">// ["1st", "2nd", "3rd", "4th", "5th"]</span>
+
+formatter<span class="pl-k">.</span>locale <span class="pl-k">=</span> NSLocale(localeIdentifier: <span class="pl-s"><span class="pl-pds">"</span>es<span class="pl-pds">"</span></span>)
+numbers<span class="pl-k">.</span><span class="pl-c1">map</span> { formatter<span class="pl-k">.</span>stringFromNumber($<span class="pl-c1">0</span>)<span class="pl-k">!</span> }
+<span class="pl-c">// ["1º", "2º", "3º", "4º", "5º"]</span></pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSNumberFormatter</span> *formatter = [[<span class="pl-c1">NSNumberFormatter</span> <span class="pl-c1">alloc</span>] <span class="pl-c1">init</span>];
+formatter.numberStyle = <span class="pl-c1">NSNumberFormatterOrdinalStyle</span>;
+<span class="pl-c1">NSArray</span>&lt;<span class="pl-c1">NSNumber</span> *&gt; *numbers = @[@<span class="pl-c1">1</span>, @<span class="pl-c1">2</span>, @<span class="pl-c1">3</span>, @<span class="pl-c1">4</span>, @<span class="pl-c1">5</span>];
+
+<span class="pl-k">for</span> (<span class="pl-c1">NSNumber</span> *number in numbers) {
+    <span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span><span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, [formatter <span class="pl-c1">stringFromNumber:</span>number]);
+}
+<span class="pl-c">// "1st", "2nd", "3rd", "4th", "5th"</span>
+
+formatter.locale = [<span class="pl-c1">NSLocale</span> <span class="pl-c1">localeWithLocaleIdentifier:</span><span class="pl-s"><span class="pl-pds">@"</span>es<span class="pl-pds">"</span></span>];
+<span class="pl-k">for</span> (<span class="pl-c1">NSNumber</span> *number in numbers) {
+    <span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span><span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, [formatter <span class="pl-c1">stringFromNumber:</span>number]);
+}
+<span class="pl-c">// "1º", "2º", "3º", "4º", "5º"</span></pre></div>
+
+<p>Next, the existing <code>.CurrencyStyle</code> gets some company with <code>.CurrencyPluralStyle</code>, <code>.CurrencyISOCodeStyle</code>, and <code>.CurrencyAccountingStyle</code>. When using these new styles, be sure your locale fully specifies both a language <em>and</em> a country, which it makes it possible for the formatter to choose the right currency and presentation:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> styles: [NSNumberFormatterStyle] <span class="pl-k">=</span> [<span class="pl-k">.</span>CurrencyStyle, <span class="pl-k">.</span>CurrencyPluralStyle, 
+                <span class="pl-k">.</span>CurrencyISOCodeStyle, <span class="pl-k">.</span>CurrencyAccountingStyle]
+formatter<span class="pl-k">.</span>locale <span class="pl-k">=</span> NSLocale(localeIdentifier: <span class="pl-s"><span class="pl-pds">"</span>en_US<span class="pl-pds">"</span></span>)
+styles<span class="pl-k">.</span><span class="pl-c1">map</span> {
+    formatter<span class="pl-k">.</span>numberStyle <span class="pl-k">=</span> $<span class="pl-c1">0</span>
+    <span class="pl-k">return</span> formatter<span class="pl-k">.</span>stringFromNumber(<span class="pl-c1">-125</span>)<span class="pl-k">!</span>
+}
+<span class="pl-c">// ["-$125.00", "-125.00 US dollars", "-USD125.00", "($125.00)"]</span>
+
+formatter<span class="pl-k">.</span>locale <span class="pl-k">=</span> NSLocale(localeIdentifier: <span class="pl-s"><span class="pl-pds">"</span>es_ES<span class="pl-pds">"</span></span>)
+styles<span class="pl-k">.</span><span class="pl-c1">map</span> {
+    formatter<span class="pl-k">.</span>numberStyle <span class="pl-k">=</span> $<span class="pl-c1">0</span>
+    <span class="pl-k">return</span> formatter<span class="pl-k">.</span>stringFromNumber(<span class="pl-c1">-125</span>)<span class="pl-k">!</span>
+}
+<span class="pl-c">// ["-125,00 €", "-125,00 euros", "-125,00 EUR", "-125,00 €"]</span></pre></div>
+
+<h3><a id="user-content-nsdateformatter" class="anchor" href="#nsdateformatter" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>NSDateFormatter</h3>
+
+<p>Second—and I'll fess up—this new <code>NSDateFormatter</code> method is a bit of a cheat. <code>setLocalizedDateFormatFromTemplate(_:)</code> was introduced in iOS 8 but largely slid under the radar until this year's sessions on internationalization. This new-<em>ish</em> method makes it supremely easy to define a template for the date and time elements you want; however, it leaves the formatting up to the excellent localization built into <code>NSDateFormatter</code>:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> now <span class="pl-k">=</span> NSDate()
+
+<span class="pl-c">// full date and time</span>
+<span class="pl-k">let</span> fullFormatter <span class="pl-k">=</span> NSDateFormatter()
+fullFormatter<span class="pl-k">.</span>setLocalizedDateFormatFromTemplate(<span class="pl-s"><span class="pl-pds">"</span>yyyyMMMMddhhmm<span class="pl-pds">"</span></span>)
+<span class="pl-c">// month name and year only</span>
+<span class="pl-k">let</span> shortFormatter <span class="pl-k">=</span> NSDateFormatter()
+shortFormatter<span class="pl-k">.</span>setLocalizedDateFormatFromTemplate(<span class="pl-s"><span class="pl-pds">"</span>yyMMMM<span class="pl-pds">"</span></span>)
+
+fullFormatter<span class="pl-k">.</span>stringFromDate(now)
+<span class="pl-c">// "June 23, 2015, 4:56 PM"</span>
+shortFormatter<span class="pl-k">.</span>stringFromDate(now)
+<span class="pl-c">// "June 15"</span></pre></div>
+
+<p>If you switch locales, you'll need to reset the localized date format to get the correct template for the new locale:</p>
+
+<div class="highlight highlight-source-swift"><pre>fullFormatter<span class="pl-k">.</span>locale <span class="pl-k">=</span> NSLocale(localeIdentifier: <span class="pl-s"><span class="pl-pds">"</span>de_DE<span class="pl-pds">"</span></span>)
+fullFormatter<span class="pl-k">.</span>setLocalizedDateFormatFromTemplate(<span class="pl-s"><span class="pl-pds">"</span>yyyyMMMMddhhmm<span class="pl-pds">"</span></span>)
+
+shortFormatter<span class="pl-k">.</span>locale <span class="pl-k">=</span> NSLocale(localeIdentifier: <span class="pl-s"><span class="pl-pds">"</span>de_DE<span class="pl-pds">"</span></span>)
+shortFormatter<span class="pl-k">.</span>setLocalizedDateFormatFromTemplate(<span class="pl-s"><span class="pl-pds">"</span>yyMMMM<span class="pl-pds">"</span></span>)
+
+fullFormatter<span class="pl-k">.</span>stringFromDate(now)
+<span class="pl-c">// "23. Juni 2015, 4:56 nachm."</span>
+shortFormatter<span class="pl-k">.</span>stringFromDate(now)
+<span class="pl-c">// "Juni 15"</span></pre></div>
+
+<hr>
+
+<p>Well, that's that for our quick tour through some of iOS 9's new APIs, though there are many more where those came from. What new features are <em>you</em> most excited about in iOS 9 or OS X 10.11? Check out <a href="https://developer.apple.com/library/prerelease/ios/releasenotes/General/iOS90APIDiffs/">Apple's diffs</a> and <a href="https://twitter.com/nshipster">let us know</a>!</p>
+</article></div>

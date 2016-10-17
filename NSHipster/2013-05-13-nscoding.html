@@ -1,0 +1,279 @@
+<div class="announce instapaper_body md" data-path="2013-05-13-nscoding.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>NSCoding / NSKeyedArchiver</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div>Cocoa</div></td>
+
+  <td><div>Among the most important architectural decisions made when building an app is how to persist data between launches. The question of how, exactly, to re-create the state of the app from the time it was last opened; of how to describe the object graph in such a way that it can be flawlessly reconstructed next time.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+
+  <th>reviewed</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>2.0</div></td>
+
+  <td><div>September 15, 2015</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>Among the most important architectural decisions made when building an app is how to persist data between launches. The question of how, exactly, to re-create the state of the app from the time it was last opened; of how to describe the object graph in such a way that it can be flawlessly reconstructed next time.</p>
+
+<p>On iOS and OS X, Apple provides two options: <a href="http://developer.apple.com/library/mac/#documentation/cocoa/Conceptual/CoreData/cdProgrammingGuide.html">Core Data</a> or <a href="http://developer.apple.com/library/ios/#Documentation/Cocoa/Reference/Foundation/Classes/NSKeyedArchiver_Class/Reference/Reference.html"><code>NSKeyedArchiver</code></a> / <a href="http://developer.apple.com/library/ios/#documentation/Cocoa/Reference/Foundation/Classes/NSKeyedUnarchiver_Class/Reference/Reference.html"><code>NSKeyedUnarchiver</code></a> (which serializes <code>&lt;NSCoding&gt;</code>-compliant classes to and from a data representation).</p>
+
+<blockquote>
+<p>Or rather: three, if you include <code>NSURLCache</code>. In the case of a client-server application, having the client load necessary data on each launch is a viable design, especially when combined with a disk-based cache, which allows stored server responses to be returned immediately from matching requests. In practice, some combination of network and object caching is advisable.</p>
+</blockquote>
+
+<p>When it comes to modeling, querying, traversing and persisting complex object graphs, there is no substitute for Core Data. Core Data is a big hammer, but not every problem is a nail—much less a sufficiently large nail.</p>
+
+<p>A fair and common comparison of Core Data to <code>NSKeyedArchiver</code> might go something like this:</p>
+
+<table id="user-content-figure-1">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Core Data</th>
+      <th>NSKeyedArchiver</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Entity Modeling</td>
+      <td>Yes</td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <td>Querying</td>
+      <td>Yes</td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <td>Speed</td>
+      <td>Fast</td>
+      <td>Slow</td>
+    </tr>
+    <tr>
+      <td>Serialization Format</td>
+      <td>SQLite, XML, or NSData</td>
+      <td>NSData</td>
+    </tr>
+    <tr>
+      <td>Migrations</td>
+      <td>Automatic</td>
+      <td>Manual</td>
+    </tr>
+    <tr>
+      <td>Undo Manager</td>
+      <td>Automatic</td>
+      <td>Manual</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Et cetera. In a heads-up, apples to apples comparison, it looks rather one-sided.</p>
+
+<p>...that is, until you look at it from a slightly different perspective:</p>
+
+<table id="user-content-figure-2">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Core Data</th>
+      <th>NSKeyedArchiver</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Persists State</td>
+      <td>Yes</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <td>Pain in the Ass</td>
+      <td>Yes</td>
+      <td>No</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>By these measures, <code>NSKeyedArchiver</code> becomes a perfectly reasonable choice in certain situations. Not all apps need to query data. Not all apps need automatic migrations. Not all apps work with large or complex object graphs. And even apps that do may have certain components better served by a simpler solution.</p>
+
+<p>This article will look at the how's, when's, and why's of <code>NSKeyedArchiver</code> and <code>NSCoding</code>. And with this understanding, hopefully provide you, dear reader, with the wisdom to choose the best tool for the job.</p>
+
+<hr>
+
+<p><code>NSCoding</code> is a simple protocol, with two methods: <code>-initWithCoder:</code> and <code>encodeWithCoder:</code>. Classes that conform to <code>NSCoding</code> can be serialized and deserialized into data that can be either be archived to disk or distributed across a network.</p>
+
+<p>For example:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">class</span> Book: NSObject, NSCoding {
+    <span class="pl-k">var</span> title: <span class="pl-c1">String</span>
+    <span class="pl-k">var</span> author: <span class="pl-c1">String</span>
+    <span class="pl-k">var</span> pageCount: <span class="pl-c1">Int</span>
+    <span class="pl-k">var</span> categories: [<span class="pl-c1">String</span>]
+    <span class="pl-k">var</span> available: <span class="pl-c1">Bool</span>
+
+    <span class="pl-c">// Memberwise initializer</span>
+    <span class="pl-k">init</span>(title: <span class="pl-c1">String</span>, author: <span class="pl-c1">String</span>, pageCount: <span class="pl-c1">Int</span>, categories: [<span class="pl-c1">String</span>], available: <span class="pl-c1">Bool</span>) {
+        <span class="pl-k">self</span><span class="pl-k">.</span>title <span class="pl-k">=</span> title
+        <span class="pl-k">self</span><span class="pl-k">.</span>author <span class="pl-k">=</span> author
+        <span class="pl-k">self</span><span class="pl-k">.</span>pageCount <span class="pl-k">=</span> pageCount
+        <span class="pl-k">self</span><span class="pl-k">.</span>categories <span class="pl-k">=</span> categories
+        <span class="pl-k">self</span><span class="pl-k">.</span>available <span class="pl-k">=</span> available
+    }
+
+    <span class="pl-c">// MARK: NSCoding</span>
+
+    <span class="pl-k">required</span> <span class="pl-k">convenience</span> <span class="pl-k">init</span>?(coder decoder: NSCoder) {
+        <span class="pl-k">guard</span> <span class="pl-k">let</span> title <span class="pl-k">=</span> decoder<span class="pl-k">.</span>decodeObjectForKey(<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>) <span class="pl-k">as?</span> <span class="pl-c1">String</span>,
+            <span class="pl-k">let</span> author <span class="pl-k">=</span> decoder<span class="pl-k">.</span>decodeObjectForKey(<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>) <span class="pl-k">as?</span> <span class="pl-c1">String</span>,
+            <span class="pl-k">let</span> categories <span class="pl-k">=</span> decoder<span class="pl-k">.</span>decodeObjectForKey(<span class="pl-s"><span class="pl-pds">"</span>categories<span class="pl-pds">"</span></span>) <span class="pl-k">as?</span> [<span class="pl-c1">String</span>]
+            <span class="pl-k">else</span> { <span class="pl-k">return</span> <span class="pl-c1">nil</span> }
+
+        <span class="pl-k">self</span><span class="pl-k">.</span><span class="pl-k">init</span>(
+            title: title,
+            author: author,
+            pageCount: decoder<span class="pl-k">.</span>decodeIntegerForKey(<span class="pl-s"><span class="pl-pds">"</span>pageCount<span class="pl-pds">"</span></span>),
+            categories: categories,
+            available: decoder<span class="pl-k">.</span>decodeBoolForKey(<span class="pl-s"><span class="pl-pds">"</span>available<span class="pl-pds">"</span></span>)
+        )
+    }
+
+    <span class="pl-k">func</span> <span class="pl-en">encodeWithCoder</span>(coder: NSCoder) {
+        coder<span class="pl-k">.</span>encodeObject(<span class="pl-k">self</span><span class="pl-k">.</span>title, forKey: <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>)
+        coder<span class="pl-k">.</span>encodeObject(<span class="pl-k">self</span><span class="pl-k">.</span>author, forKey: <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>)
+        coder<span class="pl-k">.</span>encodeInt(<span class="pl-c1">Int32</span>(<span class="pl-k">self</span><span class="pl-k">.</span>pageCount), forKey: <span class="pl-s"><span class="pl-pds">"</span>pageCount<span class="pl-pds">"</span></span>)
+        coder<span class="pl-k">.</span>encodeObject(<span class="pl-k">self</span><span class="pl-k">.</span>categories, forKey: <span class="pl-s"><span class="pl-pds">"</span>categories<span class="pl-pds">"</span></span>)
+        coder<span class="pl-k">.</span>encodeBool(<span class="pl-k">self</span><span class="pl-k">.</span>available, forKey: <span class="pl-s"><span class="pl-pds">"</span>available<span class="pl-pds">"</span></span>)
+    }
+}</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-k">@interface</span> <span class="pl-en">Book</span> : <span class="pl-e">NSObject</span> &lt;<span class="pl-c1">NSCoding</span>&gt;
+<span class="pl-k">@property</span> <span class="pl-c1">NSString</span> *title;
+<span class="pl-k">@property</span> <span class="pl-c1">NSString</span> *author;
+<span class="pl-k">@property</span> <span class="pl-c1">NSUInteger</span> pageCount;
+<span class="pl-k">@property</span> <span class="pl-c1">NSSet</span> *categories;
+<span class="pl-k">@property</span> (<span class="pl-k">getter</span> = isAvailable) <span class="pl-c1">BOOL</span> available;
+<span class="pl-k">@end</span>
+
+<span class="pl-k">@implementation</span> <span class="pl-en">Book</span>
+
+#<span class="pl-k">pragma mark</span> - NSCoding
+
+- (<span class="pl-c1">id</span>)<span class="pl-en">initWithCoder</span><span class="pl-en">:</span>(<span class="pl-c1">NSCoder</span> *)<span class="pl-smi">decoder</span> {
+    self = [<span class="pl-v">super</span> <span class="pl-c1">init</span>];
+    <span class="pl-k">if</span> (!self) {
+        <span class="pl-k">return</span> <span class="pl-c1">nil</span>;
+    }
+
+    self.<span class="pl-smi">title</span> = [decoder <span class="pl-c1">decodeObjectForKey:</span><span class="pl-s"><span class="pl-pds">@"</span>title<span class="pl-pds">"</span></span>];
+    self.<span class="pl-smi">author</span> = [decoder <span class="pl-c1">decodeObjectForKey:</span><span class="pl-s"><span class="pl-pds">@"</span>author<span class="pl-pds">"</span></span>];
+    self.<span class="pl-smi">pageCount</span> = [decoder <span class="pl-c1">decodeIntegerForKey:</span><span class="pl-s"><span class="pl-pds">@"</span>pageCount<span class="pl-pds">"</span></span>];
+    self.<span class="pl-smi">categories</span> = [decoder <span class="pl-c1">decodeObjectForKey:</span><span class="pl-s"><span class="pl-pds">@"</span>categories<span class="pl-pds">"</span></span>];
+    self.<span class="pl-smi">available</span> = [decoder <span class="pl-c1">decodeBoolForKey:</span><span class="pl-s"><span class="pl-pds">@"</span>available<span class="pl-pds">"</span></span>];
+
+    <span class="pl-k">return</span> self;
+}
+
+- (<span class="pl-k">void</span>)<span class="pl-en">encodeWithCoder</span><span class="pl-en">:</span>(<span class="pl-c1">NSCoder</span> *)<span class="pl-smi">encoder</span> {
+    [encoder <span class="pl-c1">encodeObject:</span><span class="pl-v">self</span>.title <span class="pl-c1">forKey:</span><span class="pl-s"><span class="pl-pds">@"</span>title<span class="pl-pds">"</span></span>];
+    [encoder <span class="pl-c1">encodeObject:</span><span class="pl-v">self</span>.author <span class="pl-c1">forKey:</span><span class="pl-s"><span class="pl-pds">@"</span>author<span class="pl-pds">"</span></span>];
+    [encoder <span class="pl-c1">encodeInteger:</span><span class="pl-v">self</span>.pageCount <span class="pl-c1">forKey:</span><span class="pl-s"><span class="pl-pds">@"</span>pageCount<span class="pl-pds">"</span></span>];
+    [encoder <span class="pl-c1">encodeObject:</span><span class="pl-v">self</span>.categories <span class="pl-c1">forKey:</span><span class="pl-s"><span class="pl-pds">@"</span>categories<span class="pl-pds">"</span></span>];
+    [encoder <span class="pl-c1">encodeBool:</span>[<span class="pl-v">self</span> <span class="pl-c1">isAvailable</span>] <span class="pl-c1">forKey:</span><span class="pl-s"><span class="pl-pds">@"</span>available<span class="pl-pds">"</span></span>];
+}
+
+<span class="pl-k">@end</span></pre></div>
+
+<p>As you can see, <code>NSCoding</code> is mostly boilerplate. Each property is encoded or decoded as an object or type, using the name of the property of as the key each time. (Some developers prefer to define <code>NSString *</code> constants for each keypath, but this is usually unnecessary).</p>
+
+<p>But boilerplate can be a good thing sometimes—with direct control over the entire serialization process, it remains flexible to account for things like:</p>
+
+<ul>
+<li><strong>Migrations</strong>: If a data model changes—such as adding, renaming, or removing a field—it should maintain compatibility with data serialized in the old format. Apple provides some guidelines on how to go about this in <a href="https://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/Archiving/Articles/compatibility.html#//apple_ref/doc/uid/20001055-BCICFFGE">"Forward and Backward Compatibility for Keyed Archives"</a>.</li>
+<li><strong>Archiving non-<code>NSCoding</code>-compatible Classes</strong>: According to object-oriented design, objects should take responsibility for encoding and decoding to and from a serialization format. However, when a class doesn't come with <code>NSCoding</code> support built in, it may be left up to class that uses it to help out.</li>
+</ul>
+
+<blockquote>
+<p>One library that aims to cut down the boilerplate of NSCoding is <a href="https://github.com/github/Mantle">Mantle</a>, from the good folks over at GitHub. If you're looking for more of the conveniences of Core Data modeling with <code>NSCoding</code>, Mantle is definitely worth a look.</p>
+</blockquote>
+
+<hr>
+
+<p>Of course, serialization is only one part of the story. Determining where this data will persist is another question. Again, there are two approaches: writing to the local file system and using <code>NSUserDefaults</code>.</p>
+
+<h2><a id="user-content-file-system" class="anchor" href="#file-system" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>File System</h2>
+
+<p><code>NSKeyedArchiver</code> and <code>NSKeyedUnarchiver</code> provide a convenient API to read / write objects directly to / from disk.</p>
+
+<p>An <code>NSCoding</code>-backed table view controller might, for instance, set its collection property from the file manager</p>
+
+<h4><a id="user-content-archiving" class="anchor" href="#archiving" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Archiving</h4>
+
+<div class="highlight highlight-source-swift"><pre>NSKeyedArchiver<span class="pl-k">.</span>archiveRootObject(books, toFile: <span class="pl-s"><span class="pl-pds">"</span>/path/to/archive<span class="pl-pds">"</span></span>)</pre></div>
+
+<div class="highlight highlight-source-objc"><pre>[<span class="pl-c1">NSKeyedArchiver</span> <span class="pl-c1">archiveRootObject:</span>books <span class="pl-c1">toFile:</span><span class="pl-s"><span class="pl-pds">@"</span>/path/to/archive<span class="pl-pds">"</span></span>];</pre></div>
+
+<h4><a id="user-content-unarchiving" class="anchor" href="#unarchiving" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Unarchiving</h4>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">guard</span> <span class="pl-k">let</span> books <span class="pl-k">=</span> NSKeyedUnarchiver<span class="pl-k">.</span>unarchiveObjectWithFile(<span class="pl-s"><span class="pl-pds">"</span>/path/to/archive<span class="pl-pds">"</span></span>) <span class="pl-k">as?</span> [Book] <span class="pl-k">else</span> { <span class="pl-k">return</span> <span class="pl-c1">nil</span> }</pre></div>
+
+<div class="highlight highlight-source-objc"><pre>[<span class="pl-c1">NSKeyedUnarchiver</span> <span class="pl-c1">unarchiveObjectWithFile:</span><span class="pl-s"><span class="pl-pds">@"</span>/path/to/archive<span class="pl-pds">"</span></span>];</pre></div>
+
+<h2><a id="user-content-nsuserdefaults" class="anchor" href="#nsuserdefaults" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>NSUserDefaults</code></h2>
+
+<p>Each app has its own database of user preferences, which can store and retrieve any <code>NSCoding</code>-compatible object or C value.</p>
+
+<p>While it is not advisable to store an entire object graph into <code>NSUserDefaults</code>, it can be useful to encode compound objects in this way, such as "current user" objects <del>or API credentials</del> <ins>(use <a href="https://developer.apple.com/library/mac/#documentation/security/Conceptual/keychainServConcepts/iPhoneTasks/iPhoneTasks.html">Keychain</a> instead)</ins>.</p>
+
+<h4><a id="user-content-archiving-1" class="anchor" href="#archiving-1" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Archiving</h4>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> data <span class="pl-k">=</span> NSKeyedArchiver<span class="pl-k">.</span>archivedDataWithRootObject(books)
+NSUserDefaults<span class="pl-k">.</span>standardUserDefaults()<span class="pl-k">.</span>setObject(data, forKey: <span class="pl-s"><span class="pl-pds">"</span>books<span class="pl-pds">"</span></span>)</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSData</span> *data = [<span class="pl-c1">NSKeyedArchiver</span> <span class="pl-c1">archivedDataWithRootObject:</span>books];
+[[<span class="pl-c1">NSUserDefaults</span> <span class="pl-c1">standardUserDefaults</span>] <span class="pl-c1">setObject:</span>data <span class="pl-c1">forKey:</span><span class="pl-s"><span class="pl-pds">@"</span>books<span class="pl-pds">"</span></span>];</pre></div>
+
+<h4><a id="user-content-unarchiving-1" class="anchor" href="#unarchiving-1" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Unarchiving</h4>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">if</span> <span class="pl-k">let</span> data <span class="pl-k">=</span> NSUserDefaults<span class="pl-k">.</span>standardUserDefaults()<span class="pl-k">.</span><span class="pl-c1">objectForKey</span>(<span class="pl-s"><span class="pl-pds">"</span>books<span class="pl-pds">"</span></span>) <span class="pl-k">as?</span> NSData {
+    <span class="pl-k">let</span> books <span class="pl-k">=</span> NSKeyedUnarchiver<span class="pl-k">.</span>unarchiveObjectWithData(data)
+}</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSData</span> *data = [[<span class="pl-c1">NSUserDefaults</span> <span class="pl-c1">standardUserDefaults</span>] <span class="pl-c1">objectForKey:</span><span class="pl-s"><span class="pl-pds">@"</span>books<span class="pl-pds">"</span></span>];
+<span class="pl-c1">NSArray</span> *books = [<span class="pl-c1">NSKeyedUnarchiver</span> <span class="pl-c1">unarchiveObjectWithData:</span>data];</pre></div>
+
+<hr>
+
+<p>As developers, it is our responsibility to understand the goals and needs of our applications, and to resist the urge to over-engineer and prematurely optimize our solutions.</p>
+
+<p>The decision to use Core Data in an application may appear to be a no-brainer, if not harmless. But in many cases, Core Data is discovered to be so unwieldy or unnecessary as to become a real hindrance to making something useful, let alone functional.</p>
+
+<p>And even if most applications <em>would</em> benefit from Core Data at some point, there is wisdom to letting complexity evolve from a simple as necessary. And as far as persistence goes, it doesn't get much simpler than <code>NSCoding</code>.</p>
+</article></div>

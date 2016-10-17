@@ -1,0 +1,152 @@
+<div class="announce instapaper_body md" data-path="2015-01-26-swift-objc-runtime.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>tags</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>Swift &amp; the Objective-C Runtime</div></td>
+
+  <td><div>Nate Cook</div></td>
+
+  <td><div>Swift</div></td>
+
+  <td><div>swift</div></td>
+
+  <td><div>Even when written without a single line of Objective-C code, every Swift app executes inside the Objective-C runtime, opening up a world of dynamic dispatch and associated runtime manipulation. To be sure, this may not always be the case—Swift-only frameworks, whenever they come, may lead to a Swift-only runtime. But as long as the Objective-C runtime is with us, let's use it to its fullest potential.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+
+  <th>reviewed</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>2.0</div></td>
+
+  <td><div>September 19, 2015</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>Even when written without a single line of Objective-C code, every Swift app executes inside the Objective-C runtime, opening up a world of dynamic dispatch and associated runtime manipulation. To be sure, this may not always be the case—Swift-only frameworks, whenever they come, may lead to a Swift-only runtime. But as long as the Objective-C runtime is with us, let's use it to its fullest potential.</p>
+
+<p>This week we take a new, Swift-focused look at two runtime techniques covered on NSHipster back when Objective-C was the only game in town: <a href="/associated-objects/">associated objects</a> and <a href="/method-swizzling/">method swizzling</a>.</p>
+
+<blockquote>
+<p><em>Note:</em> This post primarily covers the use of these techniques in Swift—for the full run-down, please refer to the original articles.</p>
+</blockquote>
+
+<h2><a id="user-content-associated-objects" class="anchor" href="#associated-objects" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Associated Objects</h2>
+
+<p>Swift extensions allow for great flexibility in adding to the functionality of existing Cocoa classes, but they're limited in the same way as their Objective-C brethren, categories. Namely, you can't add a property to an existing class via an extension.</p>
+
+<p>Happily, Objective-C <em>associated objects</em> come to the rescue. For example, to add a <code>descriptiveName</code> property to all the view controllers in a project, we simply add a computed property using <code>objc_get/setAssociatedObject()</code> in the backing <code>get</code> and <code>set</code> blocks:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">extension</span> UIViewController {
+    <span class="pl-k">private</span> <span class="pl-k">struct</span> AssociatedKeys {
+        <span class="pl-k">static</span> <span class="pl-k">var</span> DescriptiveName <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>nsh_DescriptiveName<span class="pl-pds">"</span></span>
+    }
+
+    <span class="pl-k">var</span> descriptiveName: <span class="pl-c1">String</span>? {
+        <span class="pl-k">get</span> {
+            <span class="pl-k">return</span> objc_getAssociatedObject(<span class="pl-k">self</span>, <span class="pl-k">&amp;</span>AssociatedKeys<span class="pl-k">.</span>DescriptiveName) <span class="pl-k">as?</span> <span class="pl-c1">String</span>
+        }
+
+        <span class="pl-k">set</span> {
+            <span class="pl-k">if</span> <span class="pl-k">let</span> newValue <span class="pl-k">=</span> newValue {
+                objc_setAssociatedObject(
+                    <span class="pl-k">self</span>,
+                    <span class="pl-k">&amp;</span>AssociatedKeys<span class="pl-k">.</span>DescriptiveName,
+                    newValue <span class="pl-k">as</span> NSString?,
+                    <span class="pl-k">.</span>OBJC_ASSOCIATION_RETAIN_NONATOMIC
+                )
+            }
+        }
+    }
+}</pre></div>
+
+<blockquote>
+<p>Note the use of <code>static var</code> in a private nested <code>struct</code>—this pattern creates the static associated object key we need but doesn't muck up the global namespace.</p>
+</blockquote>
+
+<h2><a id="user-content-method-swizzling" class="anchor" href="#method-swizzling" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Method Swizzling</h2>
+
+<p>Sometimes for convenience, sometimes to work around a bug in a framework, or sometimes because there's just no other way, you need to modify the behavior of an existing class's methods. Method swizzling lets you swap the implementations of two methods, essentially overriding an existing method with your own while keeping the original around.</p>
+
+<p>In this example, we swizzle <code>UIViewController</code>'s <code>viewWillAppear</code> method to print a message any time a view is about to appear on screen. The swizzling happens in the special class method <code>initialize</code> (see note below); the replacement implementation is in the <code>nsh_viewWillAppear</code> method:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">extension</span> UIViewController {
+    <span class="pl-k">public</span> <span class="pl-k">override</span> <span class="pl-k">class</span> <span class="pl-k">func</span> <span class="pl-en">initialize</span>() {
+        <span class="pl-k">struct</span> Static {
+            <span class="pl-k">static</span> <span class="pl-k">var</span> token: dispatch_once_t <span class="pl-k">=</span> <span class="pl-c1">0</span>
+        }
+
+        <span class="pl-c">// make sure this isn't a subclass</span>
+        <span class="pl-k">if</span> <span class="pl-k">self</span> <span class="pl-k">!==</span> UIViewController<span class="pl-k">.</span><span class="pl-k">self</span> {
+            <span class="pl-k">return</span>
+        }
+
+        dispatch_once(<span class="pl-k">&amp;</span>Static<span class="pl-k">.</span>token) {
+            <span class="pl-k">let</span> originalSelector <span class="pl-k">=</span> Selector(<span class="pl-s"><span class="pl-pds">"</span>viewWillAppear:<span class="pl-pds">"</span></span>)
+            <span class="pl-k">let</span> swizzledSelector <span class="pl-k">=</span> Selector(<span class="pl-s"><span class="pl-pds">"</span>nsh_viewWillAppear:<span class="pl-pds">"</span></span>)
+
+            <span class="pl-k">let</span> originalMethod <span class="pl-k">=</span> class_getInstanceMethod(<span class="pl-k">self</span>, originalSelector)
+            <span class="pl-k">let</span> swizzledMethod <span class="pl-k">=</span> class_getInstanceMethod(<span class="pl-k">self</span>, swizzledSelector)
+
+            <span class="pl-k">let</span> didAddMethod <span class="pl-k">=</span> class_addMethod(<span class="pl-k">self</span>, originalSelector, method_getImplementation(swizzledMethod), method_getTypeEncoding(swizzledMethod))
+
+            <span class="pl-k">if</span> didAddMethod {
+                class_replaceMethod(<span class="pl-k">self</span>, swizzledSelector, method_getImplementation(originalMethod), method_getTypeEncoding(originalMethod))
+            } <span class="pl-k">else</span> {
+                method_exchangeImplementations(originalMethod, swizzledMethod)
+            }
+        }
+    }
+
+    <span class="pl-c">// MARK: - Method Swizzling</span>
+
+    <span class="pl-k">func</span> <span class="pl-en">nsh_viewWillAppear</span>(animated: <span class="pl-c1">Bool</span>) {
+        <span class="pl-k">self</span><span class="pl-k">.</span>nsh_viewWillAppear(animated)
+        <span class="pl-k">if</span> <span class="pl-k">let</span> name <span class="pl-k">=</span> <span class="pl-k">self</span><span class="pl-k">.</span>descriptiveName {
+            <span class="pl-c1">print</span>(<span class="pl-s"><span class="pl-pds">"</span>viewWillAppear: <span class="pl-pse">\(</span><span class="pl-s1">name</span><span class="pl-pse">)</span><span class="pl-pds">"</span></span>)
+        } <span class="pl-k">else</span> {
+            <span class="pl-c1">print</span>(<span class="pl-s"><span class="pl-pds">"</span>viewWillAppear: <span class="pl-pse">\(</span><span class="pl-s1"><span class="pl-k">self</span></span><span class="pl-pse">)</span><span class="pl-pds">"</span></span>)
+        }
+    }
+}</pre></div>
+
+<h3><a id="user-content-load-vs-initialize-swift-edition" class="anchor" href="#load-vs-initialize-swift-edition" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>load vs. initialize (Swift Edition)</h3>
+
+<p>The Objective-C runtime typically calls two class methods automatically when loading and initializing classes in your app's process: <code>load</code> and <code>initialize</code>. In the full article on <a href="/method-swizzling/">method swizzling</a>, Mattt writes that swizzling should <em>always</em> be done in <code>load()</code>, for safety and consistency. <code>load</code> is called only once per class and is called on each class that is loaded. On the other hand, a single <code>initialize</code> method can be called on a class and all its subclasses, which are likely to exist for <code>UIViewController</code>, or not called at all if that particular class isn't ever messaged.</p>
+
+<p>Unfortunately, a <code>load</code> class method implemented in Swift is <em>never</em> called by the runtime, rendering that recommendation an impossibility. Instead, we're left to pick among second-choice options:</p>
+
+<ul>
+<li><p><strong>Implement method swizzling in <code>initialize</code></strong><br>
+This can be done safely, so long as you check the type at execution time and wrap the swizzling in <code>dispatch_once</code> (which you should be doing anyway).</p></li>
+<li><p><strong>Implement method swizzling in the app delegate</strong><br>
+Instead of adding method swizzling via a class extension, simply add a method to the app delegate to be executed when <code>application(_:didFinishLaunchingWithOptions:)</code> is called. Depending on the classes you're modifying, this may be sufficient and should guarantee your code is executed every time.</p></li>
+</ul>
+
+<hr>
+
+<p>In closing, remember that tinkering with the Objective-C runtime should be much more of a last resort than a place to start. Modifying the frameworks that your code is based upon, as well as any third-party code you run, is a quick way to destabilize the whole stack. Tread softly!</p>
+</article></div>

@@ -1,0 +1,195 @@
+<div class="announce instapaper_body md" data-path="2014-04-14-xcode-plugins.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>tags</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>Xcode Plugins</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div>Xcode</div></td>
+
+  <td><div>popular</div></td>
+
+  <td><div>This week on NSHipster: a roundup of some of the most useful and exciting plugins for Xcode—ready for you to try out yourself today!</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>n/a</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>Apple is nothing if not consistent. From <a href="http://en.wikipedia.org/wiki/Pentalobe_screw">Pentalobular screws</a> to <a href="https://developer.apple.com/app-sandboxing/">Sandboxing</a>, customers are simply expected to relinquish a fair amount of control when they choose to buy a Mac or iPhone. Whether these design decisions are made to ensure a good user experience, or this control is exercised as an end in itself is debatable, but the reality is that in both hardware and software, Apple prefers an ivory tower to a bazaar.</p>
+
+<p>No better example of this can be found with Xcode: the very software that software developers use to build software for the walled ecosystems of iOS &amp; OS X software, <em>is itself a closed ecosystem</em>.</p>
+
+<p>Indeed, significant progress has been made in recent years to break open the developer workflow, from alternative IDEs like <a href="http://www.jetbrains.com/objc/?utm_source=nshipster">AppCode</a> to build tools like <a href="http://cocoapods.org">CocoaPods</a>, <a href="http://nshipster.com/xctool/">xctool</a> and <a href="http://nomad-cli.com">nomad</a>. However, the notion that Xcode itself could be customized and extended by mere mortals is extremely recent, and just now starting to pick up steam.</p>
+
+<p>Xcode has had a plugin architecture going back to when Interface Builder was its own separate app. However, this system was relatively obscure, undocumented, and not widely used by third parties. Despite this, developers like <a href="https://twitter.com/kattrali">Delisa Mason</a> and <a href="https://twitter.com/_supermarin">Marin Usalj</a> have done incredible work creating a stable and vibrant ecosystem of third-party Xcode extensions.</p>
+
+<p><strong>Simply install <a href="http://alcatraz.io">Alcatraz</a>, and pull down all of the plugins (and color schemes and templates) that you desire.</strong></p>
+
+<p>This week on NSHipster: a roundup of some of the most useful and exciting plugins for Xcode—ready for you to try out yourself today!</p>
+
+<blockquote>
+<p>And since these question come up every time there's an article with pictures:
+1. The color scheme is <a href="https://github.com/ChrisKempson/Tomorrow-Theme">Tomorrow Night</a>
+2. The app used to make animated GIFs is <a href="http://www.cockos.com/licecap/">LICEcap</a></p>
+</blockquote>
+
+<hr>
+
+<h2><a id="user-content-making-xcode-more-like-x" class="anchor" href="#making-xcode-more-like-x" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Making Xcode More Like <code>X</code></h2>
+
+<p>Just as New York became a melting pot of cultures from immigrants arriving at
+<a href="http://en.wikipedia.org/wiki/Ellis_Island">Ellis Island</a>, Xcode has welcomed the tired, poor, huddled masses of developers from every platform and language imaginable. Like those first wave Americans, who settled into their respective ethnic neighborhoods to re-establish their traditions in a new land, so too have new iOS developers brought over their preferred workflows and keybindings.</p>
+
+<p>Perhaps you would appreciate a taste of home in the land of Cupertino.</p>
+
+<h3><a id="user-content-vim" class="anchor" href="#vim" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Vim</h3>
+
+<p>Finding it <em>too easy</em> to quit Xcode? Try <a href="https://github.com/JugglerShu/XVim">XVim</a>, an experimental plugin that adds all of your favorite Vim keybindings.</p>
+
+<h3><a id="user-content-sublimetext" class="anchor" href="#sublimetext" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SublimeText</h3>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/scxcodeminimap.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/scxcodeminimap.png" alt="SCXcodeMiniMap" style="max-width:100%;"></a></p>
+
+<p>Do you miss having a code minimap along the right gutter of your editor to put things into perspective? Install  <a href="https://github.com/stefanceriu/SCXcodeMiniMap">SCXcodeMiniMap</a> and never again miss the tree nodes for the forest.</p>
+
+<h3><a id="user-content-atom" class="anchor" href="#atom" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Atom</h3>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/showingithub.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/showingithub.png" alt="Show in GitHub" style="max-width:100%;"></a></p>
+
+<p>Looking to be more in tune with GitHub? Add the <a href="https://github.com/larsxschneider/ShowInGitHub">Show in GitHub / BitBucket</a> plugin to open to the selected lines of a file online.</p>
+
+<h2><a id="user-content-fixing-xcode" class="anchor" href="#fixing-xcode" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Fixing Xcode</h2>
+
+<p>Rather than waiting with crossed fingers and clenched teeth each June, as Apple engineers unveil the next version of Xcode, developers now have the ability to tailor the de facto editor to their particular needs (and most importantly, fix what's broken).</p>
+
+<h3><a id="user-content-add-line-breaks-to-issue-navigator" class="anchor" href="#add-line-breaks-to-issue-navigator" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Add Line Breaks to Issue Navigator</h3>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/bbufullissuenavigator.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/bbufullissuenavigator.png" alt="BBUFullIssueNavigator" style="max-width:100%;"></a></p>
+
+<p>An annoyance going back to Xcode 4 has been the truncation of items in the Issues Navigator. Never again be frustrated by surprise ellipses when compiler warnings were just starting to get interesting, with  <a href="https://github.com/neonichu/BBUFullIssueNavigator">BBUFullIssueNavigator</a>.</p>
+
+<h3><a id="user-content-dismiss-debugging-console-when-typing" class="anchor" href="#dismiss-debugging-console-when-typing" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Dismiss Debugging Console When Typing</h3>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/bbudebuggertuckaway.gif" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/bbudebuggertuckaway.gif" alt="BBUDebuggerTuckAway" style="max-width:100%;"></a></p>
+
+<p>Another annoyance going back to Xcode 4 is how the debugging console seems to always get in the way. No more, with <a href="https://github.com/neonichu/BBUDebuggerTuckAway">BBUDebuggerTuckAway</a>. As soon as you start typing in the editor, the debugging window will get out of your way.</p>
+
+<h3><a id="user-content-add-ansi-color-support-to-debugging-console" class="anchor" href="#add-ansi-color-support-to-debugging-console" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Add ANSI Color Support to Debugging Console</h3>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/xcodecolors.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/xcodecolors.png" alt="XcodeColors" style="max-width:100%;"></a></p>
+
+<p><code>ncurses</code> enthusiasts will no doubt be excited by the <a href="https://github.com/robbiehanson/XcodeColors">XcodeColors</a> plugin, which adds support for ANSI colors to appear in the debugging console.</p>
+
+<h3><a id="user-content-hide-property-methods-in-source-navigator" class="anchor" href="#hide-property-methods-in-source-navigator" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Hide <code>@property</code> Methods in Source Navigator</h3>
+
+<p>Finding that <code>@property</code> synthesizers are creating a low signal-to-noise ratio in the Source Navigator? Let <a href="https://github.com/shpakovski/Xprop">Xprop</a> excise the cruft, and let the functions and methods shine through.</p>
+
+<h3><a id="user-content-blow-away-deriveddata-folder" class="anchor" href="#blow-away-deriveddata-folder" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Blow Away DerivedData Folder</h3>
+
+<p><a href="http://www.textfromxcode.com">Xcode texting you again?</a> <code>rm -rf</code>-ing the heck out of "Library/Developer/Xcode/DerivedData" does the trick every time, 90% of the time. Add a convenient button to your Xcode window to do this for you, with the <a href="https://github.com/kattrali/deriveddata-exterminator">DerivedData Exterminator</a>.</p>
+
+<h2><a id="user-content-turbocharging-xcode" class="anchor" href="#turbocharging-xcode" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Turbocharging Xcode</h2>
+
+<p>Not being the most verbose language in existence, Objective-C can use all the help it can get when it comes to autocompletion. Xcode does a lot of heavy lifting when it comes to class and method completion, but these plugins extend it even further:</p>
+
+<h3><a id="user-content-autocomplete-switch-statements" class="anchor" href="#autocomplete-switch-statements" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Autocomplete <code>switch</code> Statements</h3>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/scxcodeswitchexpander.gif" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/scxcodeswitchexpander.gif" alt="SCXcodeSwitchExpander" style="max-width:100%;"></a></p>
+
+<p>Fact: <code>switch</code> statements and <a href="http://nshipster.com/ns_enum-ns_options/"><code>NS_ENUM</code></a> go together like <a href="http://www.thaitable.com/thai/recipe/mango-on-sticky-rice">mango and sweet sticky rice</a>. The only way it could be improved would be with <a href="https://github.com/stefanceriu/SCXcodeSwitchExpander">SCXcodeSwitchExpander</a> with automagically fills out a <code>case</code> statement for each value in the enumeration.</p>
+
+<h3><a id="user-content-autocomplete-documentation" class="anchor" href="#autocomplete-documentation" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Autocomplete Documentation</h3>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/vvdocumenter.gif" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/vvdocumenter.gif" alt="VVDocumenter" style="max-width:100%;"></a></p>
+
+<p><a href="http://nshipster.com/documentation/">Documentation</a> adds a great deal of value to a code base, but it's a tough habit to cultivate. The <a href="https://github.com/onevcat/VVDocumenter-Xcode">VVDocumenter-Xcode</a> plugin does a great deal to reduce the amount of work necessary to add <a href="http://gentlebytes.com/appledoc/">appledoc</a>-compatible header documentation. Install it and wrap your code in a loving lexical embrace.</p>
+
+<h2><a id="user-content-formatting-xcode" class="anchor" href="#formatting-xcode" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Formatting Xcode</h2>
+
+<p><a href="http://nshipster.com/pragma/">"Code organization is a matter of hygiene"</a>, so you owe it to yourself and your team to keep whitespace consistent in your code base. Make it easier on yourself by automating the process with these plugins.</p>
+
+<h3><a id="user-content-code-formatting-with-clangformat" class="anchor" href="#code-formatting-with-clangformat" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Code Formatting with ClangFormat</h3>
+
+<p><a href="https://github.com/travisjeffery/ClangFormat-Xcode">ClangFormat-Xcode</a> is a convenient wrapper around the <a href="http://clang.llvm.org/docs/ClangFormat.html">ClangFormat</a> tool, which automatically formats whitespace according to a specified set of style guidelines. Eliminate begrudging formatting commits forever with this plugin.</p>
+
+<h3><a id="user-content-statement-alignment" class="anchor" href="#statement-alignment" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Statement Alignment</h3>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/xalign.gif" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/xalign.gif" alt="XAlign" style="max-width:100%;"></a></p>
+
+<p>Fancy yourself a code designer, automated formatters be damned? <a href="https://github.com/qfish/XAlign">XAlign</a> automatically aligns assignments <em>just so</em>, to appease your most egregious OCD tendencies.</p>
+
+<h2><a id="user-content-extending-xcode" class="anchor" href="#extending-xcode" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Extending Xcode</h2>
+
+<p>In a similar vein to what <a href="http://worrydream.com/LearnableProgramming/">Bret Victor writes about Learnable Programming</a>, these plugins push the boundaries of what we should expect from our editors, adding context and understanding to code without obscuring the meaning.</p>
+
+<h3><a id="user-content-inspect-nscolor--uicolor-instances" class="anchor" href="#inspect-nscolor--uicolor-instances" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Inspect <code>NSColor</code> / <code>UIColor</code> Instances</h3>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/colorsense.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/colorsense.png" alt="ColorSense" style="max-width:100%;"></a></p>
+
+<p>Telling what a color is from its RGB values alone is a hard-won skill, so faced with an <code>NSColor</code> or <code>UIColor</code> value, we have little recourse to know what it'll look like until the code is built and run. Enter <a href="https://github.com/omz/ColorSense-for-Xcode">ColorSense for Xcode</a></p>
+
+<p>Quoth the README:</p>
+
+<blockquote>
+<p>When you put the caret on one of your colors, it automatically shows the actual color as an overlay, and you can even adjust it on-the-fly with the standard OS X color picker.</p>
+</blockquote>
+
+<h3><a id="user-content-autocomplete-images-from-project-bundle" class="anchor" href="#autocomplete-images-from-project-bundle" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Autocomplete Images from Project Bundle</h3>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/ksimagenamed.gif" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/ksimagenamed.gif" alt="KSImageNamed" style="max-width:100%;"></a></p>
+
+<p>Similar to the ColorSense plugin, <a href="https://github.com/ksuther/KSImageNamed-Xcode">KSImageNamed</a> will preview and autocomplete images in <code>[UIImage imageNamed:]</code> declarations.</p>
+
+<h3><a id="user-content-semantics-highlighting" class="anchor" href="#semantics-highlighting" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Semantics Highlighting</h3>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/polychromatic.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/polychromatic.png" alt="Polychromatic" style="max-width:100%;"></a></p>
+
+<p>Any editor worth its salt is expected to have some form of syntax highlighting. But <a href="https://medium.com/p/3a6db2743a1e">this recent post by Evan Brooks</a> presents the idea of <em>semantic</em> highlighting in editors. The idea is that each variable within a scope would be assigned a particular color, which would be consistent across references. This way, one could easily tell the difference between two instance variables in the same method.</p>
+
+<p><a href="https://github.com/kolinkrewinkel/Polychromatic">Polychromatic</a> is a fascinating initial implementation of this for Xcode, and worth a look. The one downside is that this plugin requires the use of special desaturated color schemes—something that may be addressed in a future release, should this idea of semantic highlighting start to pick up mind share.</p>
+
+<h3><a id="user-content-localization" class="anchor" href="#localization" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Localization</h3>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/lin-1.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/lin-1.png" alt="Lin" style="max-width:100%;"></a></p>
+
+<p><a href="%7B%7B%20site.asseturl%20%7D%7D/lin-2.png" target="_blank"><img src="%7B%7B%20site.asseturl%20%7D%7D/lin-2.png" alt="Lin" style="max-width:100%;"></a></p>
+
+<p>It's no secret that NSHipster has <a href="http://nshipster.com/nslocalizedstring/">a soft spot for localization</a>. For this reason, this publication is emphatic in its recommendation of <a href="https://github.com/questbeat/Lin-Xcode5">Lin</a>, a clever Xcode plugin that brings the localization editor to your code.</p>
+
+<hr>
+
+<p>Xcode's plugin architecture is based on a number of private frameworks specific to Xcode, including DVTKit &amp; IDEKit. A <a href="https://github.com/luisobo/Xcode5-RuntimeHeaders">complete list</a> can be derived by running <a href="http://stevenygard.com/projects/class-dump/"><code>class-dump</code></a> on the Xcode app bundle.</p>
+
+<blockquote>
+<p>Using private frameworks would be, of course, verboten on the AppStore, but since plugins aren't distributed through these channels, developers are welcome to use whatever they want, however they want to.</p>
+</blockquote>
+
+<p>To get started on your own plugin, download the <a href="https://github.com/kattrali/Xcode5-Plugin-Template">Xcode5 Plugin Template</a>, using the other available plugins and class-dump'd headers as a guide for what can be done, and how to do it.</p>
+</article></div>

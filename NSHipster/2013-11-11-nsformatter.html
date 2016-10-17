@@ -1,0 +1,810 @@
+<div class="announce instapaper_body md" data-path="2013-11-11-nsformatter.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>tags</th>
+
+  <th>excerpt</th>
+
+  <th>revisions</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>NSFormatter</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div>Cocoa</div></td>
+
+  <td><div>nshipster, popular</div></td>
+
+  <td><div>Conversion is the tireless errand of software development. Most programming tasks boil down to some variation of transforming data into something more useful.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>2014-06-30</th>
+
+  <th>2015-02-17</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>Converted examples to Swift; added iOS 8 &amp; OS X Yosemite formatter classes.</div></td>
+
+  <td><div>Converted remaining examples to Swift; reintroduced Objective-C examples; added Objective-C examples for new formatter classes.</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+
+  <th>reviewed</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>2.0</div></td>
+
+  <td><div>September 8, 2015</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>Conversion is the tireless errand of software development. Most programming tasks boil down to some variation of transforming data into something more useful.</p>
+
+<p>In the case of user-facing software, converting data into human-readable form is an essential task, and a complex one at that. A user's preferred language, locale, calendar, or currency can all factor into how information should be displayed, as can other constraints, such as a label's dimensions.</p>
+
+<p>All of this is to say that sending <code>-description</code> to an object just isn't going to cut it in most circumstances. Even <code>+stringWithFormat:</code> is going to ultimately disappoint. No, the real tool for this job is <code>NSFormatter</code>.</p>
+
+<hr>
+
+<p><code>NSFormatter</code> is an abstract class for transforming data into a textual representation. It can also interpret valid textual representations back into data.</p>
+
+<p>Its origins trace back to <code>NSCell</code>, which is used to display information and accept user input in tables, form fields, and other views in AppKit. Much of the API design of <code>NSFormatter</code> reflects this.</p>
+
+<p>Foundation provides a number of concrete subclasses for <code>NSFormatter</code> (in addition to a single <code>NSFormatter</code> subclass provided in the MapKit framework):</p>
+
+<table><thead>
+<tr>
+<th>Class</th>
+<th>Availability</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><code>NSNumberFormatter</code></td>
+<td>iOS 2.0 / OS X Cheetah</td>
+</tr>
+<tr>
+<td><code>NSDateFormatter</code></td>
+<td>iOS 2.0 / OS X Cheetah</td>
+</tr>
+<tr>
+<td><code>NSByteCountFormatter</code></td>
+<td>iOS 6.0 / OS X Mountain Lion</td>
+</tr>
+<tr>
+<td><code>NSDateComponentsFormatter</code></td>
+<td>iOS 8.0 / OS X Yosemite</td>
+</tr>
+<tr>
+<td><code>NSDateIntervalFormatter</code></td>
+<td>iOS 8.0 / OS X Yosemite</td>
+</tr>
+<tr>
+<td><code>NSEnergyFormatter</code></td>
+<td>iOS 8.0 / OS X Yosemite</td>
+</tr>
+<tr>
+<td><code>NSMassFormatter</code></td>
+<td>iOS 8.0 / OS X Yosemite</td>
+</tr>
+<tr>
+<td><code>NSLengthFormatter</code></td>
+<td>iOS 8.0 / OS X Yosemite</td>
+</tr>
+<tr>
+<td><code>MKDistanceFormatter</code></td>
+<td>iOS 7.0 / OS X Mavericks</td>
+</tr>
+</tbody></table>
+
+<p>As some of the oldest members of the Foundation framework, <code>NSNumberFormatter</code> and <code>NSDateFormatter</code> are astonishingly well-suited to their respective domains, in that way only decade-old software can. This tradition of excellence is carried by the most recent incarnations as well.</p>
+
+<blockquote>
+<p>iOS 8 &amp; OS X Yosemite more than <em>doubled</em> the number of system-provided formatter classes, which is pretty remarkable.</p>
+</blockquote>
+
+<h2><a id="user-content-nsnumberformatter" class="anchor" href="#nsnumberformatter" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>NSNumberFormatter</h2>
+
+<p><code>NSNumberFormatter</code> handles every aspect of number formatting imaginable, from mathematical and scientific notation, to currencies and percentages. Nearly everything about the formatter can be customized, whether it's the currency symbol, grouping separator, number of significant digits, rounding behavior, fractions, character for infinity, string representation for <code>0</code>, or maximum / minimum values. It can even write out numbers in several languages!</p>
+
+<h3><a id="user-content-number-styles" class="anchor" href="#number-styles" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Number Styles</h3>
+
+<p>When using an <code>NSNumberFormatter</code>, the first order of business is to determine what kind of information you're displaying. Is it a price? Is this a whole number, or should decimal values be shown?</p>
+
+<p><code>NSNumberFormatter</code> can be configured for any one of the following formats, with the <code>numberStyle</code> property.</p>
+
+<p>To illustrate the differences between each style, here is how the number <code>12345.6789</code> would be displayed for each:</p>
+
+<h4><a id="user-content-nsnumberformatterstyle" class="anchor" href="#nsnumberformatterstyle" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>NSNumberFormatterStyle</code></h4>
+
+<table><thead>
+<tr>
+<th>Formatter Style</th>
+<th>Output</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><code>NoStyle</code></td>
+<td>12346</td>
+</tr>
+<tr>
+<td><code>DecimalStyle</code></td>
+<td>12345.6789</td>
+</tr>
+<tr>
+<td><code>CurrencyStyle</code></td>
+<td>$12345.68</td>
+</tr>
+<tr>
+<td><code>PercentStyle</code></td>
+<td>1234567%</td>
+</tr>
+<tr>
+<td><code>ScientificStyle</code></td>
+<td>1.23456789E4</td>
+</tr>
+<tr>
+<td><code>SpellOutStyle</code></td>
+<td>twelve thousand three hundred forty-five point six seven eight nine</td>
+</tr>
+</tbody></table>
+
+<h3><a id="user-content-locale-awareness" class="anchor" href="#locale-awareness" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Locale Awareness</h3>
+
+<p>By default, <code>NSNumberFormatter</code> will format according to the current locale settings, which determines things like currency symbol ($, £, €, etc.) and whether to use "," or "." as the decimal separator.</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> formatter <span class="pl-k">=</span> NSNumberFormatter()
+formatter<span class="pl-k">.</span>numberStyle <span class="pl-k">=</span> NSNumberFormatterStyle<span class="pl-k">.</span>CurrencyStyle
+
+<span class="pl-k">for</span> identifier <span class="pl-k">in</span> [<span class="pl-s"><span class="pl-pds">"</span>en_US<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>fr_FR<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>ja_JP<span class="pl-pds">"</span></span>] {
+    formatter<span class="pl-k">.</span>locale <span class="pl-k">=</span> NSLocale(localeIdentifier: identifier)
+    <span class="pl-c1">print</span>(<span class="pl-s"><span class="pl-pds">"</span><span class="pl-pse">\(</span><span class="pl-s1">identifier</span><span class="pl-pse">)</span> <span class="pl-pse">\(</span><span class="pl-s1">formatter<span class="pl-k">.</span>stringFromNumber(1234.5678)</span><span class="pl-pse">)</span><span class="pl-pds">"</span></span>)
+}</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSNumberFormatter</span> *numberFormatter = [[<span class="pl-c1">NSNumberFormatter</span> <span class="pl-c1">alloc</span>] <span class="pl-c1">init</span>];
+[numberFormatter <span class="pl-c1">setNumberStyle:</span>NSNumberFormatterCurrencyStyle];
+
+<span class="pl-k">for</span> (<span class="pl-c1">NSString</span> *identifier in @[<span class="pl-s"><span class="pl-pds">@"</span>en_US<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">@"</span>fr_FR<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">@"</span>ja_JP<span class="pl-pds">"</span></span>]) {
+    numberFormatter.<span class="pl-smi">locale</span> = [<span class="pl-c1">NSLocale</span> <span class="pl-c1">localeWithLocaleIdentifier:</span>identifier];
+    <span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span><span class="pl-c1">%@</span>: <span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, identifier, [numberFormatter <span class="pl-c1">stringFromNumber:</span>@(<span class="pl-c1">1234.5678</span>)]);
+}</pre></div>
+
+<table><thead>
+<tr>
+<th>Locale</th>
+<th>Formatted Number</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><code>en_US</code></td>
+<td>$1,234.57</td>
+</tr>
+<tr>
+<td><code>fr_FR</code></td>
+<td>1 234,57 €</td>
+</tr>
+<tr>
+<td><code>ja_JP</code></td>
+<td>￥1,235</td>
+</tr>
+</tbody></table>
+
+<blockquote>
+<p>All of those settings can be overridden on an individual basis, but for most apps, the best strategy would be deferring to the locale's default settings.</p>
+</blockquote>
+
+<h3><a id="user-content-rounding--significant-digits" class="anchor" href="#rounding--significant-digits" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Rounding &amp; Significant Digits</h3>
+
+<p>In order to prevent numbers from getting annoyingly pedantic (<em>"thirty-two point three three, repeating, of course..."</em>), make sure to get a handle on <code>NSNumberFormatter</code>'s rounding behavior.</p>
+
+<p>The easiest way to do this, would be to set the <code>usesSignificantDigits</code> property to <code>false</code>, and then set minimum and maximum number of significant digits appropriately. For example, a number formatter used for approximate distances in directions, would do well with significant digits to the tenths place for miles or kilometers, but only the ones place for feet or meters.</p>
+
+<blockquote>
+<p>For anything more advanced, an <code>NSDecimalNumberHandler</code> object can be passed as the <code>roundingBehavior</code> property of a number formatter.</p>
+</blockquote>
+
+<h2><a id="user-content-nsdateformatter" class="anchor" href="#nsdateformatter" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>NSDateFormatter</h2>
+
+<p><code>NSDateFormatter</code> is the be all and end all of getting textual representations of both dates and times.</p>
+
+<h3><a id="user-content-date--time-styles" class="anchor" href="#date--time-styles" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Date &amp; Time Styles</h3>
+
+<p>The most important properties for an <code>NSDateFormatter</code> object are its <code>dateStyle</code> and <code>timeStyle</code>. Like <code>NSNumberFormatter numberStyle</code>, these styles provide common preset configurations for common formats. In this case, the various formats are distinguished by their specificity (more specific = longer).</p>
+
+<p>Both properties share a single set of <code>enum</code> values:</p>
+
+<h4><a id="user-content-nsdateformatterstyle" class="anchor" href="#nsdateformatterstyle" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>NSDateFormatterStyle</code></h4>
+
+<table>
+    <thead>
+        <tr>
+            <th>Style</th>
+            <th>Description</th>
+            <th colspan="2">Examples</th>
+        </tr>
+        <tr>
+            <th colspan="2"></th>
+            <th>Date</th>
+            <th>Time</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><tt>NoStyle</tt></td>
+            <td>Specifies no style.</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><tt>ShortStyle</tt></td>
+            <td>Specifies a short style, typically numeric only.</td>
+            <td>11/23/37</td>
+            <td>3:30pm</td>
+        </tr>
+        <tr>
+            <td><tt>MediumStyle</tt></td>
+            <td>Specifies a medium style, typically with abbreviated text.</td>
+            <td>Nov 23, 1937</td>
+            <td>3:30:32pm</td>
+        </tr>
+        <tr>
+            <td><tt>LongStyle</tt></td>
+            <td>Specifies a long style, typically with full text.</td>
+            <td>November 23, 1937</td>
+            <td>3:30:32pm</td>
+        </tr>
+        <tr>
+            <td><tt>FullStyle</tt></td>
+            <td>Specifies a full style with complete details.</td>
+            <td>Tuesday, April 12, 1952 AD</td>
+            <td>3:30:42pm PST</td>
+        </tr>
+    </tbody>
+</table>
+
+<p><code>dateStyle</code> and <code>timeStyle</code> are set independently. For example, to display just the time, an <code>NSDateFormatter</code> would be configured with a <code>dateStyle</code> of <code>NoStyle</code>:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> formatter <span class="pl-k">=</span> NSDateFormatter()
+formatter<span class="pl-k">.</span>dateStyle <span class="pl-k">=</span> <span class="pl-k">.</span>NoStyle
+formatter<span class="pl-k">.</span>timeStyle <span class="pl-k">=</span> <span class="pl-k">.</span>MediumStyle
+
+<span class="pl-k">let</span> string <span class="pl-k">=</span> formatter<span class="pl-k">.</span>stringFromDate(NSDate())
+<span class="pl-c">// 10:42:21am</span></pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSDateFormatter</span> *formatter = [[<span class="pl-c1">NSDateFormatter</span> <span class="pl-c1">alloc</span>] <span class="pl-c1">init</span>];
+[formatter <span class="pl-c1">setDateStyle:</span>NSDateFormatterNoStyle];
+[formatter <span class="pl-c1">setTimeStyle:</span>NSDateFormatterMediumStyle];
+
+<span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span><span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, [formatter <span class="pl-c1">stringFromDate:</span>[<span class="pl-c1">NSDate</span> <span class="pl-c1">date</span>]]);
+<span class="pl-c">// 12:11:19pm</span></pre></div>
+
+<p>Whereas setting both to <code>LongStyle</code> yields the following:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> formatter <span class="pl-k">=</span> NSDateFormatter()
+formatter<span class="pl-k">.</span>dateStyle <span class="pl-k">=</span> <span class="pl-k">.</span>LongStyle
+formatter<span class="pl-k">.</span>timeStyle <span class="pl-k">=</span> <span class="pl-k">.</span>LongStyle
+
+<span class="pl-k">let</span> string <span class="pl-k">=</span> formatter<span class="pl-k">.</span>stringFromDate(NSDate())
+<span class="pl-c">// Monday June 30, 2014 10:42:21am PST</span></pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSDateFormatter</span> *formatter = [[<span class="pl-c1">NSDateFormatter</span> <span class="pl-c1">alloc</span>] <span class="pl-c1">init</span>];
+[formatter <span class="pl-c1">setDateStyle:</span>NSDateFormatterLongStyle];
+[formatter <span class="pl-c1">setTimeStyle:</span>NSDateFormatterLongStyle];
+
+<span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span><span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, [formatter <span class="pl-c1">stringFromDate:</span>[<span class="pl-c1">NSDate</span> <span class="pl-c1">date</span>]]);
+<span class="pl-c">// Monday, November 11, 2013 12:11:19pm PST</span></pre></div>
+
+<p>As you might expect, each aspect of the date format can alternatively be configured individually, a la carte. For any aspiring time wizards <code>NSDateFormatter</code> has a bevy of different knobs and switches to play with.</p>
+
+<h3><a id="user-content-relative-formatting" class="anchor" href="#relative-formatting" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Relative Formatting</h3>
+
+<p>As of iOS 4 / OS X Snow Leopard, <code>NSDateFormatter</code> supports relative date formatting for certain locales with the <code>doesRelativeDateFormatting</code> property. Setting this to <code>true</code> would format the date of <code>NSDate()</code> to "Today".</p>
+
+<h2><a id="user-content-nsbytecounterformatter" class="anchor" href="#nsbytecounterformatter" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>NSByteCounterFormatter</h2>
+
+<p>For apps that work with files, data in memory, or information downloaded from a network, <code>NSByteCounterFormatter</code> is a must-have. All of the great information unit formatting behavior seen in Finder and other OS X apps is available with <code>NSByteCounterFormatter</code>, without any additional configuration.</p>
+
+<p><code>NSByteCounterFormatter</code> takes a raw number of bytes and formats it into more meaningful units. For example, rather than bombarding a user with a ridiculous quantity, like "8475891734 bytes", a formatter can make a more useful approximation of "8.48 GB":</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> formatter <span class="pl-k">=</span> NSByteCountFormatter()
+<span class="pl-k">let</span> byteCount <span class="pl-k">=</span> <span class="pl-c1">8475891734</span>
+<span class="pl-k">let</span> string <span class="pl-k">=</span> formatter<span class="pl-k">.</span>stringFromByteCount(<span class="pl-c1">Int64</span>(byteCount))
+<span class="pl-c">// 8.48 GB</span></pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSByteCountFormatter</span> *formatter = [[<span class="pl-c1">NSByteCountFormatter</span> <span class="pl-c1">alloc</span>] <span class="pl-c1">init</span>];
+<span class="pl-k">long</span> <span class="pl-k">long</span> byteCount = <span class="pl-c1">8475891734</span>;
+<span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span><span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, [formatter <span class="pl-c1">stringFromByteCount:</span>byteCount]);
+<span class="pl-c">// 8.48 GB</span></pre></div>
+
+<p>By default, specifying a <code>0</code> byte count will yield a localized string like "Zero KB". For a more consistent format, set <code>allowsNonnumericFormatting</code> to <code>false</code>:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> formatter <span class="pl-k">=</span> NSByteCountFormatter()
+<span class="pl-k">let</span> byteCount <span class="pl-k">=</span> <span class="pl-c1">0</span>
+
+formatter<span class="pl-k">.</span>stringFromByteCount(<span class="pl-c1">Int64</span>(byteCount))
+<span class="pl-c">// Zero KB</span>
+
+formatter<span class="pl-k">.</span>allowsNonnumericFormatting <span class="pl-k">=</span> <span class="pl-c1">false</span>
+formatter<span class="pl-k">.</span>stringFromByteCount(<span class="pl-c1">Int64</span>(byteCount))
+<span class="pl-c">// 0 bytes</span></pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSByteCountFormatter</span> *formatter = [[<span class="pl-c1">NSByteCountFormatter</span> <span class="pl-c1">alloc</span>] <span class="pl-c1">init</span>];
+<span class="pl-k">long</span> <span class="pl-k">long</span> byteCount = <span class="pl-c1">0</span>;
+
+<span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span><span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, [formatter <span class="pl-c1">stringFromByteCount:</span>byteCount]);
+<span class="pl-c">// Zero KB</span>
+
+formatter.allowsNonnumericFormatting = <span class="pl-c1">NO</span>;
+<span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span><span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, [formatter <span class="pl-c1">stringFromByteCount:</span>byteCount]);
+<span class="pl-c">// 0 bytes</span></pre></div>
+
+<h3><a id="user-content-count-style" class="anchor" href="#count-style" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Count Style</h3>
+
+<p>One might think that dealing with bytes in code (which is, you know, <em>a medium of bytes</em>) would be a piece of cake, but in reality, even determining how many bytes are in a kilobyte remains a contentious and confusing matter. (<a href="http://xkcd.com/394/">Obligatory XKCD link</a>)</p>
+
+<p>In <a href="http://en.wikipedia.org/wiki/International_System_of_Units">SI</a>, the "kilo" prefix multiplies the base quantity by 1000 (i.e. 1km == 1000 m). However, being based on a binary number system, a more convenient convention has been to make a kilobyte equal to 2<sup>10</sup> bytes instead (i.e. 1KB == 1024 bytes). While the 2% difference is negligible at lower quantities, this confusion has significant implications when, for example, determining how much space is available on a 1TB drive (either 1000GB or 1024 GB).</p>
+
+<p>To complicate matters further, this binary prefix was codified into the <a href="http://en.wikipedia.org/wiki/Kibibyte">Kibibyte</a> standard by the <a href="http://en.wikipedia.org/wiki/International_Electrotechnical_Commission">IEC</a> in 1998... which is summarily ignored by the <a href="http://en.wikipedia.org/wiki/JEDEC_memory_standards#Unit_prefixes_for_semiconductor_storage_capacity">JEDEC</a>, the trade and engineering standardization organization representing the actual manufacturers of storage media. The result is that one can represent information as either <code>1kB</code>, <code>1KB</code>, or <code>1KiB</code>. (<a href="http://xkcd.com/927/">Another obligatory XKCD link</a>)</p>
+
+<p>Rather than get caught up in all of this, simply use the most appropriate count style for your particular use case:</p>
+
+<h4><a id="user-content-nsbytecountformattercountstyle" class="anchor" href="#nsbytecountformattercountstyle" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>NSByteCountFormatterCountStyle</h4>
+
+<p>| <code>File</code>    | Specifies display of file byte counts. The actual behavior for this is platform-specific; on OS X Mountain Lion, this uses the binary style, but that may change over time. |
+| <code>Memory</code>  | Specifies display of memory byte counts. The actual behavior for this is platform-specific; on OS X Mountain Lion, this uses the binary style, but that may change over time. |</p>
+
+<p>In most cases, it is better to use <code>File</code> or <code>Memory</code>, however decimal or binary byte counts can be explicitly specified with either of the following values:</p>
+
+<p>| <code>Decimal</code> | Causes 1000 bytes to be shown as 1 KB. |
+| <code>Binary</code>  | Causes 1024 bytes to be shown as 1 KB. |</p>
+
+<h2><a id="user-content-date--time-interval-formatters" class="anchor" href="#date--time-interval-formatters" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Date &amp; Time Interval Formatters</h2>
+
+<p><code>NSDateFormatter</code> is great for points in time, but when it comes to dealing with date or time ranges, Foundation was without any particularly great options. That is, until the introduction of <code>NSDateComponentsFormatter</code> &amp; <code>NSDateIntervalFormatter</code>.</p>
+
+<h2><a id="user-content-nsdatecomponentsformatter" class="anchor" href="#nsdatecomponentsformatter" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>NSDateComponentsFormatter</h2>
+
+<p>As the name implies, <code>NSDateComponentsFormatter</code> works with <code>NSDateComponents</code>, which was covered in <a href="http://nshipster.com/nsdatecomponents/">a previous NSHipster article</a>. An <code>NSDateComponents</code> object is a container for representing a combination of discrete calendar quantities, such as "1 day and 2 hours". <code>NSDateComponentsFormatter</code> provides localized representations of <code>NSDateComponents</code> objects in several different formats:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> formatter <span class="pl-k">=</span> NSDateComponentsFormatter()
+formatter<span class="pl-k">.</span>unitsStyle <span class="pl-k">=</span> <span class="pl-k">.</span>Full
+
+<span class="pl-k">let</span> components <span class="pl-k">=</span> NSDateComponents()
+components<span class="pl-k">.</span>day <span class="pl-k">=</span> <span class="pl-c1">1</span>
+components<span class="pl-k">.</span>hour <span class="pl-k">=</span> <span class="pl-c1">2</span>
+
+<span class="pl-k">let</span> string <span class="pl-k">=</span> formatter<span class="pl-k">.</span>stringFromDateComponents(components)
+<span class="pl-c">// 1 day, 2 hours</span></pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSDateComponentsFormatter</span> *formatter = [[<span class="pl-c1">NSDateComponentsFormatter</span> <span class="pl-c1">alloc</span>] <span class="pl-c1">init</span>];
+formatter.unitsStyle = NSDateComponentsFormatterUnitsStyleFull;
+
+<span class="pl-c1">NSDateComponents</span> *components = [[<span class="pl-c1">NSDateComponents</span> <span class="pl-c1">alloc</span>] <span class="pl-c1">init</span>];
+components.day = <span class="pl-c1">1</span>;
+components.hour = <span class="pl-c1">2</span>;
+
+<span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span><span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, [formatter <span class="pl-c1">stringFromDateComponents:</span>components]);
+<span class="pl-c">// 1 day, 2 hours</span></pre></div>
+
+<h4><a id="user-content-nsdatecomponentsformatterunitsstyle" class="anchor" href="#nsdatecomponentsformatterunitsstyle" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>NSDateComponentsFormatterUnitsStyle</code></h4>
+
+<table><thead>
+<tr>
+<th>Unit Style</th>
+<th>Example</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><code>Positional</code></td>
+<td>"1:10"</td>
+</tr>
+<tr>
+<td><code>Abbreviated</code></td>
+<td>"1h 10m"</td>
+</tr>
+<tr>
+<td><code>Short</code></td>
+<td>"1hr 10min"</td>
+</tr>
+<tr>
+<td><code>Full</code></td>
+<td>"1 hour, 10 minutes"</td>
+</tr>
+<tr>
+<td><code>SpellOut</code></td>
+<td>"One hour, ten minutes"</td>
+</tr>
+</tbody></table>
+
+<h3><a id="user-content-nsdateintervalformatter" class="anchor" href="#nsdateintervalformatter" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>NSDateIntervalFormatter</h3>
+
+<p>Like <code>NSDateComponentsFormatter</code>, <code>NSDateIntervalFormatter</code> deals with ranges of time, but specifically for time intervals between a start and end date:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> formatter <span class="pl-k">=</span> NSDateIntervalFormatter()
+formatter<span class="pl-k">.</span>dateStyle <span class="pl-k">=</span> <span class="pl-k">.</span>NoStyle
+formatter<span class="pl-k">.</span>timeStyle <span class="pl-k">=</span> <span class="pl-k">.</span>ShortStyle
+
+<span class="pl-k">let</span> fromDate <span class="pl-k">=</span> NSDate()
+<span class="pl-k">let</span> toDate <span class="pl-k">=</span> fromDate<span class="pl-k">.</span>dateByAddingTimeInterval(<span class="pl-c1">10000</span>)
+
+<span class="pl-k">let</span> string <span class="pl-k">=</span> formatter<span class="pl-k">.</span>stringFromDate(fromDate, toDate: toDate)
+<span class="pl-c">// 5:49 - 8:36 PM</span></pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSDateIntervalFormatter</span> *formatter = [[<span class="pl-c1">NSDateIntervalFormatter</span> <span class="pl-c1">alloc</span>] <span class="pl-c1">init</span>];
+formatter.dateStyle = <span class="pl-c1">NSDateIntervalFormatterNoStyle</span>;
+formatter.timeStyle = <span class="pl-c1">NSDateIntervalFormatterShortStyle</span>;
+
+<span class="pl-c1">NSDate</span> *fromDate = [<span class="pl-c1">NSDate</span> <span class="pl-c1">date</span>];
+<span class="pl-c1">NSDate</span> *toDate = [fromDate <span class="pl-c1">dateByAddingTimeInterval:</span><span class="pl-c1">10000</span>];
+
+<span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span><span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, [formatter <span class="pl-c1">stringFromDate:</span>fromDate <span class="pl-c1">toDate:</span>toDate]);
+<span class="pl-c">// 5:49 - 8:36 PM</span></pre></div>
+
+<h4><a id="user-content-nsdateintervalformatterstyle" class="anchor" href="#nsdateintervalformatterstyle" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>NSDateIntervalFormatterStyle</code></h4>
+
+<table><thead>
+<tr>
+<th>Formatter Style</th>
+<th>Time Output</th>
+<th>Date Output</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><code>NoStyle</code></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>ShortStyle</code></td>
+<td>5:51 AM - 7:37 PM</td>
+<td>6/30/14 - 7/11/14</td>
+</tr>
+<tr>
+<td><code>MediumStyle</code></td>
+<td>5:51:49 AM - 7:38:29 PM</td>
+<td>Jun 30, 2014 - Jul 11, 2014</td>
+</tr>
+<tr>
+<td><code>LongStyle</code></td>
+<td>6:02:54 AM GMT-8 - 7:49:34 PM GMT-8</td>
+<td>June 30, 2014 - July 11, 2014</td>
+</tr>
+<tr>
+<td><code>FullStyle</code></td>
+<td>6:03:28 PM Pacific Standard Time - 7:50:08 PM Pacific Standard Time</td>
+<td>Monday, June 30, 2014 - Friday, July 11, 2014</td>
+</tr>
+</tbody></table>
+
+<p><code>NSDateIntervalFormatter</code> and <code>NSDateComponentsFormatter</code> are useful for displaying regular and pre-defined ranges of times such as the such as the opening hours of a business, or frequency or duration of calendar events.</p>
+
+<blockquote>
+<p>In the case of displaying business hours, such as "Mon – Fri: 8:00 AM – 10:00 PM", use the <code>weekdaySymbols</code> of an <code>NSDateFormatter</code> to get the localized names of the days of the week.</p>
+</blockquote>
+
+<h2><a id="user-content-mass-length--energy-formatters" class="anchor" href="#mass-length--energy-formatters" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Mass, Length, &amp; Energy Formatters</h2>
+
+<p>Prior to iOS 8 / OS X Yosemite, working with physical quantities was left as an exercise to the developer. However, with the introduction of HealthKit, this functionality is now provided in the standard library.</p>
+
+<h3><a id="user-content-nsmassformatter" class="anchor" href="#nsmassformatter" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>NSMassFormatter</h3>
+
+<p>Although the fundamental unit of physical existence, mass is pretty much relegated to tracking the weight of users in HealthKit.</p>
+
+<blockquote>
+<p>Yes, mass and weight are different, but this is programming, not science class, so stop being pedantic.</p>
+</blockquote>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> massFormatter <span class="pl-k">=</span> NSMassFormatter()
+<span class="pl-k">let</span> kilograms <span class="pl-k">=</span> <span class="pl-c1">60</span><span class="pl-k">.</span><span class="pl-c1">0</span>
+<span class="pl-c1">print</span>(massFormatter<span class="pl-k">.</span>stringFromKilograms(kilograms)) <span class="pl-c">// "132 lb"</span></pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSMassFormatter</span> *massFormatter = [[<span class="pl-c1">NSMassFormatter</span> <span class="pl-c1">alloc</span>] <span class="pl-c1">init</span>];
+<span class="pl-k">double</span> kilograms = <span class="pl-c1">60</span>;
+<span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span><span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, [massFormatter <span class="pl-c1">stringFromKilograms:</span>kilograms]); <span class="pl-c">// "132 lb"</span></pre></div>
+
+<h3><a id="user-content-nslengthformatter" class="anchor" href="#nslengthformatter" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>NSLengthFormatter</h3>
+
+<p><code>NSLengthFormatter</code> can be thought of as a more useful version of <code>MKDistanceFormatter</code>, with more unit options and formatting options.</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> lengthFormatter <span class="pl-k">=</span> NSLengthFormatter()
+<span class="pl-k">let</span> meters <span class="pl-k">=</span> <span class="pl-c1">5_000</span><span class="pl-k">.</span><span class="pl-c1">0</span>
+<span class="pl-c1">print</span>(lengthFormatter<span class="pl-k">.</span>stringFromMeters(meters)) <span class="pl-c">// "3.107 mi"</span></pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSLengthFormatter</span> *lengthFormatter = [[<span class="pl-c1">NSLengthFormatter</span> <span class="pl-c1">alloc</span>] <span class="pl-c1">init</span>];
+<span class="pl-k">double</span> meters = <span class="pl-c1">5000</span>;
+<span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span><span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, [lengthFormatter <span class="pl-c1">stringFromMeters:</span>meters]); <span class="pl-c">// "3.107 mi"</span></pre></div>
+
+<h3><a id="user-content-nsenergyformatter" class="anchor" href="#nsenergyformatter" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>NSEnergyFormatter</h3>
+
+<p>Rounding out the new <code>NSFormatter</code> subclasses added for HealthKit is <code>NSEnergyFormatter</code>, which formats energy in Joules, the raw unit of work for exercises, and Calories, which is used when working with nutrition information.</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> energyFormatter <span class="pl-k">=</span> NSEnergyFormatter()
+energyFormatter<span class="pl-k">.</span>forFoodEnergyUse <span class="pl-k">=</span> <span class="pl-c1">true</span>
+
+<span class="pl-k">let</span> joules <span class="pl-k">=</span> <span class="pl-c1">10_000</span><span class="pl-k">.</span><span class="pl-c1">0</span>
+<span class="pl-c1">print</span>(energyFormatter<span class="pl-k">.</span>stringFromJoules(joules)) <span class="pl-c">// "2.39 Cal"</span></pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSEnergyFormatter</span> *energyFormatter = [[<span class="pl-c1">NSEnergyFormatter</span> <span class="pl-c1">alloc</span>] <span class="pl-c1">init</span>];
+energyFormatter.forFoodEnergyUse = <span class="pl-c1">YES</span>;
+
+<span class="pl-k">double</span> joules = <span class="pl-c1">10000</span>;
+<span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span><span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, [energyFormatter <span class="pl-c1">stringFromJoules:</span>joules]); <span class="pl-c">// "2.39 Cal"</span></pre></div>
+
+<hr>
+
+<h2><a id="user-content-re-using-formatter-instances" class="anchor" href="#re-using-formatter-instances" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Re-Using Formatter Instances</h2>
+
+<p>Perhaps the most critical detail to keep in mind when using formatters is that they are <em>extremely</em> expensive to create. Even just an <code>alloc init</code> of an <code>NSNumberFormatter</code> in a tight loop is enough to bring an app to its knees.</p>
+
+<p>Therefore, it's strongly recommended that formatters be created once, and re-used as much as possible.</p>
+
+<p>If it's just a single method using a particular formatter, a static instance is a good strategy:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-c">// a nested struct can have a static property, </span>
+<span class="pl-c">// created only the first time it's encountered.</span>
+<span class="pl-k">func</span> <span class="pl-en">fooWithNumber</span>(number: NSNumber) {
+    <span class="pl-k">struct</span> NumberFormatter {
+        <span class="pl-k">static</span> <span class="pl-k">let</span> formatter: NSNumberFormatter <span class="pl-k">=</span> {
+            <span class="pl-k">let</span> formatter <span class="pl-k">=</span> NSNumberFormatter()
+            formatter<span class="pl-k">.</span>numberStyle <span class="pl-k">=</span> <span class="pl-k">.</span>DecimalStyle
+            <span class="pl-k">return</span> formatter
+        }()
+    }
+
+    <span class="pl-k">let</span> string <span class="pl-k">=</span> NumberFormatter<span class="pl-k">.</span>formatter<span class="pl-k">.</span>stringFromNumber(number)
+    <span class="pl-c">// ...</span>
+}</pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c">// dispatch_once guarantees that the specified block is called </span>
+<span class="pl-c">// only the first time it's encountered.</span>
+- (<span class="pl-k">void</span>)fooWithNumber:(<span class="pl-c1">NSNumber</span> *)number {
+    <span class="pl-k">static</span> <span class="pl-c1">NSNumberFormatter</span> *_numberFormatter = <span class="pl-c1">nil</span>;
+    <span class="pl-k">static</span> <span class="pl-c1">dispatch_once_t</span> onceToken;
+    <span class="pl-c1">dispatch_once</span>(&amp;onceToken, ^{
+        _numberFormatter = [[<span class="pl-c1">NSNumberFormatter</span> <span class="pl-c1">alloc</span>] <span class="pl-c1">init</span>];
+        [_numberFormatter <span class="pl-c1">setNumberStyle:</span>NSNumberFormatterDecimalStyle];
+    });
+
+    <span class="pl-c1">NSString</span> *string = [_numberFormatter <span class="pl-c1">stringFromNumber:</span>number];
+
+    <span class="pl-c">// ...</span>
+}</pre></div>
+
+<p>If the formatter is used across several methods in the same class, that static instance can be refactored into a singleton method in Objective-C or a static type property in Swift:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">static</span> <span class="pl-k">let</span> numberFormatter: NSNumberFormatter <span class="pl-k">=</span> {
+    <span class="pl-k">let</span> formatter <span class="pl-k">=</span> NSNumberFormatter()
+    formatter<span class="pl-k">.</span>numberStyle <span class="pl-k">=</span> <span class="pl-k">.</span>DecimalStyle
+    <span class="pl-k">return</span> formatter
+}()</pre></div>
+
+<div class="highlight highlight-source-objc"><pre>+ (<span class="pl-c1">NSNumberFormatter</span> *)numberFormatter {
+    <span class="pl-k">static</span> <span class="pl-c1">NSNumberFormatter</span> *_numberFormatter = <span class="pl-c1">nil</span>;
+    <span class="pl-k">static</span> <span class="pl-c1">dispatch_once_t</span> onceToken;
+    <span class="pl-c1">dispatch_once</span>(&amp;onceToken, ^{
+        _numberFormatter = [[<span class="pl-c1">NSNumberFormatter</span> <span class="pl-c1">alloc</span>] <span class="pl-c1">init</span>];
+        [_numberFormatter <span class="pl-c1">setNumberStyle:</span>NSNumberFormatterDecimalStyle];
+    });
+
+    <span class="pl-k">return</span> _numberFormatter;
+}</pre></div>
+
+<p>If the same formatter is privately implemented across several classes, one could either expose it publicly in one of the classes, or implement the static singleton method in a category on <code>NSNumberFormatter</code>.</p>
+
+<blockquote>
+<p>Prior to iOS 7 and OS X Mavericks, <code>NSDateFormatter</code> &amp; <code>NSNumberFormatter</code> were not thread safe. Under these circumstances, the safest way to reuse formatter instances was with a thread dictionary:</p>
+</blockquote>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSMutableDictionary</span> *threadDictionary = [[<span class="pl-c1">NSThread</span> <span class="pl-c1">currentThread</span>] <span class="pl-c1">threadDictionary</span>];
+<span class="pl-c1">NSDateFormatter</span> *dateFormatter = threadDictionary[<span class="pl-s"><span class="pl-pds">@"</span>dateFormatter<span class="pl-pds">"</span></span>];
+<span class="pl-k">if</span> (!dateFormatter) {
+    dateFormatter = [[<span class="pl-c1">NSDateFormatter</span> <span class="pl-c1">alloc</span>] <span class="pl-c1">init</span>];
+    dateFormatter.<span class="pl-smi">locale</span> = [<span class="pl-c1">NSLocale</span> <span class="pl-c1">currentLocale</span>];
+    dateFormatter.<span class="pl-smi">dateStyle</span> = NSDateFormatterLongStyle;
+    dateFormatter.<span class="pl-smi">timeStyle</span> = NSDateFormatterShortStyle;
+    threadDictionary[<span class="pl-s"><span class="pl-pds">@"</span>dateFormatter<span class="pl-pds">"</span></span>] = dateFormatter;
+}
+
+<span class="pl-k">return</span> dateFormatter;</pre></div>
+
+<h2><a id="user-content-formatter-context" class="anchor" href="#formatter-context" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Formatter Context</h2>
+
+<p>Another addition to formatters in iOS 8 &amp; OS X Yosemite is the idea of formatter <em>contexts</em>. This allows the formatted output to be correctly integrated into the localized string. The most salient application of this is the letter casing of formatted output at different parts of a sentence in western locales, such as English. For example, when appearing at the beginning of a sentence or by itself, the first letter of formatted output would be capitalized, whereas it would be lowercase in the middle of a sentence.</p>
+
+<p>A <code>context</code> property is available for <code>NSDateFormatter</code>, <code>NSNumberFormatter</code>, <code>NSDateComponentsFormatter</code>, and <code>NSByteCountFormatter</code>, with the following values:</p>
+
+<table><thead>
+<tr>
+<th>Formatting Context</th>
+<th>Output</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><code>Standalone</code></td>
+<td>"About 2 hours"</td>
+</tr>
+<tr>
+<td><code>ListItem</code></td>
+<td>"About 2 hours"</td>
+</tr>
+<tr>
+<td><code>BeginningOfSentence</code></td>
+<td>"About 2 hours"</td>
+</tr>
+<tr>
+<td><code>MiddleOfSentence</code></td>
+<td>"about 2 hours"</td>
+</tr>
+<tr>
+<td><code>Dynamic</code></td>
+<td><em>(Depends)</em></td>
+</tr>
+</tbody></table>
+
+<p>In cases where localizations may change the position of formatted information within a string, the <code>Dynamic</code> value will automatically change depending on where it appears in the text.</p>
+
+<hr>
+
+<h2><a id="user-content-third-party-formatters" class="anchor" href="#third-party-formatters" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Third Party Formatters</h2>
+
+<p>An article on <code>NSFormatter</code> would be remiss without mention of some of the third party subclasses that have made themselves mainstays of everyday app development: <a href="http://boredzo.org/iso8601dateformatter/">ISO8601DateFormatter</a> &amp; <a href="https://github.com/mattt/FormatterKit">FormatterKit</a></p>
+
+<h3><a id="user-content-iso8601dateformatter" class="anchor" href="#iso8601dateformatter" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>ISO8601DateFormatter</h3>
+
+<p>Created by <a href="https://twitter.com/boredzo">Peter Hosey</a>, <a href="https://github.com/boredzo/iso-8601-date-formatter">ISO8601DateFormatter</a> has become the de facto way of dealing with <a href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601 timestamps</a>, used as the interchange format for dates by webservices (<a href="http://xkcd.com/1179/">Yet another obligatory XKCD link</a>).</p>
+
+<p>Although Apple provides <a href="https://developer.apple.com/library/ios/qa/qa1480/_index.html">official recommendations on parsing internet dates</a>, the reality of formatting quirks across makes the suggested <code>NSDateFormatter</code>-with-<code>en_US_POSIX</code>-locale approach untenable for real-world usage. <code>ISO8601DateFormatter</code> offers a simple, robust interface for dealing with timestamps:</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> formatter <span class="pl-k">=</span> ISO8601DateFormatter()
+<span class="pl-k">let</span> timestamp <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>2014-06-30T08:21:56+08:00<span class="pl-pds">"</span></span>
+<span class="pl-k">let</span> date <span class="pl-k">=</span> formatter<span class="pl-k">.</span>dateFromString(timestamp)</pre></div>
+
+<blockquote>
+<p>Although not an <code>NSFormatter</code> subclass, <a href="https://github.com/mattt/TransformerKit">TransformerKit</a> offers an extremely performant alternative for parsing and formatting both ISO 8601 and RFC 2822 timestamps.</p>
+</blockquote>
+
+<h3><a id="user-content-formatterkit" class="anchor" href="#formatterkit" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>FormatterKit</h3>
+
+<p><a href="https://github.com/mattt/FormatterKit">FormatterKit</a> has great examples of <code>NSFormatter</code> subclasses for use cases not currently covered by built-in classes, such as localized addresses, arrays, colors, locations, and ordinal numbers, and URL requests. It also boasts localization in 23 different languages, making it well-suited to apps serving every major market.</p>
+
+<h4><a id="user-content-tttaddressformatter" class="anchor" href="#tttaddressformatter" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>TTTAddressFormatter</h4>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> formatter <span class="pl-k">=</span> TTTAddressFormatter()
+formatter<span class="pl-k">.</span>locale <span class="pl-k">=</span> NSLocale(localeIdentifier: <span class="pl-s"><span class="pl-pds">"</span>en_GB<span class="pl-pds">"</span></span>)
+
+<span class="pl-k">let</span> street <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>221b Baker St<span class="pl-pds">"</span></span>
+<span class="pl-k">let</span> locality <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>Paddington<span class="pl-pds">"</span></span>
+<span class="pl-k">let</span> region <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>Greater London<span class="pl-pds">"</span></span>
+<span class="pl-k">let</span> postalCode <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>NW1 6XE<span class="pl-pds">"</span></span>
+<span class="pl-k">let</span> country <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>United Kingdom<span class="pl-pds">"</span></span>
+
+<span class="pl-k">let</span> string <span class="pl-k">=</span> formatter<span class="pl-k">.</span>stringFromAddressWithStreet(street: street, locality: locality, region: region, postalCode: postalCode, country: country)
+<span class="pl-c">// 221b Baker St / Paddington / Greater London / NW1 6XE / United Kingdom</span></pre></div>
+
+<div class="highlight highlight-source-objc"><pre>TTTAddressFormatter *formatter = [[TTTAddressFormatter <span class="pl-c1">alloc</span>] <span class="pl-c1">init</span>];
+[formatter <span class="pl-c1">setLocale:</span>[<span class="pl-c1">NSLocale</span> <span class="pl-c1">localeWithLocaleIdentifier:</span><span class="pl-s"><span class="pl-pds">@"</span>en_GB<span class="pl-pds">"</span></span>]];
+
+<span class="pl-c1">NSString</span> *street = <span class="pl-s"><span class="pl-pds">@"</span>221b Baker St<span class="pl-pds">"</span></span>;
+<span class="pl-c1">NSString</span> *locality = <span class="pl-s"><span class="pl-pds">@"</span>Paddington<span class="pl-pds">"</span></span>;
+<span class="pl-c1">NSString</span> *region = <span class="pl-s"><span class="pl-pds">@"</span>Greater London<span class="pl-pds">"</span></span>;
+<span class="pl-c1">NSString</span> *postalCode = <span class="pl-s"><span class="pl-pds">@"</span>NW1 6XE<span class="pl-pds">"</span></span>;
+<span class="pl-c1">NSString</span> *country = <span class="pl-s"><span class="pl-pds">@"</span>United Kingdom<span class="pl-pds">"</span></span>;
+
+<span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span><span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, [formatter <span class="pl-c1">stringFromAddressWithStreet:</span>street <span class="pl-c1">locality:</span>locality <span class="pl-c1">region:</span>region <span class="pl-c1">postalCode:</span>postalCode <span class="pl-c1">country:</span>country]);
+<span class="pl-c">// 221b Baker St / Paddington / Greater London / NW1 6XE / United Kingdom</span></pre></div>
+
+<h4><a id="user-content-tttarrayformatter" class="anchor" href="#tttarrayformatter" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>TTTArrayFormatter</h4>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> formatter <span class="pl-k">=</span> TTTArrayFormatter()
+formatter<span class="pl-k">.</span>usesAbbreviatedConjunction <span class="pl-k">=</span> <span class="pl-c1">true</span> <span class="pl-c">// Use '&amp;' instead of 'and'</span>
+formatter<span class="pl-k">.</span>usesSerialDelimiter <span class="pl-k">=</span> <span class="pl-c1">true</span> <span class="pl-c">// Omit Oxford Comma</span>
+
+<span class="pl-k">let</span> array <span class="pl-k">=</span> [<span class="pl-s"><span class="pl-pds">"</span>Russel<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Spinoza<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Rawls<span class="pl-pds">"</span></span>]
+<span class="pl-k">let</span> string <span class="pl-k">=</span> formatter<span class="pl-k">.</span>stringFromArray(array)
+<span class="pl-c">// "Russell, Spinoza &amp; Rawls"</span></pre></div>
+
+<div class="highlight highlight-source-objc"><pre>TTTArrayFormatter *formatter = [[TTTArrayFormatter <span class="pl-c1">alloc</span>] <span class="pl-c1">init</span>];
+formatter.usesAbbreviatedConjunction = <span class="pl-c1">YES</span>; <span class="pl-c">// Use '&amp;' instead of 'and'</span>
+formatter.usesSerialDelimiter = <span class="pl-c1">YES</span>; <span class="pl-c">// Omit Oxford Comma</span>
+
+<span class="pl-c1">NSArray</span> *array = @[<span class="pl-s"><span class="pl-pds">@"</span>Russel<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">@"</span>Spinoza<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">@"</span>Rawls<span class="pl-pds">"</span></span>];
+<span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span><span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, [formatter <span class="pl-c1">stringFromArray:</span>array]);
+<span class="pl-c">// "Russell, Spinoza &amp; Rawls"</span></pre></div>
+
+<h4><a id="user-content-tttcolorformatter" class="anchor" href="#tttcolorformatter" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>TTTColorFormatter</h4>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> formatter <span class="pl-k">=</span> TTTColorFormatter()
+<span class="pl-k">let</span> color <span class="pl-k">=</span> UIColor<span class="pl-k">.</span>orangeColor()
+<span class="pl-k">let</span> hex <span class="pl-k">=</span> formatter<span class="pl-k">.</span>hexadecimalStringFromColor(color);
+<span class="pl-c">// #ffa500</span></pre></div>
+
+<div class="highlight highlight-source-objc"><pre>TTTColorFormatter *formatter = [[TTTColorFormatter <span class="pl-c1">alloc</span>] <span class="pl-c1">init</span>];
+UIColor *color = [UIColor <span class="pl-c1">orangeColor</span>];
+<span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span><span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, [formatter <span class="pl-c1">hexadecimalStringFromColor:</span>color]);
+<span class="pl-c">// #ffa500</span></pre></div>
+
+<h4><a id="user-content-tttlocationformatter" class="anchor" href="#tttlocationformatter" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>TTTLocationFormatter</h4>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> formatter <span class="pl-k">=</span> TTTLocationFormatter()
+formatter<span class="pl-k">.</span>numberFormatter<span class="pl-k">.</span>maximumSignificantDigits <span class="pl-k">=</span> <span class="pl-c1">4</span>
+formatter<span class="pl-k">.</span>bearingStyle <span class="pl-k">=</span> TTTBearingAbbreviationWordStyle
+formatter<span class="pl-k">.</span>unitSystem <span class="pl-k">=</span> TTTImperialSystem
+
+<span class="pl-k">let</span> pittsburgh <span class="pl-k">=</span> CLLocation(latitude: <span class="pl-c1">40</span><span class="pl-k">.</span><span class="pl-c1">4405556</span>, longitude: <span class="pl-c1">-79</span><span class="pl-k">.</span><span class="pl-c1">9961111</span>)
+<span class="pl-k">let</span> austin <span class="pl-k">=</span> CLLocation(latitude: <span class="pl-c1">30</span><span class="pl-k">.</span><span class="pl-c1">2669444</span>, longitude: <span class="pl-c1">-97</span><span class="pl-k">.</span><span class="pl-c1">7427778</span>)
+<span class="pl-k">let</span> string <span class="pl-k">=</span> formatter<span class="pl-k">.</span>stringFromDistanceAndBearingFromLocation(pittsburgh, toLocation: austin)
+<span class="pl-c">// "1,218 miles SW"</span></pre></div>
+
+<div class="highlight highlight-source-objc"><pre>TTTLocationFormatter *formatter = [[TTTLocationFormatter <span class="pl-c1">alloc</span>] <span class="pl-c1">init</span>];
+formatter.numberFormatter.maximumSignificantDigits = <span class="pl-c1">4</span>;
+formatter.bearingStyle = TTTBearingAbbreviationWordStyle;
+formatter.unitSystem = TTTImperialSystem;
+
+CLLocation *pittsburgh = [[CLLocation <span class="pl-c1">alloc</span>] <span class="pl-c1">initWithLatitude:</span><span class="pl-c1">40.4405556</span> <span class="pl-c1">longitude:</span>-<span class="pl-c1">79.9961111</span>];
+CLLocation *austin = [[CLLocation <span class="pl-c1">alloc</span>] <span class="pl-c1">initWithLatitude:</span><span class="pl-c1">30.2669444</span> <span class="pl-c1">longitude:</span>-<span class="pl-c1">97.7427778</span>];
+<span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span><span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, [formatter <span class="pl-c1">stringFromDistanceAndBearingFromLocation:</span>pittsburgh <span class="pl-c1">toLocation:</span>austin]);
+<span class="pl-c">// "1,218 miles SW"</span></pre></div>
+
+<h4><a id="user-content-tttordinalnumberformatter" class="anchor" href="#tttordinalnumberformatter" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>TTTOrdinalNumberFormatter</h4>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> formatter <span class="pl-k">=</span> TTTOrdinalNumberFormatter()
+formatter<span class="pl-k">.</span>locale <span class="pl-k">=</span> NSLocale(localeIdentifier: <span class="pl-s"><span class="pl-pds">"</span>fr_FR<span class="pl-pds">"</span></span>)
+formatter<span class="pl-k">.</span>grammaticalGender <span class="pl-k">=</span> TTTOrdinalNumberFormatterMaleGender
+<span class="pl-k">let</span> string <span class="pl-k">=</span> NSString(format: NSLocalizedString(<span class="pl-s"><span class="pl-pds">"</span>You came in %@ place<span class="pl-pds">"</span></span>, comment: <span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>), formatter<span class="pl-k">.</span>stringFromNumber(<span class="pl-c1">2</span>))
+<span class="pl-c">// "Vous êtes arrivé à la 2e place!"</span></pre></div>
+
+<div class="highlight highlight-source-objc"><pre>TTTOrdinalNumberFormatter *formatter = [[TTTOrdinalNumberFormatter <span class="pl-c1">alloc</span>] <span class="pl-c1">init</span>];
+[formatter <span class="pl-c1">setLocale:</span>[<span class="pl-c1">NSLocale</span> <span class="pl-c1">localeWithLocaleIdentifier:</span><span class="pl-s"><span class="pl-pds">@"</span>fr_FR<span class="pl-pds">"</span></span>]];
+[formatter <span class="pl-c1">setGrammaticalGender:</span>TTTOrdinalNumberFormatterMaleGender];
+<span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span><span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, [<span class="pl-c1">NSString</span> <span class="pl-c1">stringWithFormat:</span>NSLocalizedString(<span class="pl-s"><span class="pl-pds">@"</span>You came in <span class="pl-c1">%@</span> place!<span class="pl-pds">"</span></span>, <span class="pl-c1">nil</span>), [formatter <span class="pl-c1">stringFromNumber:</span>@<span class="pl-c1">2</span>]]);
+<span class="pl-c">// "Vous êtes arrivé à la 2e place!"</span></pre></div>
+
+<h4><a id="user-content-ttturlrequestformatter" class="anchor" href="#ttturlrequestformatter" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>TTTURLRequestFormatter</h4>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-k">let</span> request <span class="pl-k">=</span> NSMutableURLRequest(URL: NSURL(string: <span class="pl-s"><span class="pl-pds">"</span>http://nshipster.com<span class="pl-pds">"</span></span>)<span class="pl-k">!</span>)
+request<span class="pl-k">.</span>HTTPMethod <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>GET<span class="pl-pds">"</span></span>
+request<span class="pl-k">.</span>addValue(<span class="pl-s"><span class="pl-pds">"</span>text/html<span class="pl-pds">"</span></span>, forHTTPHeaderField: <span class="pl-s"><span class="pl-pds">"</span>Accept<span class="pl-pds">"</span></span>)
+
+<span class="pl-k">let</span> command <span class="pl-k">=</span> TTTURLRequestFormatter<span class="pl-k">.</span>cURLCommandFromURLRequest(request)
+<span class="pl-c">// curl -X GET "https://nshipster.com/" -H "Accept: text/html"</span></pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c1">NSMutableURLRequest</span> *request = [[<span class="pl-c1">NSMutableURLRequest</span> <span class="pl-c1">alloc</span>] <span class="pl-c1">initWithURL:</span>[<span class="pl-c1">NSURL</span> <span class="pl-c1">URLWithString:</span><span class="pl-s"><span class="pl-pds">@"</span>http://www.example.com/<span class="pl-pds">"</span></span>]];
+[request <span class="pl-c1">setHTTPMethod:</span><span class="pl-s"><span class="pl-pds">@"</span>GET<span class="pl-pds">"</span></span>];
+[request <span class="pl-c1">addValue:</span><span class="pl-s"><span class="pl-pds">@"</span>text/html<span class="pl-pds">"</span></span> <span class="pl-c1">forHTTPHeaderField:</span><span class="pl-s"><span class="pl-pds">@"</span>Accept<span class="pl-pds">"</span></span>];
+<span class="pl-c1">NSLog</span>(<span class="pl-s"><span class="pl-pds">@"</span><span class="pl-c1">%@</span><span class="pl-pds">"</span></span>, [TTTURLRequestFormatter <span class="pl-c1">cURLCommandFromURLRequest:</span>request]);
+<span class="pl-c">// curl -X GET "https://nshipster.com/" -H "Accept: text/html"</span></pre></div>
+
+<hr>
+
+<p>If your app deals in numbers or dates (or time intervals or bytes or distance or length or energy or mass), <code>NSFormatter</code> is indispensable. Actually, if your app doesn't… then what <em>does</em> it do, exactly?</p>
+
+<p>Presenting useful information to users is as much about content as presentation. Invest in learning all of the secrets of <code>NSNumberFormatter</code>, <code>NSDateFormatter</code>, and the rest of the Foundation formatter crew to get everything exactly how you want them.</p>
+
+<p>And if you find yourself with formatting logic scattered across your app, consider creating your own <code>NSFormatter</code> subclass to consolidate all of that business logic in one place.</p>
+</article></div>

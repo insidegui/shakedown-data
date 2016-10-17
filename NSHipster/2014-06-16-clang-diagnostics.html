@@ -1,0 +1,101 @@
+<div class="announce instapaper_body md" data-path="2014-06-16-clang-diagnostics.md" id="file"><article class="markdown-body entry-content" itemprop="text"><table data-table-type="yaml-metadata">
+  <thead>
+  <tr>
+  <th>title</th>
+
+  <th>author</th>
+
+  <th>category</th>
+
+  <th>excerpt</th>
+
+  <th>status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>Clang Diagnostics</div></td>
+
+  <td><div>Mattt Thompson</div></td>
+
+  <td><div>Objective-C</div></td>
+
+  <td><div>Diagnostics combine logic with analytics to arrive at a conclusion. It's science and engineering at their purest. It's human reasoning at its most potent. For us developers, our medium of code informs the production of subsequent code, creating a positive feedback loop that has catapulted the development of technology exponentially over the last half century. For us Objective-C developers specifically, the most effective diagnostics come from Clang.</div></td>
+
+  <td><div><table>
+  <thead>
+  <tr>
+  <th>swift</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><div>n/a</div></td>
+  </tr>
+  </tbody>
+</table></div></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>Diagnostics combine logic with analytics to arrive at a conclusion. It's science and engineering at their purest. It's human reasoning at its most potent.</p>
+
+<p>Within the medical profession, a diagnosis is made through instinct backed by lab samples. For industrial manufacturing, one diagnoses a product fault through an equal application of statistics and gumption.</p>
+
+<p>For us developers, our medium of code informs the production of subsequent code, creating a positive feedback loop that has catapulted the development of technology exponentially over the last half century. For us Objective-C developers specifically, the most effective diagnostics come from Clang.</p>
+
+<p>Clang is the C / Objective-C front-end to the LLVM compiler. It has a deep understanding of the syntax and semantics of Objective-C, and is much of the reason that Objective-C is such a capable language today.</p>
+
+<p>That amazing readout you get when you "Build &amp; Analyze" (<code>⌘⇧B</code>) is a function of the softer, more contemplative side of Clang: its code diagnostics.</p>
+
+<p>In our article about <a href="http://nshipster.com/pragma/"><code>#pragma</code></a>, we quipped:</p>
+
+<blockquote>
+<p>Pro tip: Try setting the <code>-Weverything</code> flag and checking the "Treat Warnings as Errors" box your build settings. This turns on Hard Mode in Xcode.</p>
+</blockquote>
+
+<p>Now, we stand by this advice, and encourage other developers to step up their game and treat build warnings more seriously. However, there are some situations in which you and Clang reach an impasse. For example, consider the following <code>switch</code> statement:</p>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-k">switch</span> (style) {
+    <span class="pl-k">case</span> UITableViewCellStyleDefault:
+    <span class="pl-k">case</span> UITableViewCellStyleValue1:
+    <span class="pl-k">case</span> UITableViewCellStyleValue2:
+    <span class="pl-k">case</span> UITableViewCellStyleSubtitle:
+        <span class="pl-c">// ...</span>
+    <span class="pl-k">default</span>:
+        <span class="pl-k">return</span>;
+}</pre></div>
+
+<p>When certain flags are enabled, Clang will complain that the "default label in switch which covers all enumeration values". However, if we <em>know</em> that, zooming out into a larger context, <code>style</code> is (for better or worse) derived from an external representation (e.g. JSON resource) that allows for unconstrained <code>NSInteger</code> values, the <code>default</code> case is a necessary safeguard. The only way to insist on this inevitability is to use <code>#pragma</code> to ignore a warning flag temporarily:</p>
+
+<blockquote>
+<p><code>push</code> &amp; <code>pop</code> are used to save and restore the compiler state, similar to Core Graphics or OpenGL contexts.</p>
+</blockquote>
+
+<div class="highlight highlight-source-objc"><pre>#<span class="pl-k">pragma</span> clang diagnostic push
+#<span class="pl-k">pragma</span> clang diagnostic ignored "-Wcovered-switch-default"
+<span class="pl-k">switch</span> (style) {
+    <span class="pl-k">case</span> UITableViewCellStyleDefault:
+    <span class="pl-k">case</span> UITableViewCellStyleValue1:
+    <span class="pl-k">case</span> UITableViewCellStyleValue2:
+    <span class="pl-k">case</span> UITableViewCellStyleSubtitle:
+        <span class="pl-c">// ...</span>
+    <span class="pl-k">default</span>:
+        <span class="pl-k">return</span>;
+}
+#<span class="pl-k">pragma</span> clang diagnostic pop</pre></div>
+
+<blockquote>
+<p>Again, and this cannot be stressed enough, Clang is right at least 99% of the time. Actually fixing an analyzer warning is <em>strongly</em> preferred to ignoring it. Use <code>#pragma clang diagnostic ignored</code> as a method of last resort.</p>
+</blockquote>
+
+<p>This week, as a public service, we've compiled a (mostly) comprehensive list of Clang warning strings and their associated flags, which can be found here:</p>
+
+<p><strong><a href="http://fuckingclangwarnings.com">F***ingClangWarnings.com</a></strong></p>
+
+<p>You can also find the compiler and analyzer flags for any warning you might encounter by <code>^</code>-Clicking the corresponding entry in the Xcode Issue Navigator and selecting "Reveal in Log". (If this option is disabled, try building the project again).</p>
+
+<hr>
+
+<p>Corrections? Additions? Open a <a href="https://github.com/mattt/fuckingclangwarnings.com/pulls">Pull Request</a> to submit your change. Any help would be greatly appreciated.</p>
+</article></div>
